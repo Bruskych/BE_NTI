@@ -1,0 +1,44 @@
+/*
+
+--- START ---
+C:\xampp\php\php.exe artisan serve
+php artisan serve
+
+--- TINKER ---
+php artisan tinker
+use App\Models\Note;
+Note::all();
+
+--- API ---
+php artisan install:api
+
+--- DATABASE ---
+php artisan make:migration create_NAME_table
+
+php artisan migrate                 -> load
+php artisan db:seed                 -> start add seeder
+php artisan migrate:rollback        -> back 1 step
+php artisan migrate:fresh           -> delete
+php artisan migrate:fresh --seed    -> delete+add
+
+php artisan make:seeder NameSeeder
+
+--- CONTROLLER ---
+php artisan make:controller NameController --api
+
+--- MODEL ---
+php artisan make:model Name -m
+
+--- POLICIES ---
+php artisan make:policy NotePolicy --model=Note
+
+--- LISTENER ---
+php artisan make:listener NAME --event=Registered
+
+--- MAIL ---
+php artisan make:mail WelcomeMail
+
+--- ARTISAN COMMAND ---
+php artisan make:command SendPremiumExpiryEmails
+
+*/
