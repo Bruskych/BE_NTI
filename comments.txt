@@ -1,5 +1,12 @@
 /*
 
+--- DOCKER ---
+1. cd C:\Users\user_name\PhpstormProjects\NTI_project\NTI_backend       -> Project folder where you have Dockerfile
+2. docker compose up --build                                            -> Build (Connect docker)
+
+--- GIT ---
+git reset --soft HEAD~1             -> delete last commit
+
 --- START ---
 C:\xampp\php\php.exe artisan serve
 php artisan serve
