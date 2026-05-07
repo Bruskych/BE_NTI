@@ -2,24 +2,39 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            // 1. Roly a oprávnenia — musí byť prvé
+            RoleAndPermissionSeeder::class,
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            // 2. Programy A a B
+            ProgramSeeder::class,
+
+            // 3. Špecializácie / tematické kategórie
+            SpecializationSeeder::class,
+
+            // 4. Šablóny hodnotenia + kritériá
+            EvaluationTemplateSeeder::class,
+
+            // 5. Testovacie používateľské účty + organizácia
+            UserSeeder::class,
+
+            // 6. Formulárové polia pre Program A a B
+            FormFieldSeeder::class,
+
+            // 7. Testovacia výzva pre Program A
+            CallSeeder::class,
+
+            // 8. Testovacie zadania pre Program B
+            ChallengeSeeder::class,
+
+            // 9. Testovacie tímy
+            TeamSeeder::class,
         ]);
     }
 }
