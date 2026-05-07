@@ -11,6 +11,8 @@ class EvaluationCriteria extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'evaluation_criteria';
+
     protected $fillable = [
         'template_id',
         'name',
