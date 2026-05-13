@@ -11,8 +11,14 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Сначало проверка языка, потом проверка роли
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->append(
+            \App\Http\Middleware\SetLocale::class
+        );
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
