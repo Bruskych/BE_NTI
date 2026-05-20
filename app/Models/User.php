@@ -125,7 +125,12 @@ class User extends Authenticatable implements HasMedia
 
     public function isStudent(): bool
     {
-        return $this->hasRole('student') || $this->hasRole('team_leader');
+        return $this->hasRole('student');
+    }
+
+    public function isTeamLeader(): bool
+    {
+        return $this->hasRole('team_leader');
     }
 
     public function isCompany(): bool
@@ -138,8 +143,48 @@ class User extends Authenticatable implements HasMedia
         return $this->hasRole('mentor');
     }
 
+    public function isEvaluator(): bool
+    {
+        return $this->hasRole('evaluator');
+    }
+
+    public function isContentEditor(): bool
+    {
+        return $this->hasRole('content_editor');
+    }
+
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin') || $this->hasRole('super_admin');
+        return $this->hasRole('admin');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super_admin');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Group Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function isStaff(): bool
+    {
+        return $this->hasAnyRole([
+            'admin',
+            'super_admin',
+            'content_editor',
+            'evaluator',
+            'mentor'
+        ]);
+    }
+
+    public function isManagement(): bool
+    {
+        return $this->hasAnyRole([
+            'admin',
+            'super_admin'
+        ]);
     }
 }

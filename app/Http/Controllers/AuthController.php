@@ -16,7 +16,7 @@ class AuthController extends Controller
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             // Проверка что роль одна из допустимых
-            'role'     => 'required|string|in:student,leader,company,mentor'
+            'role'     => 'required|string|in:student,company,mentor'
         ]);
 
         // Создание пользователя без роли
@@ -58,8 +58,9 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'token' => $token,
+            'token' => $token, // Загрузка токена на фронт
             'user'  => $user->load('roles'), // Загрузка ролей на фронт
+            'notifications' => $user->notifications()->latest()->get(), // Загрузка уведомлений на фронт
         ]);
     }
     public function me(Request $request)

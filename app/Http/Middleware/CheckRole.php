@@ -11,16 +11,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!$request->user() || !in_array($request->user()->role, $roles)) {
-            return response()->json(['message' => __('messages.access_denied')], 403);
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'message' => __('messages.access_denied')
+            ], 403);
         }
-        return $next($request);
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) {
+                return $next($request);
+            }
+        }
+        return response()->json([
+            'message' => __('messages.access_denied')
+        ], 403);
     }
 }
