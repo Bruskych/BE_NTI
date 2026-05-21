@@ -65,22 +65,25 @@ class AuthController extends Controller
     }
     public function me(Request $request)
     {
-        // Мы берем текущего юзера из запроса (его туда положил Sanctum)
         $user = $request->user();
-
-        // Подгружаем роли, чтобы на фронте работали проверки прав
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
         $user->load('roles');
-
         return response()->json([
-            'user' => $user
+            'user' => $user,
+            'notifications' => $user->notifications()->latest()->get()
         ]);
     }
     public function logout(Request $request)
     {
-        // Удаление токена который был использован для этого запроса
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user()) {
+            $request->user()->currentAccessToken()?->delete();
+        }
         return response()->json([
-            'message' => 'Сессия успешно завершена'
+            'message' => 'Logged out'
         ]);
     }
 }
