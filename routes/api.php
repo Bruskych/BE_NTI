@@ -21,7 +21,13 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin,super_admin'])
     ->prefix('admin')
     ->group(function () {
+        // Заявки студентов (Принять/Отклонить)
         Route::get('/students/pending', [AdminController::class, 'pendingStudents']);
         Route::post('/students/{user}/approve', [AdminController::class, 'approveStudent']);
         Route::post('/students/{user}/reject', [AdminController::class, 'rejectStudent']);
+
+        // Заявки компаний (Принять/Отклонить)
+        Route::get('/companies/pending', [AdminController::class, 'pendingCompanies']);
+        Route::post('/companies/{id}/approve', [AdminController::class, 'approveCompany']);
+        Route::post('/companies/{id}/reject', [AdminController::class, 'rejectCompany']);
     });
