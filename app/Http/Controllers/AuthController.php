@@ -16,8 +16,12 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Регистрация нового пользователя (Студент или Компания).
+     */
     public function register(Request $request)
     {
+        // Валидация входящего запроса на регистрацию
         $request->validate([
             'name'             => 'required|string|max:255',
             'email'            => 'required|string|email|max:255|unique:users',
@@ -31,23 +35,28 @@ class AuthController extends Controller
         ]);
 
         try {
+            // Выполняем все связанные операции создания записей внутри одной БД-транзакции
             $result = DB::transaction(function () use ($request) {
+                // Создание базовой учетной записи пользователя
                 $user = User::create([
                     'name'     => $request->name,
                     'email'    => $request->email,
                     'password' => Hash::make($request->password),
                 ]);
 
+                // Логика регистрации для роли СТУДЕНТ
                 if ($request->role === 'student') {
                     $user->assignRole('visitor');
                     $user->studentProfile()->create();
 
+                    // Создаем персональную команду для студента
                     $team = Team::create([
                         'name'      => 'Team ' . $user->name,
                         'leader_id' => $user->id,
                         'status'    => 'active',
                     ]);
 
+                    // Привязываем студента к созданной команде в качестве лидера
                     DB::table('team_user')->insert([
                         'team_id'   => $team->id,
                         'user_id'   => $user->id,
@@ -55,6 +64,7 @@ class AuthController extends Controller
                         'joined_at' => now(),
                     ]);
 
+                    // Автоматически подаем заявку на участие в программе
                     Application::create([
                         'program_id'      => 1,
                         'organization_id' => null,
@@ -64,18 +74,21 @@ class AuthController extends Controller
                         'total_score'     => 0.00,
                     ]);
                 }
+                // Логика регистрации для роли КОМПАНИЯ
                 elseif ($request->role === 'company') {
                     $user->assignRole('visitor');
 
+                    // Создаем карточку организации со статусом inactive (до верификации админом)
                     $organization = Organization::create([
                         'name'          => $request->company_name,
                         'tax_id'        => $request->company_tax_id,
                         'sector'        => $request->sector,
                         'website_link'  => $request->website_link,
                         'description'   => $request->description,
-                        'status'          => 'inactive',
+                        'status'        => 'inactive',
                     ]);
 
+                    // Связываем пользователя с организацией в качестве владельца (owner)
                     DB::table('organization_user')->insert([
                         'organization_id' => $organization->id,
                         'user_id'         => $user->id,
@@ -84,19 +97,22 @@ class AuthController extends Controller
                         'updated_at'      => now(),
                     ]);
 
+                    // Создаем команду для компании со статусом ожидания (pending)
                     $team = Team::create([
                         'name'      => 'Team ' . $organization->name,
                         'leader_id' => $user->id,
                         'status'    => 'pending',
                     ]);
 
+                    // Привязываем пользователя к команде компании
                     DB::table('team_user')->insert([
                         'team_id'   => $team->id,
-                        'user_id'   => $user->id,
-                        'role'      => 'leader',
+                        'user_id'         => $user->id,
+                        'role'            => 'leader',
                         'joined_at' => now(),
                     ]);
 
+                    // Подаем заявку на верификацию компании модераторами проекта
                     Application::create([
                         'program_id'      => 1,
                         'organization_id' => $organization->id,
@@ -106,6 +122,7 @@ class AuthController extends Controller
                         'total_score'     => 0.00,
                     ]);
 
+                    // Создаем системное уведомление для пользователя
                     Notification::create([
                         'user_id'   => $user->id,
                         'type'      => 'company_registration_submitted',
@@ -116,6 +133,7 @@ class AuthController extends Controller
                     ]);
                 }
 
+                // Выпускаем персональный токен доступа API
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 return [
@@ -137,6 +155,9 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Авторизация пользователя (Вход системы).
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -146,12 +167,14 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Проверяем существование пользователя и соответствие хэша пароля
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid email or password.'],
             ]);
         }
 
+        // Выпускаем токен доступа при успешном совпадении данных
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -161,6 +184,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Получение данных текущей сессии авторизованного пользователя.
+     */
     public function me(Request $request)
     {
         $user = $request->user();
@@ -179,6 +205,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Выход из системы (Отзыв текущего токена доступа).
+     */
     public function logout(Request $request)
     {
         if ($request->user()) {
@@ -190,6 +219,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Запрос ссылки на восстановление/сброс забытого пароля.
+     */
     public function forgotPassword(Request $request)
     {
         $request->validate([
@@ -199,6 +231,7 @@ class AuthController extends Controller
         ]);
 
         try {
+            // Отправляем ссылку сброса через стандартный брокер Laravel
             $status = Password::sendResetLink($request->only('email'));
 
             if ($status === Password::RESET_LINK_SENT) {
@@ -212,6 +245,7 @@ class AuthController extends Controller
             ], 500);
 
         } catch (\Exception $e) {
+            // Логируем непредвиденную ошибку на сервере
             \Log::error('Password Reset Link Error: ' . $e->getMessage());
 
             return response()->json([
