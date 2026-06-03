@@ -36,6 +36,15 @@ services:
         networks:
             - nti-network
 
+    mailpit:
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '1025:1025'
+            - '8025:8025'
+            - '8026:8025'
+        networks:
+            - nti-network
+
     db:
         image: mysql:8.0
         container_name: nti-db
@@ -59,7 +68,7 @@ services:
 networks:
     nti-network:
         driver: bridge
+
 volumes:
     dbdata:
         driver: local
-
