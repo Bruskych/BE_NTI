@@ -261,7 +261,7 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:3072', // max 3MB
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:10240',
         ]);
         $user = $request->user();
         DB::transaction(function () use ($request, $user) {
@@ -271,6 +271,10 @@ class AuthController extends Controller
             }
             $user->update(['avatar_path' => $path]);
         });
-        return response()->json(['message' => 'Avatar nahratý!']);
+        $user->load('roles');
+        return response()->json([
+            'message' => 'Avatar nahratý!',
+            'user' => $user
+        ]);
     }
 }
