@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 
 // Маршруты, доступные только для гостей (неавторизованных пользователей)
 Route::middleware('guest')->group(function () {
+    // чтобы не ломать текущую конфигурацию Axios на фронтенде.
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -39,6 +40,8 @@ Route::middleware(['auth:sanctum', 'role:admin,super_admin'])
 | для генерации корректного URL сброса пароля, отправляемого в email-уведомлении.
 */
 Route::get('/reset-password/{token}', function ($token) {
-    // Перенаправляем пользователя на фронтенд-приложение с передачей токена и email в параметрах
-    return redirect('http://localhost:5173/reset-password?token=' . $token . '&email=' . request('email'));
+    // УЛУЧШЕНИЕ: Берем URL фронтенда из .env (по умолчанию localhost:5173),
+    // чтобы при деплое на реальный сервер ссылка не вела на localhost.
+    $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+    return redirect($frontendUrl . '/reset-password?token=' . $token . '&email=' . request('email'));
 })->name('password.reset');
