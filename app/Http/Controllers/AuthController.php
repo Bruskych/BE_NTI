@@ -256,7 +256,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Запрос ссылки на восстановление/сброс забытого пароля.
+     * Проверка/загрузка фото в профиль.
      */
     public function store(Request $request)
     {
@@ -273,7 +273,7 @@ class AuthController extends Controller
         });
         $user->load('roles');
         return response()->json([
-            'message' => 'Avatar nahratý!',
+            'message' => 'Avatar uploaded!',
             'user' => $user
         ]);
     }

@@ -6,19 +6,17 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 
 // Маршруты, доступные только для гостей (неавторизованных пользователей)
-Route::prefix('auth')->group(function () {
-    Route::middleware('guest')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    });
+Route::middleware('guest')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+});
 
-    // Маршруты, требующие обязательной авторизации через Sanctum
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/store', [AuthController::class, 'store']);
-    });
+// Маршруты, требующие обязательной авторизации через Sanctum
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/store', [AuthController::class, 'store']);
 });
 
 // Административные маршруты с проверкой ролей (доступно для admin и super_admin)
