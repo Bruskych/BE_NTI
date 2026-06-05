@@ -20,6 +20,15 @@ class CheckRole
             ], 403);
         }
         foreach ($roles as $role) {
+            if (str_starts_with($role, '!')) {
+                $negativeRole = substr($role, 1);
+                if ($user->hasRole($negativeRole)) {
+                    return response()->json([
+                        'message' => __('messages.access_denied')
+                    ], 403);
+                }
+                continue;
+            }
             if ($user->hasRole($role)) {
                 return $next($request);
             }

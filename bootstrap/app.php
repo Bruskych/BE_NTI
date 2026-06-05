@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     // Сначало проверка языка, потом проверка роли
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(
+        $middleware->prepend(
             \App\Http\Middleware\SetLocale::class
         );
         $middleware->alias([
