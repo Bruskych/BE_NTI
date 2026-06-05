@@ -207,4 +207,11 @@ class User extends Authenticatable implements HasMedia
         }
         return Storage::disk('public')->url($this->avatar_path);
     }
+
+    public function updateProfileData(string $name): bool
+    {
+        return $this->update([
+            'name' => trim($name)
+        ]);
+    }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 
 // Маршруты, доступные только для гостей (неавторизованных пользователей)
 Route::prefix('auth')->group(function () {
@@ -18,8 +19,16 @@ Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/store', [AuthController::class, 'store']);
+        Route::put('/update-profile', ProfileController::class);
     });
 });
+
+// Маршруты настроек профиля (Только для авторизованных)
+Route::middleware('auth:sanctum')
+    ->prefix('settings')
+    ->group(function () {
+        Route::put('/update-profile', ProfileController::class);
+    });
 
 // Административные маршруты с проверкой ролей (доступно для admin и super_admin)
 Route::middleware(['auth:sanctum', 'role:admin,super_admin'])
