@@ -6,6 +6,40 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $mentorship_id
+ * @property int|null $mentor_id
+ * @property int|null $milestone_id
+ * @property \Illuminate\Support\Carbon|null $scheduled_at
+ * @property \Illuminate\Support\Carbon|null $completed_at
+ * @property string|null $notes
+ * @property string|null $recommendations
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $mentor
+ * @property-read \App\Models\Mentorship|null $mentorship
+ * @property-read \App\Models\Milestone|null $milestone
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereMentorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereMentorshipId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereMilestoneId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereRecommendations($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereScheduledAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Consultation extends Model
 {
     use SoftDeletes;
