@@ -76,4 +76,9 @@ class Project extends Model
 
         return (int) $milestones->avg('completion_percentage');
     }
+
+    public function getTeamAttribute()
+    {
+        return $this->application->team;
+    }
 }

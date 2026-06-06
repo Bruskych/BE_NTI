@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Project;
+use App\Models\Application;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ProjectPolicy
+class ApplicationPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,11 +19,9 @@ class ProjectPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Project $project): bool
+    public function view(User $user, Application $application): bool
     {
-        return $user->isAdmin() ||
-            $user->isStaff() ||
-            $project->team->members->contains($user->id);
+        return $application->team->members->contains($user->id) || $user->isAdmin();
     }
 
     /**
@@ -31,23 +29,22 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        //return $user->isStaff();
-        return true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Project $project): bool
+    public function update(User $user, Application $application): bool
     {
-        return $user->isAdmin() ||
-            $project->team->members->contains($user->id);
+        return $application->team->members->contains($user->id)
+            && $application->canBeEdited();
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user, Application $application): bool
     {
         return false;
     }
@@ -55,7 +52,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Project $project): bool
+    public function restore(User $user, Application $application): bool
     {
         return false;
     }
@@ -63,8 +60,13 @@ class ProjectPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Project $project): bool
+    public function forceDelete(User $user, Application $application): bool
     {
         return false;
+    }
+    public function submit(User $user, Application $application)
+    {
+        return $application->team->leader_id === $user->id
+            && $application->canBeSubmitted();
     }
 }

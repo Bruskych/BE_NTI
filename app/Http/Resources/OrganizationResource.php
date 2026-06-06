@@ -18,6 +18,7 @@ class OrganizationResource extends JsonResource
             'description'  => $this->description,
             'status'       => $this->status,
             'is_active'    => $this->isActive(),
+            'logo_url'     => $this->getFirstMediaUrl('logo') ?: null,
             'users'        => $this->whenLoaded('users', fn() =>
             UserResource::collection($this->users)
             ),
