@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Access\Response;
 use App\Models\Application;
 
-class EvaulationPolicy
+class EvaluationPolicy
 {
     /**
      * Determine whether the user can view any models.
