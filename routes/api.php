@@ -37,7 +37,7 @@ Route::prefix('auth')->group(function () {
 });
 
 // Маршруты настроек профиля (Только для авторизованных)
-Route::middleware('auth:sanctum')
+Route::middleware(['auth:sanctum', 'not_role:visitor'])
     ->prefix('settings')
     ->group(function () {
         Route::put('/update-profile', ProfileController::class);

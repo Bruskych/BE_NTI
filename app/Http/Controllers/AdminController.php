@@ -69,8 +69,8 @@ class AdminController extends Controller
                     'application_id' => $app->id,
                     'status'         => $app->status,
                     'submitted_at'   => $app->submitted_at ? $app->submitted_at->toIso8601String() : null,
-                    'student_name'   => 'Заявка bez lídra (Preveriť team_user)',
-                    'student_email'  => 'ID Tímu: ' . $app->team_id,
+                    'student_name'   => 'Application without a leader (Check team_user)',
+                    'student_email'  => 'Team ID: ' . $app->team_id,
                     'user_id'        => null
                 ];
             });
@@ -91,98 +91,137 @@ class AdminController extends Controller
         return response()->json($formatted);
     }
 
-    // Одобрить заявку студента и выдать ему полноценную роль
+    // Одобрить заявку студента и назначить постоянную должность
     public function approveStudent($id, Request $request)
     {
         $application = Application::findOrFail($id);
 
         if ($application->status !== Application::STATUS_SUBMITTED) {
-            return response()->json(['message' => 'Tento dopyt už nie je možné schváliť.'], 400);
+            return response()->json(['message' => 'This request can no longer be approved.'], 400);
         }
 
         try {
             DB::transaction(function () use ($application, $request) {
-                // 1. Обновляем статус заявки на APPROVED
+                $comment = $request->comment ?? 'Student application approved by administrator.';
+
+                // 1. Изменить статус заявки на «ОДОБРЕНО».
                 $application->update([
                     'status' => Application::STATUS_APPROVED,
                     'approved_at' => now(),
-                    'decision_comment' => $request->comment ?? 'Schválené administrátorom.',
+                    'decision_comment' => $comment,
                 ]);
 
-                // 2. Логируем смену статуса в историю заявок
+                // 2. Изменение статуса записи в историю
                 ApplicationHistory::create([
                     'application_id' => $application->id,
                     'old_status' => Application::STATUS_SUBMITTED,
                     'new_status' => Application::STATUS_APPROVED,
-                    'changed_by' => auth()->id(), // ID админа
-                    'comment' => $request->comment ?? 'Schválené administrátorom.',
+                    'changed_by' => auth()->id(),
+                    'comment' => $comment,
                     'created_at' => now(),
                 ]);
 
-                // 3. Переводим пользователя из visitor в student
+                // 3. Найдите студента, зарегистрировавшегося на конкурс (который является руководителем своей команды, подающей работу).
                 $team = $application->team;
                 if ($team) {
-                    // Ищем ID лидера в таблице team_user
-                    $leaderId = DB::table('team_user')
+                    $studentId = DB::table('team_user')
                         ->where('team_id', $team->id)
                         ->where('role', 'leader')
                         ->value('user_id');
 
-                    if ($leaderId) {
-                        $user = User::find($leaderId);
+                    if ($studentId) {
+                        $user = User::find($studentId);
                         if ($user) {
-                            // Spatie метод: удаляет старые роли (visitor) и записывает только 'student'
+                            // Изменить роль с посетителя на студента.
                             $user->syncRoles(['student']);
+
+                            // 4. Отправить системное уведомление на студенческий аккаунт
+                            Notification::create([
+                                'user_id' => $user->id,
+                                'type' => 'student_application_approved',
+                                'channel' => 'system',
+                                'title' => 'Application approved ✅',
+                                'message' => 'Your student application has been successfully verified. Welcome to the program! Comment: ' . $comment,
+                                'data_json' => json_encode(['application_id' => $application->id]),
+                            ]);
                         }
                     }
                 }
             });
-            return response()->json(['message' => 'Approved']);
+            return response()->json(['message' => 'Student approved successfully.']);
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Chyba pri schvaľovaní.',
+                'message' => 'Error approving student.',
                 'error'   => $e->getMessage()
             ], 500);
         }
     }
 
-    // Отклонить заявку студента
+    // Отклонить заявление студента
     public function rejectStudent($id, Request $request)
     {
         $application = Application::findOrFail($id);
 
-        if ($application->status !== Application::STATUS_SUBMITTED) {
-            return response()->json(['message' => 'Tento dopyt už nie je možné zamietnuť.'], 400);
+        if ($application->status !== 'submitted' && $application->status !== Application::STATUS_SUBMITTED) {
+            return response()->json(['message' => 'This request can no longer be denied.'], 400);
         }
 
         try {
             DB::transaction(function () use ($application, $request) {
-                // 1. Обновляем статус заявки на REJECTED
+                $comment = $request->comment ?? 'Student application rejected by administrator.';
+
+                // 1. Изменить статус заявки на «ОТКЛОНЕНО».
                 $application->update([
-                    'status' => Application::STATUS_REJECTED,
+                    'status' => 'rejected',
                     'rejected_at' => now(),
-                    'decision_comment' => $request->comment ?? 'Zamietnuté administrátorom.',
+                    'decision_comment' => $comment,
                 ]);
 
-                // 2. Логируем в историю
+                // 2. Укажите, кто совершил это действие.
+                $changedBy = auth()->id();
+
+                if (!$changedBy && $application->team_id) {
+                    $changedBy = DB::table('team_user')
+                        ->where('team_id', $application->team_id)
+                        ->where('role', 'leader')
+                        ->value('user_id');
+                }
+
+                // 3. Запись изменений статуса в историю (с использованием фиксированной модели)
                 ApplicationHistory::create([
                     'application_id' => $application->id,
-                    'old_status' => Application::STATUS_SUBMITTED,
-                    'new_status' => Application::STATUS_REJECTED,
-                    'changed_by' => auth()->id(),
-                    'comment' => $request->comment ?? 'Zamietnuté administrátorom.',
+                    'old_status' => 'submitted',
+                    'new_status' => 'rejected',
+                    'changed_by' => $changedBy,
+                    'comment' => $comment,
                     'created_at' => now(),
                 ]);
 
-                // При отклонении роль 'visitor' можно оставить без изменений,
-                // чтобы у него на фронтенде висела плашка "Ваша заявка отклонена".
+                // 4. Найдите учетную запись регистрирующегося студента и отправьте уведомление об отказе.
+                if ($application->team_id) {
+                    $studentId = DB::table('team_user')
+                        ->where('team_id', $application->team_id)
+                        ->where('role', 'leader')
+                        ->value('user_id');
+
+                    if ($studentId) {
+                        Notification::create([
+                            'user_id' => $studentId,
+                            'type' => 'student_application_rejected',
+                            'channel' => 'system',
+                            'title' => 'Application rejected ❌',
+                            'message' => 'Your student application has been rejected. Reason: ' . $comment,
+                            'data_json' => json_encode(['application_id' => $application->id]),
+                        ]);
+                    }
+                }
             });
-            return response()->json(['message' => 'Rejected']);
+            return response()->json(['message' => 'Student rejected successfully.']);
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Chyba pri zamietnutí.',
+                'message' => 'Error rejecting student.',
                 'error'   => $e->getMessage()
             ], 500);
         }
@@ -192,10 +231,10 @@ class AdminController extends Controller
     // ЗАЯВКИ КОМПАНИЙ
     // ======================================================
 
-    // Получить заявки компаний, которые ждут подтверждения
+    // Получите заявки компаний, ожидающие подтверждения.
     public function pendingCompanies()
     {
-        // Извлекаем заявки со статусом 'submitted', у которых organization_id НЕ равен NULL
+        // Извлеките заявки со статусом 'submitted', в которых organization_id не равен NULL.
         $applications = Application::where('status', 'submitted')
             ->whereNotNull('organization_id')
             ->with(['organization', 'team.leader'])
@@ -209,13 +248,13 @@ class AdminController extends Controller
                 'application_id' => $app->id,
                 'status'         => $app->status,
                 'submitted_at'   => $app->submitted_at ? $app->submitted_at->toIso8601String() : null,
-                'company_name'   => $org ? $org->name : 'Neznáma firma',
-                'company_tax_id' => $org ? $org->tax_id : 'Bez IČO',
-                'sector'         => $org ? $org->sector : 'Nezadané',
+                'company_name'   => $org ? $org->name : 'Unknown company',
+                'company_tax_id' => $org ? $org->tax_id : 'Without TAX ID',
+                'sector'         => $org ? $org->sector : 'Unregistered sector',
                 'website_link'   => $org ? $org->website_link : null,
-                'description'    => $org ? $org->description : 'Bez popisu.',
-                'owner_name'     => $owner ? $owner->name : 'Neznámy zástupca',
-                'owner_email'    => $owner ? $owner->email : 'Bez emailu',
+                'description'    => $org ? $org->description : 'No description',
+                'owner_name'     => $owner ? $owner->name : 'Unknown representative',
+                'owner_email'    => $owner ? $owner->email : 'No email',
                 'user_id'        => $owner ? $owner->id : null
             ];
         });
@@ -228,34 +267,38 @@ class AdminController extends Controller
         $application = Application::with('organization')->findOrFail($id);
 
         if ($application->status !== 'submitted' || !$application->organization_id) {
-            return response()->json(['message' => 'Túto firemnú žiadosť už nie je možné schváliť.'], 400);
+            return response()->json(['message' => 'This business request can no longer be approved.'], 400);
         }
 
         try {
             DB::transaction(function () use ($application, $request) {
-                // 1. Обновляем статус заявки
+                $comment = $request->comment ?? 'Company approved by administrator.';
+
+                // 1. Обновить статус приложения
                 $application->update([
                     'status' => 'approved',
                     'approved_at' => now(),
-                    'decision_comment' => $request->comment ?? 'Firma schválená administrátorom.',
+                    'decision_comment' => $comment,
                 ]);
 
-                // 2. Активируем саму компанию
-                $application->organization->update([
-                    'status' => 'active'
-                ]);
+                // 2. Активировать саму организацию
+                if ($application->organization) {
+                    $application->organization->update([
+                        'status' => 'active'
+                    ]);
+                }
 
-                // 3. Логируем в историю изменений
+                // 3. Войдите в историю изменений
                 ApplicationHistory::create([
                     'application_id' => $application->id,
                     'old_status' => 'submitted',
                     'new_status' => 'approved',
                     'changed_by' => auth()->id(),
-                    'comment' => $request->comment ?? 'Firma schválená administrátorom.',
+                    'comment' => $comment,
                     'created_at' => now(),
                 ]);
 
-                // 4. Находим создателя компании (лидера технической команды) и даем ему роль 'company'
+                // 4. Найдите создателя компании и безопасно назначьте ему роль «компания».
                 $team = $application->team;
                 if ($team) {
                     $ownerId = DB::table('team_user')
@@ -266,25 +309,25 @@ class AdminController extends Controller
                     if ($ownerId) {
                         $user = User::find($ownerId);
                         if ($user) {
-                            $user->syncRoles(['company']); // Меняем 'visitor' на 'company'
+                            $user->syncRoles(['company']);
 
-                            // 5. Отправляем пользователю уведомление о том, что его фирму подтвердили
+                            // 5. Отправить системное уведомление с комментарием администратора
                             Notification::create([
                                 'user_id' => $user->id,
                                 'type' => 'company_registration_approved',
                                 'channel' => 'system',
-                                'title' => 'Firma bola schválená',
-                                'message' => 'Vaša spoločnosť ' . $application->organization->name . ' bola úspešne overená. Teraz môžete pridávať zadania.',
+                                'title' => 'Company registration approved ✅',
+                                'message' => 'Your company "' . ($application->organization->name ?? 'Company') . '" has been successfully verified. You can now add new assignments. Comment: ' . $comment,
                                 'data_json' => json_encode(['organization_id' => $application->organization_id]),
                             ]);
                         }
                     }
                 }
             });
-            return response()->json(['message' => 'Company approved successfully']);
+            return response()->json(['message' => 'Company approved successfully.']);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Chyba pri schvaľovaní firmy.', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error approving company.', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -294,32 +337,31 @@ class AdminController extends Controller
         $application = Application::with('organization')->findOrFail($id);
 
         if ($application->status !== 'submitted' || !$application->organization_id) {
-            return response()->json(['message' => 'Túto firemnú žiadosť už nie je možné zamietnuť.'], 400);
+            return response()->json(['message' => 'This corporate request can no longer be denied.'], 400);
         }
 
         try {
             DB::transaction(function () use ($application, $request) {
-                // 1. Ставим статус заявки REJECTED
+                $comment = $request->comment ?? 'Company registration rejected by administrator.';
+
+                // 1. Установить статус заявки на «ОТКЛОНЕНО».
                 $application->update([
                     'status' => 'rejected',
                     'rejected_at' => now(),
-                    'decision_comment' => $request->comment ?? 'Zamietnuté administrátorom.',
+                    'decision_comment' => $comment,
                 ]);
 
-                // 2. Оставляем статус организации 'inactive' (или меняем на 'deleted_at' при soft-delete)
-                // Но лучше оставить неактивной, чтобы данные не терялись
-
-                // 3. Пишем лог в историю
+                // 2. Войдите в историю изменений
                 ApplicationHistory::create([
                     'application_id' => $application->id,
                     'old_status' => 'submitted',
                     'new_status' => 'rejected',
                     'changed_by' => auth()->id(),
-                    'comment' => $request->comment ?? 'Zamietnuté administrátorom.',
+                    'comment' => $comment,
                     'created_at' => now(),
                 ]);
 
-                // 4. Оповещаем создателя, что регистрация отклонена
+                // 3. Уведомите создателя о том, что регистрация отклонена.
                 $team = $application->team;
                 if ($team) {
                     $ownerId = DB::table('team_user')
@@ -332,17 +374,17 @@ class AdminController extends Controller
                             'user_id' => $ownerId,
                             'type' => 'company_registration_rejected',
                             'channel' => 'system',
-                            'title' => 'Registrácia firmy bola zamietnutá',
-                            'message' => 'Ľutujeme, ale vaša žiadosť o registráciu firmy bola zamietnutá. Dôvod: ' . ($request->comment ?? 'Nesplnenie podmienok.'),
-                            'data_json' => json_encode(['organization_id' => $application->organization_id]),
+                            'title' => 'Company registration rejected ❌',
+                            'message' => 'Your company registration has been rejected. Reason: ' . $comment,
+                            'data_json' => json_encode(['application_id' => $application->id]),
                         ]);
                     }
                 }
             });
-            return response()->json(['message' => 'Company rejected successfully']);
+            return response()->json(['message' => 'Company rejected successfully.']);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Chyba pri zamietnutí firmy.', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error rejecting company.', 'error' => $e->getMessage()], 500);
         }
     }
 }

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApplicationHistory extends Model
 {
+    protected $table = 'application_history';
+
     public $timestamps = false;
 
     protected $fillable = [
