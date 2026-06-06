@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Project;
+use App\Models\Consultation;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ProjectPolicy
+class ConsultationPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,11 +19,10 @@ class ProjectPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Project $project): bool
+    public function view(User $user, Consultation $consultation): bool
     {
-        return $user->isAdmin() ||
-            $user->isStaff() ||
-            $project->team->members->contains($user->id);
+        return $user->id === $consultation->mentor_id ||
+            $consultation->mentorship->team->members->contains($user->id);
     }
 
     /**
@@ -31,23 +30,21 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        //return $user->isStaff();
-        return true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Project $project): bool
+    public function update(User $user, Consultation $consultation): bool
     {
-        return $user->isAdmin() ||
-            $project->team->members->contains($user->id);
+        return $user->id === $consultation->mentor_id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user, Consultation $consultation): bool
     {
         return false;
     }
@@ -55,7 +52,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Project $project): bool
+    public function restore(User $user, Consultation $consultation): bool
     {
         return false;
     }
@@ -63,7 +60,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Project $project): bool
+    public function forceDelete(User $user, Consultation $consultation): bool
     {
         return false;
     }

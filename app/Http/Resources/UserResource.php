@@ -13,6 +13,8 @@ class UserResource extends JsonResource
             'id'                => $this->id,
             'name'              => $this->name,
             'email'             => $this->email,
+            'avatar_path'       => $this->avatar_path,
+            'avatar_url'        => $this->avatar_path ? asset('storage/' . $this->avatar_path) : null,
             'email_verified_at' => $this->email_verified_at,
             'roles'             => $this->getRoleNames(),
             'permissions'       => $this->whenLoaded('permissions', fn() =>

@@ -8,6 +8,61 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $program_id
+ * @property int|null $call_id
+ * @property int|null $challenge_id
+ * @property int $team_id
+ * @property int|null $organization_id
+ * @property string|null $status
+ * @property \Illuminate\Support\Carbon|null $submitted_at
+ * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property \Illuminate\Support\Carbon|null $rejected_at
+ * @property numeric|null $total_score
+ * @property string|null $decision_comment
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApplicationAnswer> $answers
+ * @property-read int|null $answers_count
+ * @property-read \App\Models\Call|null $call
+ * @property-read \App\Models\Challenge|null $challenge
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Document> $documents
+ * @property-read int|null $documents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Evaluation> $evaluations
+ * @property-read int|null $evaluations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApplicationHistory> $history
+ * @property-read int|null $history_count
+ * @property-read \App\Models\Organization|null $organization
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApplicationPairingSubmission> $pairingSubmissions
+ * @property-read int|null $pairing_submissions_count
+ * @property-read \App\Models\Program|null $program
+ * @property-read \App\Models\Project|null $project
+ * @property-read \App\Models\Team|null $team
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereCallId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereChallengeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereDecisionComment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereOrganizationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereProgramId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereRejectedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereSubmittedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereTeamId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereTotalScore($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Application withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Application extends Model
 {
     use SoftDeletes;

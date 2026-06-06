@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Evaulation;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+use App\Models\Application;
+
+class EvaluationPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, Evaulation $evaulation): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user, Application $application)
+    {
+        $isEvaluator = $user->isEvaluator();
+
+        $isReadyForEvaluation = $application->status === 'in_evaluation';
+
+        $alreadyEvaluated = Evaluation::where('application_id', $application->id)
+            ->where('evaluator_id', $user->id)
+            ->exists();
+
+        return $isEvaluator && $isReadyForEvaluation && !$alreadyEvaluated;
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Evaulation $evaulation): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Evaulation $evaulation): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Evaulation $evaulation): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Evaulation $evaulation): bool
+    {
+        return false;
+    }
+}

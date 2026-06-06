@@ -2,28 +2,26 @@
 
 namespace App\Policies;
 
-use App\Models\Project;
+use App\Models\Call;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ProjectPolicy
+class CallPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Project $project): bool
+    public function view(User $user, Call $call): bool
     {
-        return $user->isAdmin() ||
-            $user->isStaff() ||
-            $project->team->members->contains($user->id);
+        return true;
     }
 
     /**
@@ -31,23 +29,21 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        //return $user->isStaff();
-        return true;
+        return $user->hasAnyRole(['admin', 'super_admin']);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Project $project): bool
+    public function update(User $user, Call $call): bool
     {
-        return $user->isAdmin() ||
-            $project->team->members->contains($user->id);
+        return $user->hasAnyRole(['admin', 'super_admin']);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user, Call $call): bool
     {
         return false;
     }
@@ -55,7 +51,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Project $project): bool
+    public function restore(User $user, Call $call): bool
     {
         return false;
     }
@@ -63,7 +59,7 @@ class ProjectPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Project $project): bool
+    public function forceDelete(User $user, Call $call): bool
     {
         return false;
     }

@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\Program;
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
@@ -252,5 +253,28 @@ class AuthController extends Controller
                 'message' => 'Server error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Проверка/загрузка фото в профиль.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:10240',
+        ]);
+        $user = $request->user();
+        DB::transaction(function () use ($request, $user) {
+            $path = $request->file('photo')->store('profile_photos', 'public');
+            if ($user->avatar_path) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+            $user->update(['avatar_path' => $path]);
+        });
+        $user->load('roles');
+        return response()->json([
+            'message' => 'Avatar uploaded!',
+            'user' => $user
+        ]);
     }
 }
