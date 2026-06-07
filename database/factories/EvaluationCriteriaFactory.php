@@ -13,7 +13,7 @@ use App\Models\EvaluationTemplate;
 class EvaluationCriteriaFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Критерии оценивания
      *
      * @return array<string, mixed>
      */
