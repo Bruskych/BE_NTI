@@ -6,6 +6,7 @@ use App\Http\Controllers\{
     CallController, ChallengeController, OrganizationController, SpecializationController,
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
+    ExportController,
 };
 
 // -------------------------------------------------------------------------
@@ -52,6 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/companies/pending', [AdminController::class, 'pendingCompanies']);
         Route::post('/companies/{id}/approve', [AdminController::class, 'approveCompany']);
         Route::post('/companies/{id}/reject', [AdminController::class, 'rejectCompany']);
+        Route::get('/exports', [ExportController::class, 'index']);
+        Route::post('/exports', [ExportController::class, 'store']);
     });
 
     Route::get('/teams/my-team', [TeamController::class, 'myTeam']);
