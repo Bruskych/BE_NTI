@@ -2,10 +2,13 @@
 
 --- DOCKER ---
 1. cd C:\Users\user_name\PhpstormProjects\NTI_project\NTI_backend       -> Project folder where you have Dockerfile
-2. docker compose up --build                                            -> Build (Connect docker)
+2. docker compose up -d --build                                         -> Build and Start (Connect docker)
 
 --- GIT ---
 git reset --soft HEAD~1             -> delete last commit
+
+--- GENERATE IDE HELPER FOR MODELS ---
+php artisan ide-helper:models
 
 --- START ---
 C:\xampp\php\php.exe artisan serve
@@ -19,16 +22,25 @@ Note::all();
 --- API ---
 php artisan install:api
 
---- DATABASE ---
-php artisan make:migration create_NAME_table
 
+
+--- DATABASE ---
 php artisan migrate                 -> load
 php artisan db:seed                 -> start add seeder
 php artisan migrate:rollback        -> back 1 step
 php artisan migrate:fresh           -> delete
 php artisan migrate:fresh --seed    -> delete+add
 
-php artisan make:seeder NameSeeder
+    === FACTORIES ===
+    php artisan make:factory NameFactory --model=Name
+
+    === MIGRATIONS ===
+    php artisan make:migration create_NAME_table
+
+    === SEEDER ===
+    php artisan make:seeder NameSeeder
+
+
 
 --- CONTROLLER ---
 php artisan make:controller NameController --api
