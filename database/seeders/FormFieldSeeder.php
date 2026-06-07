@@ -2,145 +2,75 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Seeder;
+
 use App\Models\FormField;
 use App\Models\Program;
-use Illuminate\Database\Seeder;
+use App\Models\Call;
 
 class FormFieldSeeder extends Seeder
 {
+    /**
+     * Анкеты для подачи заявок
+     */
     public function run(): void
     {
-        $programA = Program::where('type', 'grant')->first();
-        $programB = Program::where('type', 'practice')->first();
+        Schema::disableForeignKeyConstraints();
+        FormField::truncate();
+        Schema::enableForeignKeyConstraints();
 
-        // ---------------------------------------------------------
-        // Polia pre Program A (platné pre celý program)
-        // ---------------------------------------------------------
-        $fieldsA = [
-            [
-                'name'             => 'project_name',
-                'label'            => 'Názov projektu',
-                'type'             => 'text',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:255',
-                'order'            => 1,
-            ],
-            [
-                'name'             => 'project_description',
-                'label'            => 'Popis projektu',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:2000',
-                'order'            => 2,
-            ],
-            [
-                'name'             => 'problem_statement',
-                'label'            => 'Aký problém projekt rieši?',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 3,
-            ],
-            [
-                'name'             => 'target_group',
-                'label'            => 'Cieľová skupina',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:500',
-                'order'            => 4,
-            ],
-            [
-                'name'             => 'innovation_description',
-                'label'            => 'Čím je projekt inovatívny?',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 5,
-            ],
-            [
-                'name'             => 'budget_breakdown',
-                'label'            => 'Rozpočet projektu',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 6,
-            ],
-            [
-                'name'             => 'timeline',
-                'label'            => 'Časový harmonogram',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 7,
-            ],
-            [
-                'name'             => 'pitch_deck',
-                'label'            => 'Pitch deck (PDF)',
-                'type'             => 'file',
-                'required'         => false,
-                'validation_rules' => 'nullable|file|mimes:pdf|max:10240',
-                'order'            => 8,
-            ],
-        ];
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
 
-        foreach ($fieldsA as $field) {
-            FormField::firstOrCreate(
-                ['program_id' => $programA->id, 'call_id' => null, 'name' => $field['name']],
-                $field + ['program_id' => $programA->id, 'call_id' => null]
-            );
+        $program = Program::inRandomOrder()->first();
+        $call = Call::first();
+
+        if ($program) {
+            FormField::create([
+                'program_id'        => $program->id,
+                'call_id'           => null,
+                'name'              => 'motivation_letter',
+                'label'             => 'Motivation Letter',
+                'type'              => 'textarea',
+                'required'          => true,
+                'options_json'      => null,
+                'validation_rules'  => 'required|string|min:100',
+                'order'             => 1,
+            ]);
+            FormField::create([
+                'program_id'        => $program->id,
+                'call_id'           => null,
+                'name'              => 'experience_level',
+                'label'             => 'Your Technical Level',
+                'type'              => 'select',
+                'required'          => true,
+                'options_json'      => ['Beginner', 'Intermediate', 'Advanced'],
+                'validation_rules'  => 'required|string',
+                'order'             => 2,
+            ]);
         }
 
-        // ---------------------------------------------------------
-        // Polia pre Program B (platné pre celý program)
-        // ---------------------------------------------------------
-        $fieldsB = [
-            [
-                'name'             => 'team_introduction',
-                'label'            => 'Predstavenie tímu',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 1,
-            ],
-            [
-                'name'             => 'relevant_experience',
-                'label'            => 'Relevantné skúsenosti tímu',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 2,
-            ],
-            [
-                'name'             => 'solution_approach',
-                'label'            => 'Navrhovaný prístup k riešeniu',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:2000',
-                'order'            => 3,
-            ],
-            [
-                'name'             => 'motivation',
-                'label'            => 'Motivácia a záujem o zadanie',
-                'type'             => 'textarea',
-                'required'         => true,
-                'validation_rules' => 'required|string|max:1000',
-                'order'            => 4,
-            ],
-            [
-                'name'             => 'availability',
-                'label'            => 'Časová dostupnosť tímu (hod/týždeň)',
-                'type'             => 'number',
-                'required'         => true,
-                'validation_rules' => 'required|integer|min:1|max:40',
-                'order'            => 5,
-            ],
-        ];
-
-        foreach ($fieldsB as $field) {
-            FormField::firstOrCreate(
-                ['program_id' => $programB->id, 'call_id' => null, 'name' => $field['name']],
-                $field + ['program_id' => $programB->id, 'call_id' => null]
-            );
+        if ($program && $call) {
+            FormField::create([
+                'program_id'        => $program->id,
+                'call_id'           => $call->id,
+                'name'              => 'github_repository',
+                'label'             => 'Project GitHub Link',
+                'type'              => 'text',
+                'required'          => true,
+                'options_json'      => null,
+                'validation_rules'  => 'required|url',
+                'order'             => 3,
+            ]);
         }
+
+        // ------------------------------
+        // Автосоздание с помощью фабрики
+        // ------------------------------
+
+        FormField::factory()->count(10)->create();
     }
 }

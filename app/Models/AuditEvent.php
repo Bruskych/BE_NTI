@@ -2,40 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @property int $id
- * @property int|null $user_id
- * @property string|null $action
- * @property string|null $object_type
- * @property int|null $object_id
- * @property array<array-key, mixed>|null $old_values_json
- * @property array<array-key, mixed>|null $new_values_json
- * @property string|null $ip_address
- * @property string|null $user_agent
- * @property string|null $result
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereAction($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereIpAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereNewValuesJson($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereObjectId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereObjectType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereOldValuesJson($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereResult($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereUserAgent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditEvent whereUserId($value)
- * @mixin \Eloquent
- */
 class AuditEvent extends Model
 {
+    use SoftDeletes, HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = [

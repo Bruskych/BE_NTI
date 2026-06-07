@@ -2,38 +2,79 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Seeder;
+
 use App\Models\Call;
-use App\Models\EvaluationTemplate;
 use App\Models\Program;
 use App\Models\Specialization;
-use Illuminate\Database\Seeder;
+use App\Models\EvaluationTemplate;
 
 class CallSeeder extends Seeder
 {
+    /**
+     * Конкретный временной интервал, в который открывается окно для сбора заявок под программу A | B
+     */
     public function run(): void
     {
-        $programA  = Program::where('type', 'grant')->first();
-        $template  = EvaluationTemplate::where('program_id', $programA->id)->first();
+        Schema::disableForeignKeyConstraints();
+        Call::truncate();
+        DB::table('call_specialization')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-        $call = Call::firstOrCreate(
-            ['title' => 'Výzva č. 1 / 2026 — Grantový inkubačný program'],
-            [
-                'program_id'             => $programA->id,
-                'description'            => 'Prvá výzva grantového inkubačného programu NTI pre akademický rok 2025/2026. Podporujeme inovatívne projekty študentov v oblasti softvérových technológií.',
-                'deadline'               => now()->addMonths(2),
-                'status'                 => 'open',
-                'budget'                 => 50000.00,
-                'evaluation_template_id' => $template?->id,
-            ]
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
+
+        if (Program::count() === 0) {
+            $this->call(ProgramSeeder::class);
+        }
+
+        $specializations = Specialization::all();
+        if ($specializations->isEmpty()) {
+            $specializations = collect([
+                Specialization::factory()->create(['name' => 'Frontend', 'slug' => 'frontend']),
+                Specialization::factory()->create(['name' => 'Backend', 'slug' => 'backend'])
+            ]);
+        }
+
+        $firstProgram = Program::first();
+        $templateForFirst = EvaluationTemplate::where('program_id', $firstProgram->id)->first()
+            ?? EvaluationTemplate::factory()->create(['program_id' => $firstProgram->id]);
+
+        $staticCall = Call::create([
+            'program_id'             => $firstProgram->id,
+            'title'                  => 'Official NTI Spring Call 2026',
+            'description'            => 'Static primary call for student software development grants.',
+            'deadline'               => now()->addMonths(2),
+            'status'                 => 'open',
+            'budget'                 => '500000.00',
+            'evaluation_template_id' => $templateForFirst->id,
+        ]);
+        $staticCall->specializations()->attach(
+            $specializations->pluck('id')->toArray()
         );
 
-        // Priraď špecializácie
-        $specializations = Specialization::whereIn('slug', [
-            'vyvoj-softveru',
-            'ai-datove-technologie',
-            'webove-aplikacie',
-        ])->pluck('id');
+        // ------------------------------
+        // Автосоздание с помощью фабрики
+        // ------------------------------
 
-        $call->specializations()->syncWithoutDetaching($specializations);
+        for ($i = 0; $i < 4; $i++) {
+            $randomProgram = Program::inRandomOrder()->first();
+
+            $template = EvaluationTemplate::where('program_id', $randomProgram->id)->first()
+                ?? EvaluationTemplate::factory()->create(['program_id' => $randomProgram->id]);
+
+            $call = Call::factory()->create([
+                'program_id'             => $randomProgram->id,
+                'evaluation_template_id' => $template->id,
+            ]);
+
+            $call->specializations()->attach(
+                $specializations->random(rand(1, $specializations->count()))->pluck('id')->toArray()
+            );
+        }
     }
 }

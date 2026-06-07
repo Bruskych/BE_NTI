@@ -2,66 +2,68 @@
 
 namespace Database\Seeders;
 
-use App\Models\Challenge;
-use App\Models\Organization;
-use App\Models\Program;
-use App\Models\Specialization;
-use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+
+use App\Models\Specialization;
+use App\Models\Organization;
+use App\Models\Challenge;
+use App\Models\Program;
+use App\Models\User;
 
 class ChallengeSeeder extends Seeder
 {
+    /**
+     * Задачи / Челленджи
+     */
     public function run(): void
     {
-        $programB     = Program::where('type', 'practice')->first();
-        $organization = Organization::where('tax_id', 'SK123456789')->first();
-        $productOwner = User::where('email', 'company@firma.sk')->first();
+        Schema::disableForeignKeyConstraints();
+        Challenge::truncate();
+        DB::table('challenge_specialization')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-        $challenge = Challenge::firstOrCreate(
-            ['title' => 'Vývoj interného HR portálu'],
-            [
-                'program_id'              => $programB->id,
-                'organization_id'         => $organization->id,
-                'description'             => 'Firma hľadá tím pre vývoj interného HR portálu na správu zamestnancov, dovoleniek a hodnotení. Portál má byť webová aplikácia s moderným UX.',
-                'technical_specification' => "## Technické požiadavky\n\n- Backend: Laravel 11 alebo Node.js\n- Frontend: Vue.js alebo React\n- Databáza: MySQL alebo PostgreSQL\n- Autentifikácia: SSO / OAuth2\n- REST API pre mobilnú aplikáciu\n\n## Funkcionality\n\n- Správa zamestnancov (CRUD)\n- Evidencia dovoleniek a absencií\n- Hodnotenie výkonu\n- Reporty a exporty\n- Notifikácie (email + push)",
-                'budget'                  => 8000.00,
-                'product_owner_id'        => $productOwner->id,
-                'deadline'                => now()->addMonths(4),
-                'status'                  => 'published',
-                'max_applications'        => 3,
-                'backlog_order'           => 1,
-            ]
-        );
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
 
-        $specializations = Specialization::whereIn('slug', [
-            'webove-aplikacie',
-            'stack-03-web',
-        ])->pluck('id');
+        $practiceProgram = Program::where('type', 'practice')->first() ?? Program::first();
+        $organization = Organization::first();
+        $user = User::first();
+        $specializations = Specialization::all();
 
-        $challenge->specializations()->syncWithoutDetaching($specializations);
+        if ($practiceProgram && $organization) {
+            $staticChallenge = Challenge::create([
+                'program_id'                => $practiceProgram->id,
+                'organization_id'           => $organization->id,
+                'title'                     => 'Development of a version control system for 3D models',
+                'description'               => 'It is necessary to create a web interface and backend to track changes in the blockbench extension binaries.',
+                'technical_specification'   => 'Use Vue 3 on the frontend and Laravel on the backend. Ensure JSON structure parsing.',
+                'budget'                    => 500000.00,
+                'product_owner_id'          => $user ? $user->id : null,
+                'deadline'                  => now()->addMonths(3),
+                'status'                    => 'published',
+                'max_applications'          => 3,
+                'backlog_order'             => 1,
+            ]);
+            if ($specializations->isNotEmpty()) {
+                $staticChallenge->specializations()->attach($specializations->pluck('id')->toArray());
+            }
+        }
 
-        // Druhé zadanie
-        $challenge2 = Challenge::firstOrCreate(
-            ['title' => 'AI chatbot pre zákaznícku podporu'],
-            [
-                'program_id'              => $programB->id,
-                'organization_id'         => $organization->id,
-                'description'             => 'Vývoj AI chatbota pre automatizáciu zákazníckej podpory s integráciou na existujúci helpdesk systém.',
-                'technical_specification' => "## Technické požiadavky\n\n- LLM integrácia (OpenAI API alebo podobné)\n- Backend: Python (FastAPI) alebo Node.js\n- Integrácia so Zendesk / Freshdesk API\n- Tréning na vlastných dátach firmy\n\n## Funkcionality\n\n- Automatické odpovedanie na časté otázky\n- Eskalácia na ľudského agenta\n- Analýza sentimentu\n- Dashboard s metrikami",
-                'budget'                  => 6000.00,
-                'product_owner_id'        => $productOwner->id,
-                'deadline'                => now()->addMonths(3),
-                'status'                  => 'published',
-                'max_applications'        => 3,
-                'backlog_order'           => 2,
-            ]
-        );
+        // ------------------------------
+        // Автосоздание с помощью фабрики
+        // ------------------------------
 
-        $specializations2 = Specialization::whereIn('slug', [
-            'ai-datove-technologie',
-            'stack-02-ai-data',
-        ])->pluck('id');
-
-        $challenge2->specializations()->syncWithoutDetaching($specializations2);
+        $challenges = Challenge::factory()->count(10)->create();
+        if ($specializations->isNotEmpty()) {
+            foreach ($challenges as $challenge) {
+                $challenge->specializations()->attach(
+                    $specializations->random(rand(1, min(3, $specializations->count())))->pluck('id')->toArray()
+                );
+            }
+        }
     }
 }

@@ -2,30 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @property int $id
- * @property int|null $user_id
- * @property string|null $export_type
- * @property array<array-key, mixed>|null $filters_json
- * @property string|null $file_path
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereExportType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereFilePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereFiltersJson($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExportsLog whereUserId($value)
- * @mixin \Eloquent
- */
 class ExportsLog extends Model
 {
+    use SoftDeletes, HasFactory;
+
     public $timestamps = false;
 
     protected $table = 'exports_log';

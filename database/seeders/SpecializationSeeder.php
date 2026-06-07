@@ -2,28 +2,81 @@
 
 namespace Database\Seeders;
 
-use App\Models\Specialization;
 use Illuminate\Database\Seeder;
+
+use App\Models\Specialization;
 
 class SpecializationSeeder extends Seeder
 {
+    /**
+     * Специализации / Направления
+     */
     public function run(): void
     {
-        $specializations = [
-            ['name' => 'Vývoj softvéru',             'slug' => 'vyvoj-softveru',             'description' => 'Desktop, mobilné aplikácie, embedded systémy.'],
-            ['name' => 'AI a dátové technológie',     'slug' => 'ai-datove-technologie',       'description' => 'AI aplikácie, dátové technológie, strojové učenie.'],
-            ['name' => 'Webové aplikácie',            'slug' => 'webove-aplikacie',            'description' => 'Internetové a prehliadačové aplikácie.'],
-            ['name' => 'Herný vývoj',                 'slug' => 'herny-vyvoj',                 'description' => 'Herné aplikácie, jazyk a platforma.'],
-            ['name' => 'IoT a embedded systémy',      'slug' => 'iot-embedded-systemy',        'description' => 'Softvérové aj hardvérové komponenty internetu vecí.'],
-            ['name' => 'Kvalifikačný stack 01 — Objektové technológie', 'slug' => 'stack-01-objektove-technologie', 'description' => 'Objektové technológie, mobilné aplikácie, testovanie.'],
-            ['name' => 'Kvalifikačný stack 02 — AI a dáta',             'slug' => 'stack-02-ai-data',              'description' => 'Databázové systémy, AI, strojové učenie, neurónové siete.'],
-            ['name' => 'Kvalifikačný stack 03 — Web',                   'slug' => 'stack-03-web',                  'description' => 'Jazyky webu, FE/BE technológie, webové aplikácie.'],
-            ['name' => 'Kvalifikačný stack 04 — Herný vývoj a VR',      'slug' => 'stack-04-herny-vyvoj-vr',       'description' => 'Herné vývojové prostredia, VR a rozšírená realita.'],
-            ['name' => 'Kvalifikačný stack 05 — IoT a robotika',        'slug' => 'stack-05-iot-robotika',         'description' => 'Programovanie v C, internet vecí, robotické systémy.'],
-        ];
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
 
-        foreach ($specializations as $data) {
-            Specialization::firstOrCreate(['slug' => $data['slug']], $data);
+        $specializations = [
+            [
+                'name'        => 'Software Development',
+                'slug'        => 'software-development',
+                'description' => 'Desktop, mobile applications, embedded systems.',
+            ],
+            [
+                'name'        => 'AI and Data Technologies',
+                'slug'        => 'ai-data-technologies',
+                'description' => 'AI applications, data technologies, machine learning.',
+            ],
+            [
+                'name'        => 'Web Applications',
+                'slug'        => 'web-applications',
+                'description' => 'Internet and browser applications.',
+            ],
+            [
+                'name'        => 'Game Development',
+                'slug'        => 'game-development',
+                'description' => 'Game applications, language and platform.',
+            ],
+            [
+                'name'        => 'IoT and Embedded Systems',
+                'slug'        => 'iot-embedded-systems',
+                'description' => 'Software and hardware components of the Internet of Things.',
+            ],
+            [
+                'name'        => 'Qualification Stack 01 — Object Technologies',
+                'slug'        => 'stack-01-object-technologies',
+                'description' => 'Object technologies, mobile applications, testing.',
+            ],
+            [
+                'name'        => 'Qualification Stack 02 — AI and Data',
+                'slug'        => 'stack-02-ai-data',
+                'description' => 'Database systems, AI, machine learning, neural networks.',
+            ],
+            [
+                'name'        => 'Qualification Stack 03 — Web',
+                'slug'        => 'stack-03-web',
+                'description' => 'Web languages, FE/BE technologies, web applications.',
+            ],
+            [
+                'name'        => 'Qualification Stack 04 — Game Development and VR',
+                'slug'        => 'stack-04-game-development-vr',
+                'description' => 'Game development environments, VR and augmented reality.',
+            ],
+            [
+                'name'        => 'Qualification Stack 05 — IoT and Robotics',
+                'slug'        => 'stack-05-iot-robotics',
+                'description' => 'C programming, Internet of Things, robotic systems.',
+            ],
+        ];
+        foreach ($specializations as $item) {
+            Specialization::firstOrCreate(
+                ['slug' => $item['slug']],
+                [
+                    'name'        => $item['name'],
+                    'description' => $item['description'],
+                ]
+            );
         }
     }
 }

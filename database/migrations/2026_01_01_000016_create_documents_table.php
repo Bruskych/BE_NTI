@@ -29,7 +29,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('milestone_id')->constrained()->cascadeOnDelete();
             $table->foreignId('document_id')->constrained()->cascadeOnDelete();
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
     }
 

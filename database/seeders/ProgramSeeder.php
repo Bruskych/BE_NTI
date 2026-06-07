@@ -2,28 +2,36 @@
 
 namespace Database\Seeders;
 
-use App\Models\Program;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+use App\Models\Program;
 
 class ProgramSeeder extends Seeder
 {
+    /**
+     * Программы А + Б
+     */
     public function run(): void
     {
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
+
         Program::firstOrCreate(
             ['type' => 'grant'],
             [
-                'name'        => 'Program A — Grantový inkubačný program',
-                'description' => 'Grantový inkubačný program zameraný na vlastný inovatívny nápad uchádzača alebo tímu. Výsledkom má byť startup alebo produkt.',
-                'is_active'   => true,
+                'name'          => 'Program A — Grant Incubation Program',
+                'description'   => 'A grant incubation program focused on the applicants or teams own innovative idea. The result should be a startup or product.',
+                'is_active'     => true,
             ]
         );
-
         Program::firstOrCreate(
             ['type' => 'practice'],
             [
-                'name'        => 'Program B — Živá prax',
-                'description' => 'Program živej praxe prepájajúci reálne zadania zo súkromného sektora so študentskými tímami. NTI vystupuje ako sprostredkovateľ medzi firmou a realizačným tímom.',
-                'is_active'   => true,
+                'name'          => 'Program B — Live practice',
+                'description'   => 'A live practice program connecting real-world assignments from the private sector with student teams. NTI acts as an intermediary between the company and the implementation team.',
+                'is_active'     => true,
             ]
         );
     }

@@ -2,67 +2,65 @@
 
 namespace Database\Seeders;
 
-use App\Models\EvaluationCriteria;
-use App\Models\EvaluationTemplate;
-use App\Models\Program;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
+
+use App\Models\EvaluationTemplate;
+use App\Models\EvaluationCriteria;
+use App\Models\Program;
 
 class EvaluationTemplateSeeder extends Seeder
 {
+    /**
+     * Шаблон оценки
+     */
     public function run(): void
     {
-        $programA = Program::where('type', 'grant')->first();
-        $programB = Program::where('type', 'practice')->first();
+        Schema::disableForeignKeyConstraints();
+        EvaluationCriteria::truncate();
+        EvaluationTemplate::truncate();
+        Schema::enableForeignKeyConstraints();
 
-        // ---------------------------------------------------------
-        // Šablóna pre Program A
-        // ---------------------------------------------------------
-        $templateA = EvaluationTemplate::firstOrCreate(
-            ['name' => 'Štandardná šablóna hodnotenia — Program A'],
-            [
-                'program_id'  => $programA->id,
-                'description' => 'Základná šablóna hodnotenia pre grantový inkubačný program.',
-            ]
-        );
+        // ------------------------------
+        // Автосоздание с помощью фабрики
+        // ------------------------------
 
-        $criteriaA = [
-            ['name' => 'Inovácia a originalita', 'description' => 'Miera inovatívnosti nápadu a jeho originalita na trhu.', 'weight' => 25.00, 'order' => 1],
-            ['name' => 'Realizovateľnosť', 'description' => 'Technická a organizačná realizovateľnosť projektu.', 'weight' => 20.00, 'order' => 2],
-            ['name' => 'Trhový potenciál', 'description' => 'Potenciál projektu na trhu a škálovateľnosť riešenia.', 'weight' => 20.00, 'order' => 3],
-            ['name' => 'Tím a kompetencie', 'description' => 'Skúsenosti a kompetencie členov tímu.', 'weight' => 20.00, 'order' => 4],
-            ['name' => 'Prezentácia a dokumentácia', 'description' => 'Kvalita prezentácie projektu a priložených dokumentov.', 'weight' => 15.00, 'order' => 5],
-        ];
-
-        foreach ($criteriaA as $criteria) {
-            EvaluationCriteria::firstOrCreate(
-                ['template_id' => $templateA->id, 'name' => $criteria['name']],
-                $criteria
-            );
+        if (Program::count() === 0) {
+            $this->call(ProgramSeeder::class);
         }
+        $program = Program::first();
 
-        // ---------------------------------------------------------
-        // Šablóna pre Program B
-        // ---------------------------------------------------------
-        $templateB = EvaluationTemplate::firstOrCreate(
-            ['name' => 'Štandardná šablóna hodnotenia — Program B'],
-            [
-                'program_id'  => $programB->id,
-                'description' => 'Základná šablóna hodnotenia pre program živej praxe.',
-            ]
-        );
+        for ($i = 0; $i < 5; $i++) {
+            $template = EvaluationTemplate::factory()->create([
+                'program_id' => $program->id,
+            ]);
 
-        $criteriaB = [
-            ['name' => 'Technické kompetencie tímu', 'description' => 'Úroveň technických zručností tímu vo vzťahu k zadaniu.', 'weight' => 30.00, 'order' => 1],
-            ['name' => 'Pochopenie zadania', 'description' => 'Miera pochopenia firemného zadania a jeho požiadaviek.', 'weight' => 25.00, 'order' => 2],
-            ['name' => 'Návrh riešenia', 'description' => 'Kvalita a reálnosť navrhovaného riešenia.', 'weight' => 25.00, 'order' => 3],
-            ['name' => 'Motivácia a záujem', 'description' => 'Motivácia tímu a záujem o danú problematiku.', 'weight' => 20.00, 'order' => 4],
-        ];
+            // ------------------------------
+            // Ручное создание
+            // ------------------------------
 
-        foreach ($criteriaB as $criteria) {
-            EvaluationCriteria::firstOrCreate(
-                ['template_id' => $templateB->id, 'name' => $criteria['name']],
-                $criteria
-            );
+            EvaluationCriteria::factory()->create([
+                'template_id' => $template->id,
+                'name'        => 'Technical Implementation',
+                'description' => 'Code quality, database architecture, and framework utilization.',
+                'weight'      => '0.40',
+                'order'       => 1,
+            ]);
+            EvaluationCriteria::factory()->create([
+                'template_id' => $template->id,
+                'name'        => 'Feasibility & Scalability',
+                'description' => 'How realistic, secure, and scalable the solution is for business.',
+                'weight'      => '0.30',
+                'order'       => 2,
+            ]);
+            EvaluationCriteria::factory()->create([
+                'template_id' => $template->id,
+                'name'        => 'Presentation & Demo',
+                'description' => 'Quality of the pitch, UI/UX responsiveness, and live demonstration.',
+                'weight'      => '0.30',
+                'order'       => 3,
+            ]);
         }
     }
 }

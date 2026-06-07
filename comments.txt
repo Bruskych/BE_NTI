@@ -7,9 +7,6 @@
 --- GIT ---
 git reset --soft HEAD~1             -> delete last commit
 
---- GENERATE IDE HELPER FOR MODELS ---
-php artisan ide-helper:models
-
 --- START ---
 C:\xampp\php\php.exe artisan serve
 php artisan serve
@@ -25,11 +22,12 @@ php artisan install:api
 
 
 --- DATABASE ---
-php artisan migrate                 -> load
-php artisan db:seed                 -> start add seeder
-php artisan migrate:rollback        -> back 1 step
-php artisan migrate:fresh           -> delete
-php artisan migrate:fresh --seed    -> delete+add
+php artisan migrate                         -> load
+php artisan db:seed                         -> start add seeder
+php artisan db:seed --class=NameSeeder      -> test seeder
+php artisan migrate:rollback                -> back 1 step
+php artisan migrate:fresh                   -> delete
+php artisan migrate:fresh --seed            -> delete+add
 
     === FACTORIES ===
     php artisan make:factory NameFactory --model=Name
@@ -39,6 +37,22 @@ php artisan migrate:fresh --seed    -> delete+add
 
     === SEEDER ===
     php artisan make:seeder NameSeeder
+
+
+
+--- IDE HELPER ---
+
+    === GENERATE IDE HELPER FOR FACADES ===
+    php artisan ide-helper:generate
+
+    === GENERATE IDE HELPER ===
+    php artisan ide-helper:meta
+
+    === GENERATE IDE HELPER FOR MODELS ===
+    php artisan ide-helper:models --nowrite
+
+    === DELETE IDE HELPER FOR MODELS ===
+    php artisan ide-helper:models --reset
 
 
 

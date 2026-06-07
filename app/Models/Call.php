@@ -7,49 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-/**
- * @property int $id
- * @property int $program_id
- * @property string|null $title
- * @property string|null $description
- * @property \Illuminate\Support\Carbon|null $deadline
- * @property string $status
- * @property numeric|null $budget
- * @property int|null $evaluation_template_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Application> $applications
- * @property-read int|null $applications_count
- * @property-read \App\Models\EvaluationTemplate|null $evaluationTemplate
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FormField> $formFields
- * @property-read int|null $form_fields_count
- * @property-read \App\Models\Program|null $program
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Specialization> $specializations
- * @property-read int|null $specializations_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereBudget($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereDeadline($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereEvaluationTemplateId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereProgramId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Call withoutTrashed()
- * @mixin \Eloquent
- */
 class Call extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     protected $fillable = [
         'program_id',

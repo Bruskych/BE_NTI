@@ -2,68 +2,84 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Seeder;
+
 use App\Models\Specialization;
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 
 class TeamSeeder extends Seeder
 {
+    /**
+     * Команды студентов
+     */
     public function run(): void
     {
-        $leader  = User::where('email', 'leader@student.nti.sk')->first();
-        $student = User::where('email', 'student@student.nti.sk')->first();
+        Schema::disableForeignKeyConstraints();
+        Team::truncate();
+        DB::table('team_specialization')->truncate();
+        DB::table('team_user')->truncate();
+        Schema::enableForeignKeyConstraints();
 
-        // ---------------------------------------------------------
-        // Tím 1 — Program A
-        // ---------------------------------------------------------
-        $team1 = Team::firstOrCreate(
-            ['name' => 'InnoTech Team'],
-            [
-                'leader_id'   => $leader->id,
-                'description' => 'Tím zameraný na vývoj inovatívnych softvérových riešení pre Program A.',
-                'skills_json' => json_encode(['PHP', 'Laravel', 'Vue.js', 'MySQL']),
-                'capacity'    => 5,
-                'status'      => 'active',
-            ]
-        );
+        // ------------------------------
+        // Ручное создание
+        // ------------------------------
 
-        // Pridaj členov
-        $team1->members()->syncWithoutDetaching([
-            $leader->id  => ['role' => 'leader', 'joined_at' => now()],
-            $student->id => ['role' => 'member', 'joined_at' => now()],
+        $users = User::all();
+        $specializations = Specialization::all();
+        if ($users->isEmpty()) {
+            return;
+        }
+        $leader = $users->first();
+        $staticTeam = Team::create([
+            'name'          => 'Dream Team NTI',
+            'leader_id'     => $leader->id,
+            'description'   => 'A core team of developers building services using Vue 3 and Laravel.',
+            'skills_json'   => [
+                'Vue 3',
+                'Laravel',
+                'Docker',
+                'Git'
+            ],
+            'capacity'      => 5,
+            'status'        => 'formed',
         ]);
+        $staticTeam->users()->attach($leader->id, ['role' => 'leader', 'joined_at' => now()]);
+        if ($users->count() > 1) {
+            $members = $users->skip(1)->take(3)->pluck('id')->toArray();
+            foreach ($members as $memberId) {
+                $staticTeam->users()->attach($memberId, ['role' => 'member', 'joined_at' => now()]);
+            }
+        }
+        if ($specializations->isNotEmpty()) {
+            $staticTeam->specializations()->attach($specializations->pluck('id')->toArray());
+        }
 
-        // Pridaj špecializácie
-        $specs1 = Specialization::whereIn('slug', [
-            'webove-aplikacie',
-            'stack-03-web',
-        ])->pluck('id');
-        $team1->specializations()->syncWithoutDetaching($specs1);
+        // ------------------------------
+        // Автосоздание с помощью фабрики
+        // ------------------------------
 
-        // ---------------------------------------------------------
-        // Tím 2 — Program B
-        // ---------------------------------------------------------
-        $team2 = Team::firstOrCreate(
-            ['name' => 'AI Builders'],
-            [
-                'leader_id'   => $leader->id,
-                'description' => 'Tím špecializovaný na AI a dátové technológie pre Program B.',
-                'skills_json' => json_encode(['Python', 'TensorFlow', 'FastAPI', 'PostgreSQL']),
-                'capacity'    => 4,
-                'status'      => 'active',
-            ]
-        );
-
-        $team2->members()->syncWithoutDetaching([
-            $leader->id  => ['role' => 'leader', 'joined_at' => now()],
-            $student->id => ['role' => 'member', 'joined_at' => now()],
-        ]);
-
-        $specs2 = Specialization::whereIn('slug', [
-            'ai-datove-technologie',
-            'stack-02-ai-data',
-        ])->pluck('id');
-        $team2->specializations()->syncWithoutDetaching($specs2);
+        $teams = Team::factory()->count(8)->create();
+        foreach ($teams as $team) {
+            if ($team->leader_id) {
+                $team->users()->attach($team->leader_id, ['role' => 'leader', 'joined_at' => now()]);
+            }
+            $potentialMembers = $users->where('id', '!=', $team->leader_id);
+            if ($potentialMembers->isNotEmpty()) {
+                $memberCount = rand(1, min($team->capacity - 1, $potentialMembers->count()));
+                $randomMembers = $potentialMembers->random($memberCount)->pluck('id')->toArray();
+                foreach ($randomMembers as $userId) {
+                    $team->users()->attach($userId, ['role' => 'member', 'joined_at' => now()]);
+                }
+            }
+            if ($specializations->isNotEmpty()) {
+                $team->specializations()->attach(
+                    $specializations->random(rand(1, min(2, $specializations->count())))->pluck('id')->toArray()
+                );
+            }
+        }
     }
 }
