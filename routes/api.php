@@ -69,7 +69,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/submit', [ApplicationController::class, 'submit']);
         Route::post('/evaluations', [EvaluationController::class, 'store']);
     });
-
     Route::prefix('calls')->group(function () {
         Route::get('/', [CallController::class, 'index']);
         Route::get('/{call}', [CallController::class, 'show']);
