@@ -22,11 +22,8 @@ class ApplicationPolicy
 
     public function submit(User $user, Application $application): bool
     {
-        //return $user->can('applications.submit') &&
-        //    $application->team->leader_id === $user->id &&
-        //    $application->canBeSubmitted();
-        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
-        return $application->team->leader_id === $user->id &&
+        return $user->can('applications.submit') &&
+            $application->team->leader_id === $user->id &&
             $application->canBeSubmitted();
     }
 
