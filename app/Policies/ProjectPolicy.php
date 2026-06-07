@@ -15,6 +15,7 @@ class ProjectPolicy
         return null;
     }
 
+
     private function isMember(User $user, Project $project): bool
     {
         return $project->team && $project->team->members()
