@@ -2,10 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Models\ExportsLog;
-use App\Models\User;
-use App\Models\Project;
 use App\Models\Application;
+use App\Models\ExportsLog;
+use App\Models\Project;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,7 +15,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PDF;
 
 class GenerateExport implements ShouldQueue
 {
@@ -37,11 +37,42 @@ class GenerateExport implements ShouldQueue
         $type = $log->export_type;
         $filename = 'exports/' . $type . '_' . $log->id . '_' . time();
 
-        if ($type === 'users_csv') {
+        if ($type === 'personal_data_json') {
+            $this->exportPersonalDataJson($log, $filename);
+            return;
+        }
+
+        if (preg_match('/^(users|projects|applications)_(csv|xlsx|pdf)$/', $type, $matches)) {
+            $resource = $matches[1];
+            $format = $matches[2];
+
+            match ($resource) {
+                'users' => $this->exportUsers($format, $filename, $log),
+                'projects' => $this->exportProjects($format, $filename, $log),
+                'applications' => $this->exportApplications($format, $filename, $log),
+                default => null,
+            };
+
+            return;
+        }
+
+        $filename .= '.txt';
+        Storage::put($filename, "Export ({$type}) generated at " . now()->toIso8601String());
+        $log->file_path = $filename;
+        $log->save();
+    }
+
+    protected function exportUsers(string $format, string $filename, ExportsLog $log): void
+    {
+        $filters = $log->filters_json ?? [];
+        $query = $this->applyFilters(User::with('roles'), 'users', $filters);
+
+        if ($format === 'csv') {
             $filename .= '.csv';
             $handle = fopen(storage_path('app/' . $filename), 'w');
-            fputcsv($handle, ['id', 'name', 'email', 'roles', 'created_at']);
-            User::with('roles')->chunk(100, function ($users) use ($handle) {
+            fputcsv($handle, ['id', 'name', 'email', 'roles', 'created_at'], ',', '"', '\\');
+
+            $query->chunk(100, function ($users) use ($handle) {
                 foreach ($users as $user) {
                     fputcsv($handle, [
                         $user->id,
@@ -49,25 +80,88 @@ class GenerateExport implements ShouldQueue
                         $user->email,
                         implode(',', $user->getRoleNames()->toArray()),
                         $user->created_at ? $user->created_at->toIso8601String() : null,
-                    ]);
+                    ], ',', '"', '\\');
                 }
             });
+
             fclose($handle);
-            $log->file_path = $filename;
-            $log->save();
+            $this->saveLog($log, $filename);
             return;
         }
 
-        if ($type === 'projects_xlsx') {
+        if ($format === 'xlsx') {
+            $filename .= '.xlsx';
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray(['id', 'name', 'email', 'roles', 'created_at'], null, 'A1');
+
+            $row = 2;
+            $query->chunk(100, function ($users) use (&$row, $sheet) {
+                foreach ($users as $user) {
+                    $sheet->fromArray([
+                        $user->id,
+                        $user->name,
+                        $user->email,
+                        implode(',', $user->getRoleNames()->toArray()),
+                        $user->created_at ? $user->created_at->toIso8601String() : null,
+                    ], null, 'A' . $row);
+                    $row++;
+                }
+            });
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'pdf') {
+            $filename .= '.pdf';
+            $users = $query->get();
+            $html = view('exports.users', ['users' => $users])->render();
+            Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
+        }
+    }
+
+    protected function exportProjects(string $format, string $filename, ExportsLog $log): void
+    {
+        $filters = $log->filters_json ?? [];
+        $query = $this->applyFilters(Project::with('application.team'), 'projects', $filters);
+
+        if ($format === 'csv') {
+            $filename .= '.csv';
+            $handle = fopen(storage_path('app/' . $filename), 'w');
+            fputcsv($handle, ['id', 'title', 'status', 'final_score', 'started_at', 'finished_at', 'team'], ',', '"', '\\');
+
+            $query->chunk(100, function ($projects) use ($handle) {
+                foreach ($projects as $project) {
+                    fputcsv($handle, [
+                        $project->id,
+                        $project->title,
+                        $project->status,
+                        $project->final_score,
+                        $project->started_at ? $project->started_at->toIso8601String() : null,
+                        $project->finished_at ? $project->finished_at->toIso8601String() : null,
+                        optional($project->application->team)->name,
+                    ], ',', '"', '\\');
+                }
+            });
+
+            fclose($handle);
+            $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'xlsx') {
             $filename .= '.xlsx';
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $sheet->fromArray(['id', 'title', 'status', 'final_score', 'started_at', 'finished_at', 'team'], null, 'A1');
 
             $row = 2;
-            Project::with('application.team')->chunk(100, function ($projects) use (&$row, $sheet) {
+            $query->chunk(100, function ($projects) use (&$row, $sheet) {
                 foreach ($projects as $project) {
-                    $teamName = optional($project->application->team)->name;
                     $sheet->fromArray([
                         $project->id,
                         $project->title,
@@ -75,35 +169,191 @@ class GenerateExport implements ShouldQueue
                         $project->final_score,
                         $project->started_at ? $project->started_at->toIso8601String() : null,
                         $project->finished_at ? $project->finished_at->toIso8601String() : null,
-                        $teamName,
+                        optional($project->application->team)->name,
                     ], null, 'A' . $row);
                     $row++;
                 }
             });
 
             $writer = new Xlsx($spreadsheet);
-            $path = storage_path('app/' . $filename);
-            $writer->save($path);
-            $log->file_path = $filename;
-            $log->save();
+            $writer->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
             return;
         }
 
-        if ($type === 'applications_pdf') {
+        if ($format === 'pdf') {
             $filename .= '.pdf';
-            $applications = Application::with('team')->get();
-            $html = view('exports.applications', ['applications' => $applications])->render();
-            $pdf = PDF::loadHTML($html);
-            $path = storage_path('app/' . $filename);
-            $pdf->save($path);
-            $log->file_path = $filename;
-            $log->save();
+            $projects = $query->get();
+            $html = view('exports.projects', ['projects' => $projects])->render();
+            Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
+        }
+    }
+
+    protected function exportApplications(string $format, string $filename, ExportsLog $log): void
+    {
+        $filters = $log->filters_json ?? [];
+        $query = $this->applyFilters(Application::with('team'), 'applications', $filters);
+
+        if ($format === 'csv') {
+            $filename .= '.csv';
+            $handle = fopen(storage_path('app/' . $filename), 'w');
+            fputcsv($handle, ['id', 'team', 'status', 'submitted_at', 'total_score', 'decision_comment'], ',', '"', '\\');
+
+            $query->chunk(100, function ($applications) use ($handle) {
+                foreach ($applications as $application) {
+                    fputcsv($handle, [
+                        $application->id,
+                        optional($application->team)->name,
+                        $application->status,
+                        $application->submitted_at ? $application->submitted_at->toIso8601String() : null,
+                        $application->total_score,
+                        $application->decision_comment,
+                    ], ',', '"', '\\');
+                }
+            });
+
+            fclose($handle);
+            $this->saveLog($log, $filename);
             return;
         }
 
-        // Fallback
-        $filename .= '.txt';
-        Storage::put($filename, "Export ({$type}) generated at " . now()->toIso8601String());
+        if ($format === 'xlsx') {
+            $filename .= '.xlsx';
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray(['id', 'team', 'status', 'submitted_at', 'total_score', 'decision_comment'], null, 'A1');
+
+            $row = 2;
+            $query->chunk(100, function ($applications) use (&$row, $sheet) {
+                foreach ($applications as $application) {
+                    $sheet->fromArray([
+                        $application->id,
+                        optional($application->team)->name,
+                        $application->status,
+                        $application->submitted_at ? $application->submitted_at->toIso8601String() : null,
+                        $application->total_score,
+                        $application->decision_comment,
+                    ], null, 'A' . $row);
+                    $row++;
+                }
+            });
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'pdf') {
+            $filename .= '.pdf';
+            $applications = $query->get();
+            $html = view('exports.applications', ['applications' => $applications])->render();
+            Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
+            $this->saveLog($log, $filename);
+        }
+    }
+
+    protected function applyFilters($query, string $resource, array $filters)
+    {
+        if (isset($filters['active'])) {
+            $active = filter_var($filters['active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($active !== null) {
+                if ($resource === 'users') {
+                    $query->when($active, fn ($query) => $query->whereNotNull('email_verified_at'))
+                        ->when(!$active, fn ($query) => $query->whereNull('email_verified_at'));
+                }
+
+                if ($resource === 'projects') {
+                    $inactiveStatuses = ['archived', 'suspended'];
+                    $query->when($active, fn ($query) => $query->whereNotIn('status', $inactiveStatuses))
+                        ->when(!$active, fn ($query) => $query->whereIn('status', $inactiveStatuses));
+                }
+
+                if ($resource === 'applications') {
+                    $inactiveStatuses = ['rejected', 'archived'];
+                    $query->when($active, fn ($query) => $query->whereNotIn('status', $inactiveStatuses))
+                        ->when(!$active, fn ($query) => $query->whereIn('status', $inactiveStatuses));
+                }
+            }
+        }
+
+        if (isset($filters['status']) && is_string($filters['status'])) {
+            $status = $filters['status'];
+            if ($status !== '' && $status !== 'active' && $status !== 'inactive') {
+                $query->where('status', $status);
+            }
+        }
+
+        return $query;
+    }
+
+    protected function exportPersonalDataJson(ExportsLog $log, string $filename): void
+    {
+        $filename .= '.json';
+        $userId = data_get($log->filters_json, 'user_id');
+        $user = User::with([
+            'studentProfile',
+            'organizations',
+            'teams',
+            'gdprConsents',
+            'auditEvents',
+            'notificationPreference',
+        ])->find($userId);
+
+        $payload = [
+            'exported_at' => now()->toIso8601String(),
+            'requested_for' => $userId,
+            'personal_data' => null,
+        ];
+
+        if ($user) {
+            $payload['personal_data'] = [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->getRoleNames()->toArray(),
+                    'created_at' => $user->created_at ? $user->created_at->toIso8601String() : null,
+                    'avatar_url' => $user->avatar_url,
+                ],
+                'student_profile' => $user->studentProfile ? $user->studentProfile->toArray() : null,
+                'organizations' => $user->organizations->map(function ($organization) {
+                    return [
+                        'id' => $organization->id,
+                        'name' => $organization->name,
+                        'pivot' => $organization->pivot ? $organization->pivot->toArray() : null,
+                    ];
+                })->toArray(),
+                'teams' => $user->teams->map(function ($team) {
+                    return [
+                        'id' => $team->id,
+                        'name' => $team->name,
+                        'pivot' => $team->pivot ? $team->pivot->toArray() : null,
+                    ];
+                })->toArray(),
+                'notification_preference' => $user->notificationPreference ? $user->notificationPreference->toArray() : null,
+                'gdpr_consents' => $user->gdprConsents->toArray(),
+                'audit_events' => $user->auditEvents->map(function ($event) {
+                    return [
+                        'action' => $event->action,
+                        'object_type' => $event->object_type,
+                        'object_id' => $event->object_id,
+                        'old_values' => $event->old_values_json,
+                        'new_values' => $event->new_values_json,
+                        'result' => $event->result,
+                        'created_at' => $event->created_at ? $event->created_at->toIso8601String() : null,
+                    ];
+                })->toArray(),
+            ];
+        }
+
+        file_put_contents(storage_path('app/' . $filename), json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $this->saveLog($log, $filename);
+    }
+
+    protected function saveLog(ExportsLog $log, string $filename): void
+    {
         $log->file_path = $filename;
         $log->save();
     }

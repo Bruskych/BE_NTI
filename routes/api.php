@@ -6,7 +6,7 @@ use App\Http\Controllers\{
     CallController, ChallengeController, OrganizationController, SpecializationController,
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
-    ExportController,
+    ExportController, GdprController,
 };
 
 // -------------------------------------------------------------------------
@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/gdpr/export', [GdprController::class, 'exportMyData']);
+        Route::delete('/gdpr/erase', [GdprController::class, 'eraseMyData']);
     });
     Route::put('/settings/update-profile', ProfileController::class);
 
@@ -53,8 +55,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/companies/pending', [AdminController::class, 'pendingCompanies']);
         Route::post('/companies/{id}/approve', [AdminController::class, 'approveCompany']);
         Route::post('/companies/{id}/reject', [AdminController::class, 'rejectCompany']);
+        Route::get('/exports/types', [ExportController::class, 'types']);
         Route::get('/exports', [ExportController::class, 'index']);
         Route::post('/exports', [ExportController::class, 'store']);
+        Route::post('/export/{resource}/{format}', [ExportController::class, 'storeByRoute']);
+        Route::post('/gdpr/users/{user}/export', [GdprController::class, 'exportUserData']);
+        Route::delete('/gdpr/users/{user}', [GdprController::class, 'eraseUserData']);
     });
 
     Route::get('/teams/my-team', [TeamController::class, 'myTeam']);

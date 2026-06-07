@@ -16,16 +16,16 @@ class ExportController extends Controller
         return response()->json($logs);
     }
 
+    public function types()
+    {
+        return response()->json([
+            'types' => StoreExportRequest::availableExportOptionsGrouped(),
+        ]);
+    }
+
     public function store(StoreExportRequest $request)
     {
-        $user = $request->user();
-
-        $log = ExportsLog::create([
-            'user_id'     => $user->id,
-            'export_type' => $request->export_type,
-            'filters_json'=> $request->filters ?? [],
-            'created_at'  => now(),
-        ]);
+        $log = $this->createExportLog($request->user()->id, $request->export_type, $request->filters ?? []);
 
         GenerateExport::dispatch($log->id);
 
@@ -33,5 +33,36 @@ class ExportController extends Controller
             'message' => 'Export scheduled',
             'export'  => $log
         ], 202);
+    }
+
+    public function storeByRoute(Request $request, string $resource, string $format)
+    {
+        $exportType = sprintf('%s_%s', $resource, $format);
+
+        if (!in_array($exportType, StoreExportRequest::allowedExportTypes(), true)) {
+            abort(404, 'Export format not found.');
+        }
+
+        $validated = $request->validate([
+            'filters' => 'nullable|array',
+        ]);
+
+        $log = $this->createExportLog($request->user()->id, $exportType, $validated['filters'] ?? []);
+        GenerateExport::dispatch($log->id);
+
+        return response()->json([
+            'message' => 'Export scheduled',
+            'export'  => $log
+        ], 202);
+    }
+
+    protected function createExportLog(int $userId, string $exportType, array $filters): ExportsLog
+    {
+        return ExportsLog::create([
+            'user_id' => $userId,
+            'export_type' => $exportType,
+            'filters_json' => $filters,
+            'created_at' => now(),
+        ]);
     }
 }
