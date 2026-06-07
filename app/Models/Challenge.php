@@ -7,10 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Challenge extends Model
 {
     use SoftDeletes;
+
+    const STATUS_DRAFT     = 'draft';
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_PAIRING   = 'pairing';
+    const STATUS_ASSIGNED  = 'assigned';
+    const STATUS_ACTIVE    = 'active';
+    const STATUS_CLOSED    = 'closed';
 
     protected $fillable = [
         'program_id',
@@ -29,14 +37,9 @@ class Challenge extends Model
     protected $casts = [
         'deadline'         => 'datetime',
         'budget'           => 'decimal:2',
-        'status'           => 'string',
         'max_applications' => 'integer',
         'backlog_order'    => 'integer',
     ];
-
-    // ---------------------------------------------------------
-    // Relationships
-    // ---------------------------------------------------------
 
     public function program(): BelongsTo
     {
@@ -63,39 +66,34 @@ class Challenge extends Model
         return $this->hasMany(Application::class);
     }
 
-    // ---------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------
 
-    public function isDraft(): bool
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        return $this->status === 'draft';
+        if ($user->can('challenges.view-all')) {
+            return $query;
+        }
+        if ($user->hasRole(['student', 'visitor'])) {
+            return $query->whereIn('status', [self::STATUS_PUBLISHED, self::STATUS_PAIRING, self::STATUS_ASSIGNED, self::STATUS_ACTIVE]);
+        }
+
+        $myOrgIds = $user->organizations()->pluck('organizations.id');
+
+        return $query->where(function ($q) use ($myOrgIds) {
+            $q->whereIn('status', [self::STATUS_PUBLISHED, self::STATUS_PAIRING, self::STATUS_ASSIGNED, self::STATUS_ACTIVE])
+                ->orWhere(function ($sub) use ($myOrgIds) {
+                    $sub->where('status', self::STATUS_DRAFT)
+                        ->whereIn('organization_id', $myOrgIds);
+                });
+        });
     }
 
-    public function isPublished(): bool
-    {
-        return $this->status === 'published';
-    }
-
-    public function isPairing(): bool
-    {
-        return $this->status === 'pairing';
-    }
-
-    public function isAssigned(): bool
-    {
-        return $this->status === 'assigned';
-    }
-
-    public function isActive(): bool
-    {
-        return $this->status === 'active';
-    }
-
-    public function isClosed(): bool
-    {
-        return $this->status === 'closed';
-    }
+    public function isDraft(): bool     { return $this->status === self::STATUS_DRAFT; }
+    public function isPublished(): bool { return $this->status === self::STATUS_PUBLISHED; }
+    public function isPairing(): bool   { return $this->status === self::STATUS_PAIRING; }
+    public function isAssigned(): bool  { return $this->status === self::STATUS_ASSIGNED; }
+    public function isActive(): bool    { return $this->status === self::STATUS_ACTIVE; }
+    public function isClosed(): bool    { return $this->status === self::STATUS_CLOSED; }
 
     public function hasCapacity(): bool
     {

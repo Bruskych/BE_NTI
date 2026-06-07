@@ -74,4 +74,14 @@ class Milestone extends Model
             && $this->deadline->isPast()
             && ! $this->isCompleted();
     }
+
+    public function markAsApproved(int $userId): void
+    {
+        $this->update([
+            'approved_by'           => $userId,
+            'status'                => 'completed',
+            'completed_at'          => now(),
+            'completion_percentage' => 100,
+        ]);
+    }
 }

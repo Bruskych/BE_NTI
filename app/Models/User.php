@@ -61,8 +61,7 @@ class User extends Authenticatable implements HasMedia
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(Team::class, 'team_user')
-            ->withPivot('role', 'joined_at')
-            ->withTimestamps();
+            ->withPivot('role', 'joined_at');
     }
 
     public function ledTeams(): HasMany
@@ -161,7 +160,7 @@ class User extends Authenticatable implements HasMedia
 
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
+        return $this->hasRole('admin') || $this->hasRole('super_admin');
     }
 
     public function isSuperAdmin(): bool
@@ -214,4 +213,21 @@ class User extends Authenticatable implements HasMedia
             'name' => trim($name)
         ]);
     }
+
+    public function isOwnerOf(Organization $organization): bool
+    {
+        return $this->organizations()
+            ->where('organizations.id', $organization->id)
+            ->wherePivot('role', 'owner')
+            ->exists();
+    }
+
+    public function belongsToOrg(Organization $organization): bool
+    {
+        return $this->organizations()
+            ->where('organizations.id', $organization->id)
+            ->exists();
+    }
+
+
 }

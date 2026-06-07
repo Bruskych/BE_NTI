@@ -4,75 +4,59 @@ namespace App\Policies;
 
 use App\Models\Milestone;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class MilestonePolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function before(User $user, string $ability): ?bool
     {
-        return false;
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return true;
+        }
+
+        return null;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
+    private function isMember(User $user, Milestone $milestone): bool
+    {
+        return $milestone->project->team->members()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
+
     public function view(User $user, Milestone $milestone): bool
     {
-        return $milestone->project->team->members->contains($user->id) || $user->isStaff();
+        return $user->can('milestones.view') || $this->isMember($user, $milestone);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('milestones.create');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Milestone $milestone): bool
     {
-        return $milestone->project->team->members->contains($user->id);
+        if ($user->can('milestones.edit')) {
+            return true;
+        }
+
+        return $this->isMember($user, $milestone);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Milestone $milestone): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Milestone $milestone): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Milestone $milestone): bool
-    {
-        return false;
-    }
     public function approve(User $user, Milestone $milestone): bool
     {
-        if (!$user->hasAnyRole(['mentor', 'evaluator', 'admin'])) {
+        if (!$user->can('milestones.approve')) {
             return false;
         }
 
-        if ($milestone->project->team->members->contains($user->id)) {
+        if ($this->isMember($user, $milestone)) {
             return false;
         }
 
         return true;
+    }
+
+    public function viewAny(User $user): bool
+    {
+        return $user->can('milestones.view');
     }
 }

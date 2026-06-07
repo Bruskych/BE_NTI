@@ -4,69 +4,34 @@ namespace App\Policies;
 
 use App\Models\Application;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ApplicationPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Application $application): bool
     {
-        return $application->team->members->contains($user->id) || $user->isAdmin();
+        if ($user->can('applications.view-all')) return true;
+
+        return $application->team->members()->where('user_id', $user->id)->exists();
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Application $application): bool
     {
-        return $application->team->members->contains($user->id)
+        return $application->team->members()->where('user_id', $user->id)->exists()
             && $application->canBeEdited();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Application $application): bool
+    public function submit(User $user, Application $application): bool
     {
-        return false;
+        //return $user->can('applications.submit') &&
+        //    $application->team->leader_id === $user->id &&
+        //    $application->canBeSubmitted();
+        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
+        return $application->team->leader_id === $user->id &&
+            $application->canBeSubmitted();
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Application $application): bool
+    public function changeStatus(User $user, Application $application): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Application $application): bool
-    {
-        return false;
-    }
-    public function submit(User $user, Application $application)
-    {
-        return $application->team->leader_id === $user->id
-            && $application->canBeSubmitted();
+        return $user->can('applications.change-status');
     }
 }

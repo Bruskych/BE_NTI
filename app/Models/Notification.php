@@ -61,4 +61,29 @@ class Notification extends Model
     {
         return $this->channel === self::CHANNEL_SYSTEM;
     }
+
+    public function scopeUnread($query)
+    {
+        return $query->whereNull('read_at');
+    }
+
+    public function scopeForTeamInvite($query)
+    {
+        return $query->where('type', 'team_invite');
+    }
+
+    public function getTeamIdAttribute(): ?int
+    {
+        return $this->data_json['team_id'] ?? null;
+    }
+
+    public function scopeForTeam($query, $teamId)
+    {
+        return $query->whereJsonContains('data_json->team_id', $teamId);
+    }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
 }

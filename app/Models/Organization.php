@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Organization extends Model implements HasMedia
 {
@@ -30,6 +31,12 @@ class Organization extends Model implements HasMedia
     // Relationships
     // ---------------------------------------------------------
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('logo')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp']);
+    }
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organization_user')

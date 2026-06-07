@@ -4,67 +4,41 @@ namespace App\Policies;
 
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ProjectPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function before(User $user, string $ability): ?bool
     {
-        return false;
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return true;
+        }
+        return null;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
+    private function isMember(User $user, Project $project): bool
+    {
+        return $project->team && $project->team->members()
+                ->where('users.id', $user->id)
+                ->exists();
+    }
+
     public function view(User $user, Project $project): bool
     {
-        return $user->isAdmin() ||
-            $user->isStaff() ||
-            $project->team->members->contains($user->id);
+        return $user->can('projects.view') || $this->isMember($user, $project);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        //return $user->isStaff();
-        return true;
+        return $user->can('projects.create');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Project $project): bool
     {
-        return $user->isAdmin() ||
-            $project->team->members->contains($user->id);
+        return $user->can('projects.edit') || $this->isMember($user, $project);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Project $project): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Project $project): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Project $project): bool
-    {
-        return false;
+        return $user->can('projects.delete');
     }
 }

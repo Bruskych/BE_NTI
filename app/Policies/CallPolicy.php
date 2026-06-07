@@ -8,59 +8,57 @@ use Illuminate\Auth\Access\Response;
 
 class CallPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+
+    private function isAdmin(User $user): bool
+    {
+        return $user->hasAnyRole(['admin', 'super_admin']);
+    }
+
+    private function isOrganizationOwner(User $user, Call $call): bool
+    {
+        return $user->organizations->contains('id', $call->organization_id);
+    }
+
     public function viewAny(User $user): bool
     {
         return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Call $call): bool
     {
+        if ($this->isAdmin($user)) return true;
+
+        if ($call->status === 'draft') {
+            return $this->isOrganizationOwner($user, $call);
+        }
+
         return true;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['admin', 'super_admin']);
+        if ($this->isAdmin($user)) return true;
+
+        $organization = $user->organizations()->first();
+        return $organization && $organization->isActive();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Call $call): bool
     {
-        return $user->hasAnyRole(['admin', 'super_admin']);
+        if ($this->isAdmin($user)) return true;
+
+        return $this->isOrganizationOwner($user, $call);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Call $call): bool
     {
-        return false;
+        if ($this->isAdmin($user)) return true;
+
+        return $this->isOrganizationOwner($user, $call) && $call->status === 'draft';
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Call $call): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Call $call): bool
-    {
-        return false;
+        return $this->isAdmin($user);
     }
 }

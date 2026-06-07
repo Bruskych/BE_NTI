@@ -8,31 +8,23 @@ use Illuminate\Auth\Access\Response;
 
 class ChallengePolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
         return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Challenge $challenge): bool
     {
         if ($challenge->isDraft()) {
-            return $user->hasAnyRole(['admin', 'super_admin']) ||
-                $user->organizations()->where('organizations.id', $challenge->organization_id)->exists();
+            return $user->can('challenges.view-all') ||
+                $user->organizations->contains($challenge->organization_id);
         }
         return true;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
+        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
         if ($user->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
@@ -41,39 +33,29 @@ class ChallengePolicy
         return $organization && $organization->isActive();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Challenge $challenge): bool
     {
+        if ($user->can('challenges.edit-all')) return true;
+
+        return $user->organizations->contains($challenge->organization_id);
+    }
+
+    public function delete(User $user, Challenge $challenge): bool
+    {
+        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
         if ($user->hasAnyRole(['admin', 'super_admin'])) {
             return true;
         }
 
-        return $user->organizations()
-            ->where('organizations.id', $challenge->organization_id)
-            ->exists();
+        return $user->organizations->contains($challenge->organization_id)
+            && $challenge->isDraft();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Challenge $challenge): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Challenge $challenge): bool
     {
         return false;
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, Challenge $challenge): bool
     {
         return false;

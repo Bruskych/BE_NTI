@@ -148,4 +148,14 @@ class Application extends Model
     {
         return $this->status === self::STATUS_DRAFT;
     }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', self::STATUS_DRAFT);
+    }
+
+    public function scopeSubmitted($query)
+    {
+        return $query->where('status', self::STATUS_SUBMITTED);
+    }
 }

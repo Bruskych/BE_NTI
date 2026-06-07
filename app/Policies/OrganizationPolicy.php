@@ -8,74 +8,31 @@ use Illuminate\Auth\Access\Response;
 
 class OrganizationPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Organization $organization): bool
     {
-        if ($user->hasAnyRole(['admin', 'super_admin'])) {
+        if ($user->can('organizations.view') || $organization->isActive()) {
             return true;
         }
 
-        if ($organization->isActive()) {
-            return true;
-        }
-
-        return $user->organizations()->where('organizations.id', $organization->id)->exists();
+        return $user->belongsToOrg($organization);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Organization $organization): bool
     {
-        if ($user->hasAnyRole(['admin', 'super_admin'])) {
+        if ($user->can('organizations.edit')) {
             return true;
         }
 
-        return $user->organizations()
-            ->where('organizations.id', $organization->id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->isOwnerOf($organization);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
+    public function create(User $user): bool
+    {
+        return $user->can('organizations.create');
+    }
+
     public function delete(User $user, Organization $organization): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Organization $organization): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Organization $organization): bool
-    {
-        return false;
+        return $user->can('organizations.delete') || $user->isOwnerOf($organization);
     }
 }
