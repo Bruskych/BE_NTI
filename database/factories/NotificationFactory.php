@@ -27,7 +27,7 @@ class NotificationFactory extends Factory
                 Notification::CHANNEL_PUSH
             ]
         );
-        $isRead = fake()->boolean(40);
+        $isRead = fake()->boolean(30);
         return [
             'user_id'       => fn() => User::inRandomOrder()->first()?->id ?? User::factory(),
             'type'          => fake()->randomElement(
