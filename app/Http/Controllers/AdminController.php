@@ -45,28 +45,28 @@ class AdminController extends Controller
     public function approveStudent($id, Request $request, ApproveApplicationAction $action)
     {
         $application = Application::findOrFail($id);
-        $action->execute($application, $request->comment ?? 'Approved', 'student');
+        $action->execute($application, $request->comment ?? 'Approved', 'student', $request->user()->id);
         return response()->json(['message' => 'Student approved successfully.']);
     }
 
     public function rejectStudent($id, Request $request, RejectApplicationAction $action)
     {
         $application = Application::findOrFail($id);
-        $action->execute($application, $request->comment ?? 'Rejected');
+        $action->execute($application, $request->comment ?? 'Rejected', $request->user()->id);
         return response()->json(['message' => 'Student rejected successfully.']);
     }
 
     public function approveCompany($id, Request $request, ApproveApplicationAction $action)
     {
         $application = Application::with('organization')->findOrFail($id);
-        $action->execute($application, $request->comment ?? 'Approved', 'company');
+        $action->execute($application, $request->comment ?? 'Approved', 'company', $request->user()->id);
         return response()->json(['message' => 'Company approved successfully.']);
     }
 
     public function rejectCompany($id, Request $request, RejectApplicationAction $action)
     {
         $application = Application::findOrFail($id);
-        $action->execute($application, $request->comment ?? 'Rejected');
+        $action->execute($application, $request->comment ?? 'Rejected', $request->user()->id);
         return response()->json(['message' => 'Company rejected successfully.']);
     }
 }

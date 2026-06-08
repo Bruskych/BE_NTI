@@ -7,7 +7,7 @@ use App\Http\Controllers\{
     CallController, ChallengeController, OrganizationController, SpecializationController,
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
-    NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController,
+    NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController, DocumentController,
 };
 
 // -------------------------------------------------------------------------
@@ -122,5 +122,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('settings')->group(function () {
         Route::get('/notifications', [NotificationPreferenceController::class, 'show']);
         Route::patch('/notifications', [NotificationPreferenceController::class, 'update']);
+    });
+
+    // Documents
+    Route::apiResource('documents', DocumentController::class);
+    Route::prefix('documents')->group(function () {
+        Route::get('/{document}/download', [DocumentController::class, 'download']);
+        Route::post('/{document}/access-code', [DocumentController::class, 'requestAccessCode']);
+        Route::get('/{document}/preview', [DocumentController::class, 'preview']);
+        Route::post('/generate/internship-agreement', [DocumentController::class, 'generateInternshipAgreement']);
+        Route::post('/templates/upload', [DocumentController::class, 'uploadTemplate']);
+        Route::post('/templates/generate', [DocumentController::class, 'generateFromTemplate']);
     });
 });

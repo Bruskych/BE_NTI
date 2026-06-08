@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class RejectApplicationAction
 {
-    public function execute(Application $application, string $comment): void
+    public function execute(Application $application, string $comment, ?int $changedBy = null): void
     {
-        DB::transaction(function () use ($application, $comment) {
+        DB::transaction(function () use ($application, $comment, $changedBy) {
             $application->update([
                 'status' => 'rejected',
                 'rejected_at' => now(),
@@ -23,7 +23,7 @@ class RejectApplicationAction
                 'application_id' => $application->id,
                 'old_status' => 'submitted',
                 'new_status' => 'rejected',
-                'changed_by' => auth()->id(),
+                'changed_by' => $changedBy,
                 'comment' => $comment,
             ]);
 

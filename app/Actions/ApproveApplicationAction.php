@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class ApproveApplicationAction
 {
-    public function execute(Application $application, string $comment, string $role): void
+    public function execute(Application $application, string $comment, string $role, ?int $changedBy = null): void
     {
-        DB::transaction(function () use ($application, $comment, $role) {
+        DB::transaction(function () use ($application, $comment, $role, $changedBy) {
             $application->update([
                 'status' => 'approved',
                 'approved_at' => now(),
@@ -26,7 +26,7 @@ class ApproveApplicationAction
                 'application_id' => $application->id,
                 'old_status'     => 'submitted',
                 'new_status'     => 'approved',
-                'changed_by'     => auth()->id(),
+                'changed_by'     => $changedBy,
                 'comment'        => $comment,
             ]);
 
