@@ -67,6 +67,7 @@ services:
 
 networks:
     nti-network:
+        name: nti-network
         driver: bridge
 
 volumes:
