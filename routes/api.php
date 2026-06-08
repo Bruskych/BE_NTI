@@ -8,6 +8,7 @@ use App\Http\Controllers\{
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
     NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController, DocumentController,
+    BulkMessageController,
 };
 
 // -------------------------------------------------------------------------
@@ -65,6 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/gdpr/users/{user}/export', [GdprController::class, 'exportUserData']);
         Route::delete('/gdpr/users/{user}', [GdprController::class, 'eraseUserData']);
+
+        Route::get('/bulk-messages', [BulkMessageController::class, 'index']);
+        Route::post('/bulk-messages', [BulkMessageController::class, 'store']);
+        Route::get('/bulk-messages/{bulk_message}', [BulkMessageController::class, 'show']);
     });
 
     // Teams
