@@ -57,6 +57,7 @@ return new class extends Migration
             $table->string('file_path', 500)->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

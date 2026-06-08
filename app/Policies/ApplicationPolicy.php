@@ -85,4 +85,15 @@ class ApplicationPolicy
             ? Response::allow()
             : Response::deny('You lack permission to change status.');
     }
+
+    public function decide(User $user, Application $application): Response
+    {
+        if (!$user->can('evaluations.decide')) {
+            return Response::deny('You lack permission to decide on applications.');
+        }
+
+        return $application->status === Application::STATUS_IN_EVALUATION
+            ? Response::allow()
+            : Response::deny('This application is not awaiting a decision.');
+    }
 }

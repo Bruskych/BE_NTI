@@ -2,31 +2,38 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class EmailConfirmationService
 {
-    const REDIS_PREFIX = 'email_confirmation:';
+    const CACHE_PREFIX = 'email_confirmation:';
     const DEFAULT_EXPIRES_IN = 3600; // 1 hour
 
     /**
-     * Generate confirmation code and store in Redis
+     * Namespaces the cache key by purpose so e.g. a registration "email_verification"
+     * code can't collide with (or be overwritten by) a "document_access" code
+     * requested for the same address.
      */
-    public function generateCode(string $email, array $data = []): string
+    private function key(string $email, ?string $purpose = null): string
+    {
+        return self::CACHE_PREFIX . ($purpose ? "{$purpose}:" : '') . $email;
+    }
+
+    /**
+     * Generate a confirmation code and store it in the application cache
+     * (backed by Redis when CACHE_STORE=redis, but driver-agnostic otherwise —
+     * keeps this service usable without a phpredis/predis client installed).
+     */
+    public function generateCode(string $email, array $data = [], ?string $purpose = null): string
     {
         $code = Str::random(6);
-        $key = self::REDIS_PREFIX . $email;
 
-        Redis::setex(
-            $key,
-            self::DEFAULT_EXPIRES_IN,
-            json_encode([
-                'code' => $code,
-                'data' => $data,
-                'created_at' => now()->toIso8601String(),
-            ])
-        );
+        Cache::put($this->key($email, $purpose), [
+            'code'       => $code,
+            'data'       => $data,
+            'created_at' => now()->toIso8601String(),
+        ], self::DEFAULT_EXPIRES_IN);
 
         return $code;
     }
@@ -34,51 +41,34 @@ class EmailConfirmationService
     /**
      * Verify confirmation code
      */
-    public function verify(string $email, string $code): ?array
+    public function verify(string $email, string $code, ?string $purpose = null): ?array
     {
-        $key = self::REDIS_PREFIX . $email;
-        $value = Redis::get($key);
+        $key = $this->key($email, $purpose);
+        $stored = Cache::get($key);
 
-        if (!$value) {
-            return null;
-        }
-
-        $stored = json_decode($value, true);
-
-        if ($stored['code'] !== $code) {
+        if (!$stored || $stored['code'] !== $code) {
             return null;
         }
 
         // Delete after verification
-        Redis::del($key);
+        Cache::forget($key);
 
         return $stored['data'];
     }
 
     /**
-     * Check if verification code exists
+     * Check if a (still valid) confirmation code exists
      */
-    public function exists(string $email): bool
+    public function exists(string $email, ?string $purpose = null): bool
     {
-        $key = self::REDIS_PREFIX . $email;
-        return Redis::exists($key) > 0;
+        return Cache::has($this->key($email, $purpose));
     }
 
     /**
-     * Get time remaining for verification
+     * Revoke confirmation code
      */
-    public function getTimeRemaining(string $email): ?int
+    public function revoke(string $email, ?string $purpose = null): bool
     {
-        $key = self::REDIS_PREFIX . $email;
-        return Redis::ttl($key);
-    }
-
-    /**
-     * Revoke verification code
-     */
-    public function revoke(string $email): bool
-    {
-        $key = self::REDIS_PREFIX . $email;
-        return Redis::del($key) > 0;
+        return Cache::forget($this->key($email, $purpose));
     }
 }

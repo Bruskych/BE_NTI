@@ -62,7 +62,7 @@ class DocumentController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'file'            => 'required|file|max:10240', // 10MB
+            'file'            => 'required|file|mimes:' . Document::ALLOWED_UPLOAD_EXTENSIONS . '|max:10240', // 10MB
             'application_id'  => 'nullable|exists:applications,id',
             'project_id'      => 'nullable|exists:projects,id',
             'milestone_id'    => 'nullable|exists:milestones,id',
@@ -191,7 +191,7 @@ class DocumentController extends Controller
     public function update(Request $request, Document $document): JsonResponse
     {
         $validated = $request->validate([
-            'file' => 'required|file|max:10240',
+            'file' => 'required|file|mimes:' . Document::ALLOWED_UPLOAD_EXTENSIONS . '|max:10240',
             'classification' => 'nullable|in:' . implode(',', [
                 Document::CLASSIFICATION_PUBLIC,
                 Document::CLASSIFICATION_INTERNAL,

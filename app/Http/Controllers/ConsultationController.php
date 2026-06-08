@@ -17,6 +17,30 @@ class ConsultationController extends Controller
         $this->authorizeResource(Consultation::class, 'consultation');
     }
 
+    public function index(): JsonResponse
+    {
+        $user = request()->user();
+
+        $query = Consultation::with(['mentor', 'milestone']);
+
+        if (!$user->can('consultations.view')) {
+            $query->where(function ($q) use ($user) {
+                $q->where('mentor_id', $user->id)
+                    ->orWhereHas(
+                        'mentorship.project.application.team.members',
+                        fn ($members) => $members->where('users.id', $user->id)
+                    );
+            });
+        }
+
+        return response()->api(ConsultationResource::collection($query->get()));
+    }
+
+    public function show(Consultation $consultation): JsonResponse
+    {
+        return response()->api(new ConsultationResource($consultation->load(['mentor', 'milestone'])));
+    }
+
     public function store(StoreConsultationRequest $request): JsonResponse
     {
         $this->authorize('create', Consultation::class);

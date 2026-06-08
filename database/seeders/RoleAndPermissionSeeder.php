@@ -45,13 +45,14 @@ class RoleAndPermissionSeeder extends Seeder
             'projects.view-own', 'projects.view-all', 'projects.create', 'projects.edit', 'projects.delete',
 
             // Менторство и Консультации
-            'mentorships.view', 'mentorships.assign', 'consultations.view', 'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
+            'mentorships.view-any', 'mentorships.view-all', 'mentorships.create', 'mentorships.edit', 'mentorships.edit-all', 'mentorships.delete',
+            'consultations.view', 'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
 
             // Вехи / Этапы разработки (Milestones)
             'milestones.view', 'milestones.create', 'milestones.edit', 'milestones.approve',
 
             // Документы
-            'documents.view', 'documents.upload', 'documents.delete',
+            'documents.view', 'documents.view-all', 'documents.upload', 'documents.edit', 'documents.delete', 'documents.delete-all',
 
             // Уведомления и CMS контент
             'notifications.send-bulk', 'notifications.manage-templates',
@@ -83,9 +84,9 @@ class RoleAndPermissionSeeder extends Seeder
         $student = Role::firstOrCreate(['name' => 'student', 'guard_name' => 'web']);
         $student->syncPermissions([
             'student-profiles.view', 'student-profiles.edit',
-            'teams.view', 'teams.create',
-            'applications.view-own', 'applications.create', 'applications.edit',
-            'projects.view-own', 'milestones.view', 'consultations.view', 'documents.view', 'documents.upload',
+            'teams.view', 'teams.create', 'teams.edit', 'teams.invite-members', 'teams.delete',
+            'applications.view-own', 'applications.create', 'applications.edit', 'applications.submit', 'applications.delete',
+            'projects.view-own', 'milestones.view', 'consultations.view-own', 'documents.view', 'documents.upload',
         ]);
 
         // 3. Лидер команды (получает доп. права на отправку заявок и инвайты)
@@ -94,7 +95,7 @@ class RoleAndPermissionSeeder extends Seeder
             'student-profiles.view', 'student-profiles.edit',
             'teams.view', 'teams.create', 'teams.edit', 'teams.invite-members', 'teams.delete',
             'applications.view-own', 'applications.create', 'applications.edit', 'applications.submit', 'applications.delete',
-            'projects.view-own', 'milestones.view', 'consultations.view', 'documents.view', 'documents.upload',
+            'projects.view-own', 'milestones.view', 'consultations.view-own', 'documents.view', 'documents.upload',
         ]);
 
         // 4. Представитель Компании (Заказчик челленджей)
@@ -109,8 +110,8 @@ class RoleAndPermissionSeeder extends Seeder
         $mentor = Role::firstOrCreate(['name' => 'mentor', 'guard_name' => 'web']);
         $mentor->syncPermissions([
             'projects.view-own', 'milestones.view', 'milestones.create', 'milestones.edit', 'milestones.approve',
-            'consultations.view', 'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
-            'mentorships.view', 'documents.view', 'documents.upload',
+            'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
+            'mentorships.view-any', 'mentorships.edit', 'documents.view', 'documents.upload',
         ]);
 
         // 6. Эксперт / Оцениватель заявок (Evaluator)
@@ -140,9 +141,10 @@ class RoleAndPermissionSeeder extends Seeder
             'applications.view-all', 'applications.change-status', 'applications.request-supplement',
             'evaluations.view', 'evaluations.decide',
             'projects.view-all', 'projects.create', 'projects.edit', 'projects.delete',
-            'mentorships.view', 'mentorships.assign',
+            'mentorships.view-any', 'mentorships.view-all', 'mentorships.create', 'mentorships.edit-all', 'mentorships.delete',
+            'consultations.view',
             'milestones.view', 'milestones.approve',
-            'documents.view', 'documents.upload', 'documents.delete',
+            'documents.view', 'documents.view-all', 'documents.upload', 'documents.edit', 'documents.delete', 'documents.delete-all',
             'notifications.send-bulk', 'notifications.manage-templates',
             'cms.posts.view', 'cms.posts.create', 'cms.posts.edit', 'cms.posts.delete',
             'cms.pages.view', 'cms.pages.create', 'cms.pages.edit', 'cms.pages.delete', 'cms.partners.manage',

@@ -74,7 +74,7 @@ class GdprController extends Controller
         ]);
     }
 
-    protected function anonymizeUser(User $user, string $ipAddress = null, string $userAgent = null): void
+    protected function anonymizeUser(User $user, ?string $ipAddress = null, ?string $userAgent = null): void
     {
         DB::transaction(function () use ($user, $ipAddress, $userAgent) {
             $user->studentProfile()->delete();

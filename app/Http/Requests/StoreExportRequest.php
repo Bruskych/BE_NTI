@@ -13,12 +13,15 @@ class StoreExportRequest extends FormRequest
             'users_csv' => ['resource' => 'users', 'format' => 'csv', 'label' => 'Users (CSV)'],
             'users_xlsx' => ['resource' => 'users', 'format' => 'xlsx', 'label' => 'Users (XLSX)'],
             'users_pdf' => ['resource' => 'users', 'format' => 'pdf', 'label' => 'Users (PDF)'],
+            'users_docx' => ['resource' => 'users', 'format' => 'docx', 'label' => 'Users (DOCX)'],
             'projects_csv' => ['resource' => 'projects', 'format' => 'csv', 'label' => 'Projects (CSV)'],
             'projects_xlsx' => ['resource' => 'projects', 'format' => 'xlsx', 'label' => 'Projects (XLSX)'],
             'projects_pdf' => ['resource' => 'projects', 'format' => 'pdf', 'label' => 'Projects (PDF)'],
+            'projects_docx' => ['resource' => 'projects', 'format' => 'docx', 'label' => 'Projects (DOCX)'],
             'applications_csv' => ['resource' => 'applications', 'format' => 'csv', 'label' => 'Applications (CSV)'],
             'applications_xlsx' => ['resource' => 'applications', 'format' => 'xlsx', 'label' => 'Applications (XLSX)'],
             'applications_pdf' => ['resource' => 'applications', 'format' => 'pdf', 'label' => 'Applications (PDF)'],
+            'applications_docx' => ['resource' => 'applications', 'format' => 'docx', 'label' => 'Applications (DOCX)'],
             'personal_data_json' => ['resource' => 'personal_data', 'format' => 'json', 'label' => 'Personal data (JSON)'],
         ];
     }

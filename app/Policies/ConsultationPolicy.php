@@ -15,7 +15,7 @@ class ConsultationPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can('consultations.view')
+        return ($user->can('consultations.view') || $user->can('consultations.view-own'))
             ? Response::allow()
             : Response::deny('You do not have permission to view consultations.');
     }
@@ -23,13 +23,16 @@ class ConsultationPolicy
     public function view(User $user, Consultation $consultation): Response
     {
         // Доступ открыт если:
-        // 1 У пользователя есть глобальное право view
-        // 2 ИЛИ пользователь ментор
-        // 3 ИЛИ пользователь участник команды
+        // 1 У пользователя есть глобальное право view (видит все консультации платформы)
+        // 2 ИЛИ у пользователя есть право view-own И он ментор этой консультации либо участник команды проекта
 
-        $isTeamMember = $consultation->mentorship->team->hasMember($user->id);
+        if ($user->can('consultations.view')) {
+            return Response::allow();
+        }
 
-        if ($user->can('consultations.view') || $this->isOwner($user, $consultation) || $isTeamMember) {
+        $isTeamMember = $consultation->mentorship->project->team->hasMember($user->id);
+
+        if ($user->can('consultations.view-own') && ($this->isOwner($user, $consultation) || $isTeamMember)) {
             return Response::allow();
         }
 
