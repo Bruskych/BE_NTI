@@ -13,6 +13,8 @@ class RegisterRequest extends FormRequest
             'email'            => 'required|string|email|max:255|unique:users',
             'password'         => 'required|string|min:8|confirmed',
             'role'             => 'required|string|in:student,company,mentor',
+            'gdpr_consent'     => 'accepted',
+            'consent_version'  => 'sometimes|string|max:50',
             'company_name'     => 'required_if:role,company|string|max:255',
             'company_tax_id'   => 'required_if:role,company|string|regex:/^\d{8,10}$/',
             'sector'           => 'required_if:role,company|string|max:255',

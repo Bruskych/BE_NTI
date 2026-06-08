@@ -23,7 +23,7 @@ class AuditLogTest extends TestCase
     {
         parent::setUp();
 
-        foreach (['admin', 'student', 'company', 'expert'] as $role) {
+        foreach (['admin', 'student', 'company', 'evaluator'] as $role) {
             Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
 
@@ -104,7 +104,7 @@ class AuditLogTest extends TestCase
     public function test_submitting_evaluation_logs_audit_event()
     {
         $expert = User::factory()->create();
-        $expert->assignRole('expert');
+        $expert->assignRole('evaluator');
 
         $team = Team::factory()->create();
         $application = Application::factory()->create([

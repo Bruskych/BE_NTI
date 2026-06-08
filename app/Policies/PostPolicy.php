@@ -13,6 +13,11 @@ class PostPolicy
         return $user->id === $post->author_id;
     }
 
+    public function before(User $user, string $ability): ?bool
+    {
+        return $user->hasRole(['super_admin', 'admin']) ? true : null;
+    }
+
     public function viewAny(User $user): Response
     {
         return Response::allow();
@@ -25,36 +30,30 @@ class PostPolicy
             return Response::allow();
         }
 
-        // Черновики — только автор или админ
-        return ($this->isAuthor($user, $post) || $user->can('posts.view-all'))
+        // Черновики — только автор или редактор с правом просмотра
+        return ($this->isAuthor($user, $post) || $user->can('cms.posts.view'))
             ? Response::allow()
             : Response::deny('This post is not published yet.');
     }
 
     public function create(User $user): Response
     {
-        return $user->can('posts.create')
+        return $user->can('cms.posts.create')
             ? Response::allow()
             : Response::deny('You do not have permission to create posts.');
     }
 
     public function update(User $user, Post $post): Response
     {
-        if ($user->can('posts.edit-all')) return Response::allow();
-
-        return ($user->can('posts.edit') && $this->isAuthor($user, $post))
+        return ($user->can('cms.posts.edit') && $this->isAuthor($user, $post))
             ? Response::allow()
             : Response::deny('You cannot edit this post.');
     }
 
     public function delete(User $user, Post $post): Response
     {
-        if (!$user->can('posts.delete')) {
-            return Response::deny('No permission to delete.');
-        }
-
-        return ($this->isAuthor($user, $post) || $user->can('posts.delete-all'))
+        return ($user->can('cms.posts.delete') && $this->isAuthor($user, $post))
             ? Response::allow()
-            : Response::deny('You do not own this post.');
+            : Response::deny('You cannot delete this post.');
     }
 }

@@ -8,7 +8,7 @@ use App\Http\Controllers\{
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
     NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController, DocumentController,
-    BulkMessageController,
+    BulkMessageController, PartnerController, EmailTemplateController,
 };
 
 // -------------------------------------------------------------------------
@@ -16,7 +16,7 @@ use App\Http\Controllers\{
 // -------------------------------------------------------------------------
 
 Route::prefix('auth')->group(function () {
-    Route::middleware('guest')->group(function () {
+    Route::middleware(['guest', 'throttle:auth'])->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -29,10 +29,16 @@ Route::get('/reset-password/{token}', function ($token) {
 
 Route::prefix('programs')->group(function () {
     Route::get('/', [ProgramController::class, 'index']);
+    Route::get('/{program}/form-fields', [ProgramController::class, 'formFields']);
     Route::get('/{id}', [ProgramController::class, 'show']);
 });
 
 Route::get('/specializations', [SpecializationController::class, 'index']);
+
+Route::prefix('partners')->group(function () {
+    Route::get('/', [PartnerController::class, 'index']);
+    Route::get('/{partner}', [PartnerController::class, 'show']);
+});
 
 
 // -------------------------------------------------------------------------
@@ -44,6 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+        Route::post('/email/resend', [AuthController::class, 'resendEmailVerification']);
         Route::post('/gdpr/export', [GdprController::class, 'exportMyData']);
         Route::delete('/gdpr/erase', [GdprController::class, 'eraseMyData']);
     });
@@ -52,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin,super_admin')->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::get('/students/pending', [AdminController::class, 'pendingStudents']);
         Route::post('/students/{user}/approve', [AdminController::class, 'approveStudent']);
         Route::post('/students/{user}/reject', [AdminController::class, 'rejectStudent']);
@@ -70,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/bulk-messages', [BulkMessageController::class, 'index']);
         Route::post('/bulk-messages', [BulkMessageController::class, 'store']);
         Route::get('/bulk-messages/{bulk_message}', [BulkMessageController::class, 'show']);
+
+        Route::apiResource('email-templates', EmailTemplateController::class)->except(['create', 'edit']);
     });
 
     // Teams
@@ -94,6 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Contextual actions
     Route::prefix('applications/{application}')->group(function () {
         Route::post('/submit', [ApplicationController::class, 'submit']);
+        Route::post('/decide', [ApplicationController::class, 'decide']);
         Route::post('/evaluations', [EvaluationController::class, 'store']);
     });
 

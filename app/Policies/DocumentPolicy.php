@@ -4,62 +4,70 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Document;
+use Illuminate\Auth\Access\Response;
 
 class DocumentPolicy
 {
-    public function viewAny(User $user): bool
+    private function isOwner(User $user, Document $document): bool
     {
-        return true;
+        return $user->id === $document->uploaded_by;
     }
 
-    public function view(User $user, Document $document): bool
+    private function isRelatedTeamMember(User $user, Document $document): bool
     {
-        // Public documents visible to all
+        if ($document->application_id && $document->application?->team?->members?->contains('id', $user->id)) {
+            return true;
+        }
+
+        if ($document->project_id && $document->project?->team?->members?->contains('id', $user->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function viewAny(User $user): Response
+    {
+        return Response::allow();
+    }
+
+    public function view(User $user, Document $document): Response
+    {
         if ($document->classification === Document::CLASSIFICATION_PUBLIC) {
-            return true;
+            return Response::allow();
         }
 
-        // Own documents
-        if ($document->uploaded_by === $user->id) {
-            return true;
+        if ($this->isOwner($user, $document) || $this->isRelatedTeamMember($user, $document) || $user->can('documents.view-all')) {
+            return Response::allow();
         }
 
-        // Application documents
-        if ($document->application_id) {
-            $application = $document->application;
-            if ($application?->team?->members?->contains('id', $user->id)) {
-                return true;
-            }
-        }
-
-        // Project documents
-        if ($document->project_id) {
-            $project = $document->project;
-            if ($project?->team?->members?->contains('id', $user->id)) {
-                return true;
-            }
-        }
-
-        // Admin can view all
-        return $user->hasRole(['admin', 'super_admin']);
+        return Response::deny('You do not have access to this document.');
     }
 
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return true;
+        return Response::allow();
     }
 
-    public function update(User $user, Document $document): bool
+    public function update(User $user, Document $document): Response
     {
-        return $user->id === $document->uploaded_by || $user->hasRole(['admin', 'super_admin']);
+        if ($this->isOwner($user, $document) || $user->can('documents.edit')) {
+            return Response::allow();
+        }
+
+        return Response::deny('You cannot edit this document.');
     }
 
-    public function delete(User $user, Document $document): bool
+    public function delete(User $user, Document $document): Response
     {
-        return $user->id === $document->uploaded_by || $user->hasRole(['admin', 'super_admin']);
+        if ($this->isOwner($user, $document) || $user->can('documents.delete-all')) {
+            return Response::allow();
+        }
+
+        return Response::deny('You cannot delete this document.');
     }
 
-    public function download(User $user, Document $document): bool
+    public function download(User $user, Document $document): Response
     {
         return $this->view($user, $document);
     }

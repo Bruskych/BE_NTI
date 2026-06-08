@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -51,6 +50,23 @@ class DocumentTest extends TestCase
         $response->assertStatus(201);
         $response->assertJsonStructure(['message', 'document']);
         $this->assertDatabaseHas('documents', ['type' => 'agreement']);
+    }
+
+    public function test_uploading_document_with_disallowed_extension_is_rejected()
+    {
+        Storage::fake('public');
+        $file = UploadedFile::fake()->create('script.exe', 100);
+
+        // Spec 13: "Antivírusová alebo aspoň MIME / príponová kontrola uploadovaných príloh"
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/documents', [
+                'file' => $file,
+                'type' => 'agreement',
+                'classification' => 'internal',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['file']);
     }
 
     public function test_user_can_view_own_document()
@@ -111,7 +127,6 @@ class DocumentTest extends TestCase
     public function test_user_can_request_access_code_for_confidential_document()
     {
         Mail::fake();
-        Redis::shouldReceive('setex')->once()->andReturn(true);
 
         $document = Document::factory()->create([
             'uploaded_by' => $this->user->id,

@@ -16,6 +16,12 @@ class Document extends Model
     const CLASSIFICATION_INTERNAL     = 'internal';
     const CLASSIFICATION_CONFIDENTIAL = 'confidential';
 
+    /**
+     * Spec 13: "Antivírusová alebo aspoň MIME / príponová kontrola uploadovaných príloh"
+     * — minimum baseline of accepted attachment extensions for uploaded documents.
+     */
+    const ALLOWED_UPLOAD_EXTENSIONS = 'pdf,doc,docx,jpg,jpeg,png';
+
     protected $fillable = [
         'application_id',
         'project_id',

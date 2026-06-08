@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Http\Resources\ApplicationResource;
-use App\Http\Requests\{StoreApplicationRequest, UpdateApplicationRequest};
+use App\Http\Requests\{StoreApplicationRequest, UpdateApplicationRequest, DecideApplicationRequest};
 use App\Services\ApplicationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -26,7 +26,9 @@ class ApplicationController extends Controller
 
     public function show(Application $application): JsonResponse
     {
-        return response()->api(new ApplicationResource($application->load(['team', 'organization'])));
+        return response()->api(new ApplicationResource($application->load([
+            'team', 'organization', 'answers.field', 'pairingSubmissions',
+        ])));
     }
 
     public function store(StoreApplicationRequest $request, ApplicationService $service): JsonResponse
@@ -39,11 +41,23 @@ class ApplicationController extends Controller
         return response()->api(new ApplicationResource($application), 201);
     }
 
-    public function update(UpdateApplicationRequest $request, Application $application): JsonResponse
+    public function update(UpdateApplicationRequest $request, Application $application, ApplicationService $service): JsonResponse
     {
-        $application->update($request->validated());
+        $validated = $request->validated();
 
-        return response()->api(new ApplicationResource($application));
+        $application->update(\Illuminate\Support\Arr::only($validated, ['organization_id']));
+
+        if (!empty($validated['answers'])) {
+            $service->saveAnswers($application, $validated['answers']);
+        }
+
+        if (!empty($validated['pairing_submissions'])) {
+            $service->savePairingSubmissions($application, $validated['pairing_submissions']);
+        }
+
+        return response()->api(new ApplicationResource(
+            $application->fresh(['team', 'organization', 'answers.field', 'pairingSubmissions'])
+        ));
     }
 
     public function submit(Request $request, Application $application, ApplicationService $service): JsonResponse
@@ -51,6 +65,20 @@ class ApplicationController extends Controller
         $this->authorize('submit', $application);
         $service->submitApplication($application, $request->user()->id);
         return response()->api(['message' => 'Application submitted successfully']);
+    }
+
+    public function decide(DecideApplicationRequest $request, Application $application, ApplicationService $service): JsonResponse
+    {
+        $this->authorize('decide', $application);
+
+        $application = $service->decideApplication(
+            $application,
+            $request->validated('decision'),
+            $request->validated('comment'),
+            $request->user()->id
+        );
+
+        return response()->api(new ApplicationResource($application));
     }
 
     public function destroy(Application $application): JsonResponse

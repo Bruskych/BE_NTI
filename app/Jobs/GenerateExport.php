@@ -15,6 +15,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpWord\IOFactory as WordIOFactory;
+use PhpOffice\PhpWord\PhpWord;
 
 class GenerateExport implements ShouldQueue
 {
@@ -42,7 +44,7 @@ class GenerateExport implements ShouldQueue
             return;
         }
 
-        if (preg_match('/^(users|projects|applications)_(csv|xlsx|pdf)$/', $type, $matches)) {
+        if (preg_match('/^(users|projects|applications)_(csv|xlsx|pdf|docx)$/', $type, $matches)) {
             $resource = $matches[1];
             $format = $matches[2];
 
@@ -121,6 +123,24 @@ class GenerateExport implements ShouldQueue
             $html = view('exports.users', ['users' => $users])->render();
             Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
             $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'docx') {
+            $rows = [];
+            $query->chunk(100, function ($users) use (&$rows) {
+                foreach ($users as $user) {
+                    $rows[] = [
+                        $user->id,
+                        $user->name,
+                        $user->email,
+                        implode(',', $user->getRoleNames()->toArray()),
+                        $user->created_at ? $user->created_at->toIso8601String() : null,
+                    ];
+                }
+            });
+
+            $this->generateDocxReport('Users Report', ['id', 'name', 'email', 'roles', 'created_at'], $rows, $filename, $log);
         }
     }
 
@@ -187,6 +207,26 @@ class GenerateExport implements ShouldQueue
             $html = view('exports.projects', ['projects' => $projects])->render();
             Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
             $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'docx') {
+            $rows = [];
+            $query->chunk(100, function ($projects) use (&$rows) {
+                foreach ($projects as $project) {
+                    $rows[] = [
+                        $project->id,
+                        $project->title,
+                        $project->status,
+                        $project->final_score,
+                        $project->started_at ? $project->started_at->toIso8601String() : null,
+                        $project->finished_at ? $project->finished_at->toIso8601String() : null,
+                        optional($project->application->team)->name,
+                    ];
+                }
+            });
+
+            $this->generateDocxReport('Projects Report', ['id', 'title', 'status', 'final_score', 'started_at', 'finished_at', 'team'], $rows, $filename, $log);
         }
     }
 
@@ -251,6 +291,25 @@ class GenerateExport implements ShouldQueue
             $html = view('exports.applications', ['applications' => $applications])->render();
             Pdf::loadHTML($html)->save(storage_path('app/' . $filename));
             $this->saveLog($log, $filename);
+            return;
+        }
+
+        if ($format === 'docx') {
+            $rows = [];
+            $query->chunk(100, function ($applications) use (&$rows) {
+                foreach ($applications as $application) {
+                    $rows[] = [
+                        $application->id,
+                        optional($application->team)->name,
+                        $application->status,
+                        $application->submitted_at ? $application->submitted_at->toIso8601String() : null,
+                        $application->total_score,
+                        $application->decision_comment,
+                    ];
+                }
+            });
+
+            $this->generateDocxReport('Applications Report', ['id', 'team', 'status', 'submitted_at', 'total_score', 'decision_comment'], $rows, $filename, $log);
         }
     }
 
@@ -349,6 +408,36 @@ class GenerateExport implements ShouldQueue
         }
 
         file_put_contents(storage_path('app/' . $filename), json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $this->saveLog($log, $filename);
+    }
+
+    /**
+     * Spec: "exporty do CSV, XLSX a PDF / DOCX reportov podľa filtra" — builds a
+     * simple titled-table DOCX report, mirroring the columns used by the CSV/XLSX/PDF variants.
+     */
+    protected function generateDocxReport(string $title, array $headers, array $rows, string $filename, ExportsLog $log): void
+    {
+        $filename .= '.docx';
+
+        $phpWord = new PhpWord();
+        $section = $phpWord->addSection();
+        $section->addTitle($title, 1);
+
+        $table = $section->addTable(['borderSize' => 6, 'borderColor' => '999999', 'cellMargin' => 80]);
+
+        $table->addRow();
+        foreach ($headers as $header) {
+            $table->addCell(2200)->addText($header, ['bold' => true]);
+        }
+
+        foreach ($rows as $row) {
+            $table->addRow();
+            foreach ($row as $value) {
+                $table->addCell(2200)->addText(htmlspecialchars((string) ($value ?? ''), ENT_QUOTES, 'UTF-8'));
+            }
+        }
+
+        WordIOFactory::createWriter($phpWord, 'Word2007')->save(storage_path('app/' . $filename));
         $this->saveLog($log, $filename);
     }
 

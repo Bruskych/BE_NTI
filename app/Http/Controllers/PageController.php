@@ -13,7 +13,8 @@ class PageController extends Controller
 {
     public function index()
     {
-        $query = auth()->user()?->can('pages.view-all')
+        $user = auth()->user();
+        $query = ($user?->hasRole(['super_admin', 'admin']) || $user?->can('cms.pages.view'))
             ? Page::query()
             : Page::where('is_published', true);
 

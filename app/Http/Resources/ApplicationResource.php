@@ -42,6 +42,12 @@ class ApplicationResource extends JsonResource
             'project'          => $this->whenLoaded('project', fn() =>
             new ProjectResource($this->project)
             ),
+            'answers'             => $this->whenLoaded('answers', fn() =>
+            ApplicationAnswerResource::collection($this->answers)
+            ),
+            'pairing_submissions' => $this->whenLoaded('pairingSubmissions', fn() =>
+            ApplicationPairingSubmissionResource::collection($this->pairingSubmissions)
+            ),
             'created_at'       => $this->created_at,
         ];
     }

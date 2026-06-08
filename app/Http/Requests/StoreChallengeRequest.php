@@ -24,6 +24,7 @@ class StoreChallengeRequest extends FormRequest
     {
         return [
             'program_id'              => 'required|exists:programs,id',
+            'organization_id'         => 'nullable|exists:organizations,id',
             'title'                   => 'required|string|max:255',
             'description'             => 'required|string',
             'technical_specification' => 'nullable|string',

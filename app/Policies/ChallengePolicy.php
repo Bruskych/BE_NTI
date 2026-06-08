@@ -34,7 +34,7 @@ class ChallengePolicy
             return Response::deny('You do not have permission to create challenges.');
         }
 
-        return $user->organizations()->where('is_active', true)->exists()
+        return $user->organizations()->where('status', 'active')->exists()
             ? Response::allow()
             : Response::deny('Active organization is required to create a challenge.');
     }

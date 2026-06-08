@@ -2,24 +2,42 @@
 
 namespace App\Actions;
 
+use App\Mail\EmailVerificationMail;
 use App\Models\User;
 use App\Models\Team;
 use App\Models\Application;
+use App\Models\GdprConsent;
 use App\Models\Organization;
 use App\Models\Notification;
+use App\Services\EmailConfirmationService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterUserAction
 {
-    public function execute(array $data): User
+    // Spec 6.2: GDPR consent must be captured at registration time
+    private const REQUIRED_CONSENT_TYPES = ['privacy_policy', 'terms_of_service'];
+
+    // Spec 6.2: "registrácia e-mailom s overením adresy" — namespaces the verification
+    // code so it can't collide with other EmailConfirmationService purposes (e.g. document access)
+    public const EMAIL_VERIFICATION_PURPOSE = 'email_verification';
+
+    public function __construct(private EmailConfirmationService $confirmation)
     {
-        return DB::transaction(function () use ($data) {
+    }
+
+    public function execute(array $data, ?string $ipAddress = null): User
+    {
+        return DB::transaction(function () use ($data, $ipAddress) {
             $user = User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => Hash::make($data['password']),
             ]);
+
+            $this->recordGdprConsent($user, $data, $ipAddress);
+            $this->sendEmailVerificationCode($user);
 
             $user->notificationPreference()->create([
                 'email_enabled'           => true,
@@ -40,6 +58,35 @@ class RegisterUserAction
 
             return $user;
         });
+    }
+
+    /**
+     * Spec 6.2: "registrácia e-mailom s overením adresy" — sends a one-time code
+     * (Redis-backed via EmailConfirmationService, same mechanism as document access codes)
+     * that the user must submit to POST /auth/email/verify before email_verified_at is set.
+     */
+    private function sendEmailVerificationCode(User $user): void
+    {
+        $code = $this->confirmation->generateCode($user->email, [], self::EMAIL_VERIFICATION_PURPOSE);
+
+        Mail::to($user->email)->queue(new EmailVerificationMail($user->name, $code, EmailConfirmationService::DEFAULT_EXPIRES_IN));
+    }
+
+    private function recordGdprConsent(User $user, array $data, ?string $ipAddress): void
+    {
+        $version = $data['consent_version'] ?? '1.0';
+        $acceptedAt = now();
+
+        foreach (self::REQUIRED_CONSENT_TYPES as $consentType) {
+            GdprConsent::create([
+                'user_id'      => $user->id,
+                'consent_type' => $consentType,
+                'version'      => $version,
+                'accepted_at'  => $acceptedAt,
+                'ip_address'   => $ipAddress,
+                'created_at'   => $acceptedAt,
+            ]);
+        }
     }
 
     private function createStudentTeam(User $user): void

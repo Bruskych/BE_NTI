@@ -11,8 +11,8 @@ class EvaluationPolicy
 {
     public function create(User $user, Application $application): Response
     {
-        if (!$user->hasRole('expert')) {
-            return Response::deny('Only experts can evaluate.');
+        if (!$user->hasRole('evaluator')) {
+            return Response::deny('Only evaluators can evaluate.');
         }
 
         if ($application->status !== 'in_evaluation') {
