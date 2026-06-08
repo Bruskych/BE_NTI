@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Project extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
+    const STATUS_ACTIVE   = 'active';
+    const STATUS_FINISHED = 'finished';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'application_id',
@@ -54,17 +66,36 @@ class Project extends Model
     }
 
     // ---------------------------------------------------------
-    // Helpers
+    // Query Scopes
     // ---------------------------------------------------------
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    public function scopeFinished(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_FINISHED);
+    }
+
+    // ---------------------------------------------------------
+    // Accessors & Helpers
+    // ---------------------------------------------------------
+
+    public function getTeamAttribute()
+    {
+        return $this->application->team;
+    }
 
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return $this->status === self::STATUS_ACTIVE;
     }
 
     public function isFinished(): bool
     {
-        return $this->status === 'finished';
+        return $this->status === self::STATUS_FINISHED;
     }
 
     public function completionPercentage(): int
@@ -76,10 +107,5 @@ class Project extends Model
         }
 
         return (int) $milestones->avg('completion_percentage');
-    }
-
-    public function getTeamAttribute()
-    {
-        return $this->application->team;
     }
 }

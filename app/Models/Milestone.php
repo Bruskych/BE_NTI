@@ -13,6 +13,10 @@ class Milestone extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $fillable = [
         'project_id',
         'title',

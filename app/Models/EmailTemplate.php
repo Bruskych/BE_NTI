@@ -10,6 +10,10 @@ class EmailTemplate extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $fillable = [
         'name',
         'subject',

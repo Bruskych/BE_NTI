@@ -13,6 +13,10 @@ class GdprConsent extends Model
 
     public $timestamps = false;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $fillable = [
         'user_id',
         'consent_type',

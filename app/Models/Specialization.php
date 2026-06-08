@@ -11,6 +11,10 @@ class Specialization extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $fillable = [
         'name',
         'slug',

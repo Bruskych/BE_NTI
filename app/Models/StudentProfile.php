@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class StudentProfile extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'user_id',
@@ -38,5 +43,28 @@ class StudentProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeEligible(Builder $query): Builder
+    {
+        return $query->whereNotNull('eligibility_confirmed_at');
+    }
+
+    public function scopeHasCarriedSubjects(Builder $query): Builder
+    {
+        return $query->where('has_carried_subjects', true);
+    }
+
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
+
+    public function isEligible(): bool
+    {
+        return $this->eligibility_confirmed_at !== null;
     }
 }

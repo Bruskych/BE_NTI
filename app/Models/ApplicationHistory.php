@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,8 +12,11 @@ class ApplicationHistory extends Model
 {
     use SoftDeletes, HasFactory;
 
-    protected $table = 'application_history';
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
+    protected $table = 'application_history';
     public $timestamps = false;
 
     protected $fillable = [
@@ -40,5 +44,15 @@ class ApplicationHistory extends Model
     public function changedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'changed_by');
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeForApplication(Builder $query, int $applicationId): Builder // Позволяет быстро получить историю конкретной заявки
+    {
+        return $query->where('application_id', $applicationId)
+            ->latest('created_at');
     }
 }

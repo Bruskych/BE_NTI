@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ApplicationAnswer extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'application_id',
@@ -35,5 +40,23 @@ class ApplicationAnswer extends Model
     public function field(): BelongsTo
     {
         return $this->belongsTo(FormField::class, 'field_id');
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeForField(Builder $query, int $fieldId): Builder
+    {
+        return $query->where('field_id', $fieldId);
+    }
+
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
+
+    public function getFormattedValue() // Возвращает значение ответа, независимо от того, где оно хранится
+    {
+        return $this->value_text ?? $this->value_json ?? $this->file_path;
     }
 }

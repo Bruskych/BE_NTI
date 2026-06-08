@@ -8,15 +8,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements HasMedia
 {
     use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'name',
@@ -125,7 +129,7 @@ class User extends Authenticatable implements HasMedia
     }
 
     // ---------------------------------------------------------
-    // Helpers (Role Checks)
+    // Role Helpers
     // ---------------------------------------------------------
 
     public function isStudent(): bool { return $this->hasRole('student'); }
@@ -153,10 +157,12 @@ class User extends Authenticatable implements HasMedia
 
     public function getAvatarUrlAttribute(): ?string
     {
-        if (!$this->avatar_path) {
-            return null;
-        }
-        return Storage::disk('public')->url($this->avatar_path);
+        return $this->avatar_path ? Storage::disk('public')->url($this->avatar_path) : null;
+    }
+
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->notifications()->whereNull('read_at')->count();
     }
 
     public function isOwnerOf(Organization $organization): bool
@@ -172,10 +178,5 @@ class User extends Authenticatable implements HasMedia
         return $this->organizations()
             ->where('organizations.id', $organization->id)
             ->exists();
-    }
-
-    public function getUnreadNotificationsCountAttribute(): int
-    {
-        return $this->notifications()->whereNull('read_at')->count();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class EvaluationTemplate extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'program_id',
@@ -36,5 +41,23 @@ class EvaluationTemplate extends Model
     public function calls(): HasMany
     {
         return $this->hasMany(Call::class, 'evaluation_template_id');
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeForProgram(Builder $query, int $programId): Builder
+    {
+        return $query->where('program_id', $programId);
+    }
+
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
+
+    public function getTotalWeight(): float
+    {
+        return (float) $this->criteria()->sum('weight');
     }
 }

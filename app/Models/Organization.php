@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +15,16 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Organization extends Model implements HasMedia
 {
     use SoftDeletes, HasFactory, InteractsWithMedia;
+
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
+    const STATUS_ACTIVE = 'active';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'name',
@@ -29,7 +40,7 @@ class Organization extends Model implements HasMedia
     ];
 
     // ---------------------------------------------------------
-    // Relationships
+    // Media Library
     // ---------------------------------------------------------
 
     public function registerMediaCollections(): void
@@ -38,6 +49,11 @@ class Organization extends Model implements HasMedia
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/webp']);
     }
+
+    // ---------------------------------------------------------
+    // Relationships
+    // ---------------------------------------------------------
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organization_user')
@@ -60,15 +76,6 @@ class Organization extends Model implements HasMedia
         return $this->hasMany(Partner::class);
     }
 
-    // ---------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------
-
-    public function isActive(): bool
-    {
-        return $this->status === 'active';
-    }
-
     public function owners(): BelongsToMany
     {
         return $this->users()->wherePivot('role', 'owner');
@@ -77,5 +84,23 @@ class Organization extends Model implements HasMedia
     public function productOwners(): BelongsToMany
     {
         return $this->users()->wherePivot('role', 'product_owner');
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
     }
 }

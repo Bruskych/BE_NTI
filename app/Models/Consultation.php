@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Consultation extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'mentorship_id',
@@ -43,6 +48,22 @@ class Consultation extends Model
     public function milestone(): BelongsTo
     {
         return $this->belongsTo(Milestone::class);
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->whereNotNull('completed_at');
+    }
+
+    public function scopeUpcoming(Builder $query): Builder
+    {
+        return $query->whereNull('completed_at')
+            ->whereNotNull('scheduled_at')
+            ->where('scheduled_at', '>', now());
     }
 
     // ---------------------------------------------------------

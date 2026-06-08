@@ -12,6 +12,10 @@ class FormField extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $fillable = [
         'program_id',
         'call_id',

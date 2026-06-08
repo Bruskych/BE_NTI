@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,9 +12,17 @@ class Notification extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
     const CHANNEL_EMAIL  = 'email';
     const CHANNEL_SYSTEM = 'system';
     const CHANNEL_PUSH   = 'push';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'user_id',
@@ -40,8 +49,37 @@ class Notification extends Model
     }
 
     // ---------------------------------------------------------
-    // Helpers
+    // Query Scopes
     // ---------------------------------------------------------
+
+    public function scopeUnread(Builder $query): Builder
+    {
+        return $query->whereNull('read_at');
+    }
+
+    public function scopeForTeamInvite(Builder $query): Builder
+    {
+        return $query->where('type', 'team_invite');
+    }
+
+    public function scopeForTeam(Builder $query, $teamId): Builder
+    {
+        return $query->whereJsonContains('data_json->team_id', $teamId);
+    }
+
+    public function scopeForUser(Builder $query, $userId): Builder
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    // ---------------------------------------------------------
+    // Accessors & Helpers
+    // ---------------------------------------------------------
+
+    public function getTeamIdAttribute(): ?int
+    {
+        return $this->data_json['team_id'] ?? null;
+    }
 
     public function isRead(): bool
     {
@@ -61,31 +99,6 @@ class Notification extends Model
     public function isSystem(): bool
     {
         return $this->channel === self::CHANNEL_SYSTEM;
-    }
-
-    public function scopeUnread($query)
-    {
-        return $query->whereNull('read_at');
-    }
-
-    public function scopeForTeamInvite($query)
-    {
-        return $query->where('type', 'team_invite');
-    }
-
-    public function getTeamIdAttribute(): ?int
-    {
-        return $this->data_json['team_id'] ?? null;
-    }
-
-    public function scopeForTeam($query, $teamId)
-    {
-        return $query->whereJsonContains('data_json->team_id', $teamId);
-    }
-
-    public function scopeForUser($query, $userId)
-    {
-        return $query->where('user_id', $userId);
     }
 
     public function isActionable(): bool

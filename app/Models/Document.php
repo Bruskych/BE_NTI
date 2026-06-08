@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,10 @@ class Document extends Model
 {
     use SoftDeletes, HasFactory;
 
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
     const CLASSIFICATION_PUBLIC       = 'public';
     const CLASSIFICATION_INTERNAL     = 'internal';
     const CLASSIFICATION_CONFIDENTIAL = 'confidential';
@@ -21,6 +26,10 @@ class Document extends Model
      * — minimum baseline of accepted attachment extensions for uploaded documents.
      */
     const ALLOWED_UPLOAD_EXTENSIONS = 'pdf,doc,docx,jpg,jpeg,png';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'application_id',
@@ -69,6 +78,25 @@ class Document extends Model
     {
         return $this->belongsToMany(Milestone::class, 'milestone_documents')
             ->withTimestamps();
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopePublic(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_PUBLIC);
+    }
+
+    public function scopeInternal(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_INTERNAL);
+    }
+
+    public function scopeConfidential(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_CONFIDENTIAL);
     }
 
     // ---------------------------------------------------------
