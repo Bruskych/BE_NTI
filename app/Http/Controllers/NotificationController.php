@@ -13,7 +13,7 @@ class NotificationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $notifications = Notification::forUser($request->user()->id)
-            ->unread()
+            //->unread() - не отдаёт прочитанные сообщение (отключено)
             ->latest()
             ->get();
 
