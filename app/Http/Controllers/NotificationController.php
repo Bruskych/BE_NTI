@@ -61,4 +61,18 @@ class NotificationController extends Controller
             'message' => 'All notifications cleared successfully.'
         ], 200);
     }
+
+    public function markAsRead(Notification $notification): JsonResponse
+    {
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $notification->markAsRead();
+
+        return response()->json([
+            'message' => 'Notification marked as read successfully.',
+            'data' => $notification
+        ]);
+    }
 }

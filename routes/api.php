@@ -123,6 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::post('/{notification}/accept', [NotificationController::class, 'accept']);
         Route::post('/{notification}/reject', [NotificationController::class, 'reject']);
+        Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
         Route::delete('/{notification}', [NotificationController::class, 'destroy']);
         Route::delete('/', [NotificationController::class, 'destroyAll']);
     });
