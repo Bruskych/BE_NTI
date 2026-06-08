@@ -57,7 +57,7 @@ class StudentApplicationFlowTest extends TestCase
 
         // 2. Student fills out the profile
         $this->actingAs($student)
-            ->putJson('/api/settings/update-profile', ['name' => 'Ivan Petrenko'])
+            ->postJson('/api/settings/update-profile/name', ['name' => 'Ivan Petrenko'])
             ->assertStatus(200);
 
         $this->assertEquals('Ivan Petrenko', $student->fresh()->name);
