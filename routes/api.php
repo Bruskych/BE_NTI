@@ -55,8 +55,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/gdpr/export', [GdprController::class, 'exportMyData']);
         Route::delete('/gdpr/erase', [GdprController::class, 'eraseMyData']);
     });
-
-    Route::put('/settings/update-profile', ProfileController::class);
+    Route::prefix('settings/update-profile')->group(function () {
+        Route::post('/name', [ProfileController::class, 'updateName']);
+        Route::post('/email', [ProfileController::class, 'updateEmail']);
+        Route::post('/avatar', [ProfileController::class, 'updateAvatar']);
+    });
 
     // Admin Routes
     Route::middleware('role:admin,super_admin')->prefix('admin')->group(function () {
