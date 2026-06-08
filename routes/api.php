@@ -1,12 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\{
     AuthController, AdminController, ProfileController, ProgramController,
     CallController, ChallengeController, OrganizationController, SpecializationController,
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
-    ExportController, GdprController,
+    NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController,
 };
 
 // -------------------------------------------------------------------------
@@ -45,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/gdpr/export', [GdprController::class, 'exportMyData']);
         Route::delete('/gdpr/erase', [GdprController::class, 'eraseMyData']);
     });
+
     Route::put('/settings/update-profile', ProfileController::class);
 
     // Admin Routes
@@ -55,29 +57,41 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/companies/pending', [AdminController::class, 'pendingCompanies']);
         Route::post('/companies/{id}/approve', [AdminController::class, 'approveCompany']);
         Route::post('/companies/{id}/reject', [AdminController::class, 'rejectCompany']);
+
         Route::get('/exports/types', [ExportController::class, 'types']);
         Route::get('/exports', [ExportController::class, 'index']);
         Route::post('/exports', [ExportController::class, 'store']);
         Route::post('/export/{resource}/{format}', [ExportController::class, 'storeByRoute']);
+
         Route::post('/gdpr/users/{user}/export', [GdprController::class, 'exportUserData']);
         Route::delete('/gdpr/users/{user}', [GdprController::class, 'eraseUserData']);
     });
 
+    // Teams
     Route::get('/teams/my-team', [TeamController::class, 'myTeam']);
-    Route::apiResource('teams', TeamController::class);
     Route::post('/teams/leave', [TeamController::class, 'leave']);
+    Route::apiResource('teams', TeamController::class);
+    Route::prefix('teams/{team}')->group(function () {
+        Route::post('/invite', [TeamController::class, 'invite']);
+        Route::post('/remove-member', [TeamController::class, 'removeMember']);
+    });
 
+    // Resources
     Route::apiResource('challenges', ChallengeController::class);
     Route::apiResource('organizations', OrganizationController::class);
-    Route::apiResource('teams', TeamController::class);
     Route::apiResource('applications', ApplicationController::class);
     Route::apiResource('projects', ProjectController::class);
     Route::apiResource('consultations', ConsultationController::class);
+    Route::apiResource('mentorships', MentorshipController::class);
+    Route::apiResource('posts', PostController::class);
+    Route::apiResource('pages', PageController::class);
 
+    // Contextual actions
     Route::prefix('applications/{application}')->group(function () {
         Route::post('/submit', [ApplicationController::class, 'submit']);
         Route::post('/evaluations', [EvaluationController::class, 'store']);
     });
+
     Route::prefix('calls')->group(function () {
         Route::get('/', [CallController::class, 'index']);
         Route::get('/{call}', [CallController::class, 'show']);
@@ -85,26 +99,28 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{call}', [CallController::class, 'update']);
     });
 
-    Route::prefix('teams/{team}')->group(function () {
-        Route::post('/invite', [TeamController::class, 'invite']);
-    });
-
-    // 1. Маршруты, привязанные к конкретному проекту (Коллекция)
+    // Milestones
     Route::prefix('projects/{project}/milestones')->group(function () {
         Route::get('/', [MilestoneController::class, 'index']);
         Route::post('/', [MilestoneController::class, 'store']);
     });
-
-    // 2. Маршруты привязанные к конкретному майлстоуну (Ресурс)
     Route::prefix('milestones')->group(function () {
         Route::get('/{milestone}', [MilestoneController::class, 'show']);
         Route::put('/{milestone}', [MilestoneController::class, 'update']);
         Route::post('/{milestone}/approve', [MilestoneController::class, 'approve']);
     });
 
+    // Notifications and Preferecnes
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::post('/{notification}/accept', [NotificationController::class, 'accept']);
         Route::post('/{notification}/reject', [NotificationController::class, 'reject']);
+        Route::delete('/{notification}', [NotificationController::class, 'destroy']);
+        Route::delete('/', [NotificationController::class, 'destroyAll']);
+    });
+
+    Route::prefix('settings')->group(function () {
+        Route::get('/notifications', [NotificationPreferenceController::class, 'show']);
+        Route::patch('/notifications', [NotificationPreferenceController::class, 'update']);
     });
 });

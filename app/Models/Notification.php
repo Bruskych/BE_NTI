@@ -87,4 +87,9 @@ class Notification extends Model
     {
         return $query->where('user_id', $userId);
     }
+
+    public function isActionable(): bool
+    {
+        return $this->type === 'team_invite';
+    }
 }

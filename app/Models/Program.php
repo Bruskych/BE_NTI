@@ -65,4 +65,9 @@ class Program extends Model
     {
         return $this->type === 'practice';
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

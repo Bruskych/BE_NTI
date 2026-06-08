@@ -2,64 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Notification, Team};
+use App\Models\Notification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use App\Http\Resources\TeamResource;
 
 class NotificationController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $notifications = Notification::forUser($request->user()->id)
+            ->unread()
+            ->latest()
+            ->get();
+
+        return response()->json(['data' => $notifications]);
+    }
+
+    public function accept(Notification $notification, NotificationService $service): JsonResponse
+    {
+        $this->authorize('accept', $notification);
+
+        try {
+            $team = $service->acceptInvitation($notification, auth()->user());
+            return response()->json(['message' => 'Joined successfully.', 'data' => new TeamResource($team)]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function reject(Notification $notification, NotificationService $service): JsonResponse
+    {
+        $this->authorize('reject', $notification);
+
+        try {
+            $service->rejectInvitation($notification);
+            return response()->json(['message' => 'Declined successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function destroy(Notification $notification, NotificationService $service): JsonResponse
+    {
+        $this->authorize('delete', $notification);
+
+        $service->deleteNotification($notification);
+
+        return response()->json(['message' => 'Notification deleted successfully.']);
+    }
+
+    public function destroyAll(Request $request): JsonResponse
+    {
+        $request->user()->notifications()->delete();
+
         return response()->json([
-            'data' => Notification::forTeamInvite()
-                ->forUser($request->user()->id)
-                ->unread()
-                ->latest()
-                ->get()
-        ]);
-    }
-
-    public function accept(Notification $notification, Request $request): JsonResponse
-    {
-        if ($notification->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
-
-        if ($notification->isRead()) {
-            return response()->json(['message' => 'Invitation already processed.'], 422);
-        }
-
-        $team = Team::find($notification->team_id);
-
-        if (!$team) return response()->json(['message' => 'Team does not exist.'], 404);
-        if ($request->user()->teams()->exists()) return response()->json(['message' => 'Already in a team.'], 422);
-
-        if (method_exists($team, 'isFull') && $team->isFull()) {
-            return response()->json(['message' => 'Team is full.'], 422);
-        }
-
-        DB::transaction(function () use ($notification, $team, $request) {
-            $team->members()->attach($request->user()->id, ['role' => 'member', 'joined_at' => now()]);
-            $notification->markAsRead();
-        });
-
-        return response()->json(['message' => 'Joined successfully.', 'data' => new TeamResource($team)]);
-    }
-
-    public function reject(Notification $notification, Request $request): JsonResponse
-    {
-        if ($notification->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
-
-        if ($notification->isRead()) {
-            return response()->json(['message' => 'Invitation already processed.'], 422);
-        }
-
-        $notification->markAsRead();
-
-        return response()->json(['message' => 'Invitation declined successfully.']);
+            'message' => 'All notifications cleared successfully.'
+        ], 200);
     }
 }

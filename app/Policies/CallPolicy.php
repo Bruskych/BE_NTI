@@ -8,57 +8,61 @@ use Illuminate\Auth\Access\Response;
 
 class CallPolicy
 {
-
-    private function isAdmin(User $user): bool
-    {
-        return $user->hasAnyRole(['admin', 'super_admin']);
-    }
-
     private function isOrganizationOwner(User $user, Call $call): bool
     {
-        return $user->organizations->contains('id', $call->organization_id);
+        return $user->organizations()->where('organizations.id', $call->organization_id)->exists();
     }
 
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response
     {
-        return true;
+        return Response::allow();
     }
 
-    public function view(User $user, Call $call): bool
+    public function view(User $user, Call $call): Response
     {
-        if ($this->isAdmin($user)) return true;
-
-        if ($call->status === 'draft') {
-            return $this->isOrganizationOwner($user, $call);
+        if ($user->can('calls.view-all') || $call->status !== 'draft') {
+            return Response::allow();
         }
 
-        return true;
+        return $this->isOrganizationOwner($user, $call)
+            ? Response::allow()
+            : Response::deny('You do not have access to this draft call.');
     }
 
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        if ($this->isAdmin($user)) return true;
-
-        $organization = $user->organizations()->first();
-        return $organization && $organization->isActive();
+        return $user->can('calls.create')
+            ? Response::allow()
+            : Response::deny('You do not have permission to create calls.');
     }
 
-    public function update(User $user, Call $call): bool
+    public function update(User $user, Call $call): Response
     {
-        if ($this->isAdmin($user)) return true;
+        if ($user->can('calls.edit-all')) return Response::allow();
 
-        return $this->isOrganizationOwner($user, $call);
+        return ($user->can('calls.edit') && $this->isOrganizationOwner($user, $call))
+            ? Response::allow()
+            : Response::deny('You cannot edit this call.');
     }
 
-    public function delete(User $user, Call $call): bool
+    public function delete(User $user, Call $call): Response
     {
-        if ($this->isAdmin($user)) return true;
+        if (!$user->can('calls.delete')) {
+            return Response::deny('No permission to delete.');
+        }
 
-        return $this->isOrganizationOwner($user, $call) && $call->status === 'draft';
+        return ($call->isDraft() && $this->isOrganizationOwner($user, $call))
+            ? Response::allow()
+            : Response::deny('Only draft calls owned by your organization can be deleted.');
     }
 
-    public function restore(User $user, Call $call): bool
+    public function open(User $user, Call $call): Response
     {
-        return $this->isAdmin($user);
+        return $user->can('calls.open') ? Response::allow() : Response::deny();
+    }
+
+    public function close(User $user, Call $call): Response
+    {
+        return $user->can('calls.close') ? Response::allow() : Response::deny();
     }
 }

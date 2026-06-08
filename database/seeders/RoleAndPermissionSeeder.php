@@ -45,7 +45,7 @@ class RoleAndPermissionSeeder extends Seeder
             'projects.view-own', 'projects.view-all', 'projects.create', 'projects.edit', 'projects.delete',
 
             // Менторство и Консультации
-            'mentorships.view', 'mentorships.assign', 'consultations.view', 'consultations.create', 'consultations.edit',
+            'mentorships.view', 'mentorships.assign', 'consultations.view', 'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
 
             // Вехи / Этапы разработки (Milestones)
             'milestones.view', 'milestones.create', 'milestones.edit', 'milestones.approve',
@@ -109,7 +109,7 @@ class RoleAndPermissionSeeder extends Seeder
         $mentor = Role::firstOrCreate(['name' => 'mentor', 'guard_name' => 'web']);
         $mentor->syncPermissions([
             'projects.view-own', 'milestones.view', 'milestones.create', 'milestones.edit', 'milestones.approve',
-            'consultations.view', 'consultations.create', 'consultations.edit',
+            'consultations.view', 'consultations.create', 'consultations.edit', 'consultations.view-own', 'consultations.edit-own', 'consultations.delete-own',
             'mentorships.view', 'documents.view', 'documents.upload',
         ]);
 

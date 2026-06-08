@@ -4,36 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Http\Resources\ProjectResource;
-use Illuminate\Http\Request;
+use App\Http\Requests\{StoreProjectRequest, UpdateProjectRequest};
+use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
+
 class ProjectController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(Project $project): ProjectResource
+    public function __construct()
     {
-        $this->authorize('view', $project);
-
-        return new ProjectResource($project->load(['milestones', 'application.team.members']));
+        $this->authorizeResource(Project::class, 'project');
     }
 
-    public function store(StoreProjectRequest $request): ProjectResource
+    public function show(Project $project): JsonResponse
+    {
+        return response()->api(new ProjectResource($project->load(['milestones', 'application.team.members'])));
+    }
+
+    public function store(StoreProjectRequest $request): JsonResponse
     {
         $this->authorize('create', Project::class);
 
         $project = Project::create($request->validated());
 
-        return new ProjectResource($project);
+        return response()->api(new ProjectResource($project), 201);
     }
 
-    public function update(UpdateProjectRequest $request, Project $project): ProjectResource
+    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        $this->authorize('update', $project);
-
         $project->update($request->validated());
 
-        return new ProjectResource($project);
+        return response()->api(new ProjectResource($project));
+    }
+
+    public function destroy(Project $project): JsonResponse
+    {
+        $project->delete();
+
+        return response()->api(null, 204);
     }
 }

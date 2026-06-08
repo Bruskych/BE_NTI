@@ -8,31 +8,38 @@ use Illuminate\Auth\Access\Response;
 
 class OrganizationPolicy
 {
-    public function view(User $user, Organization $organization): bool
+    public function before(User $user, string $ability): ?bool
     {
-        if ($user->can('organizations.view') || $organization->isActive()) {
-            return true;
+        return $user->hasRole(['super_admin', 'admin']) ? true : null;
+    }
+
+    public function view(User $user, Organization $organization): Response
+    {
+        if ($user->can('organizations.view') || $organization->isActive() || $user->belongsToOrg($organization)) {
+            return Response::allow();
         }
 
-        return $user->belongsToOrg($organization);
+        return Response::deny('You do not have access to this organization.');
     }
 
-    public function update(User $user, Organization $organization): bool
+    public function create(User $user): Response
     {
-        if ($user->can('organizations.edit')) {
-            return true;
-        }
-
-        return $user->isOwnerOf($organization);
+        return $user->can('organizations.create')
+            ? Response::allow()
+            : Response::deny('You do not have permission to create organizations.');
     }
 
-    public function create(User $user): bool
+    public function update(User $user, Organization $organization): Response
     {
-        return $user->can('organizations.create');
+        return ($user->can('organizations.edit') || $user->isOwnerOf($organization))
+            ? Response::allow()
+            : Response::deny('You do not have permission to update this organization.');
     }
 
-    public function delete(User $user, Organization $organization): bool
+    public function delete(User $user, Organization $organization): Response
     {
-        return $user->can('organizations.delete') || $user->isOwnerOf($organization);
+        return ($user->can('organizations.delete') || $user->isOwnerOf($organization))
+            ? Response::allow()
+            : Response::deny('You do not have permission to delete this organization.');
     }
 }

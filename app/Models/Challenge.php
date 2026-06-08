@@ -66,29 +66,30 @@ class Challenge extends Model
     {
         return $this->hasMany(Application::class);
     }
-
-
-
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
+        // АДМИН - ВИДИТ ВСЁ
         if ($user->can('challenges.view-all')) {
             return $query;
         }
-        if ($user->hasRole(['student', 'visitor'])) {
-            return $query->whereIn('status', [self::STATUS_PUBLISHED, self::STATUS_PAIRING, self::STATUS_ASSIGNED, self::STATUS_ACTIVE]);
+        // ГОСТЬ И СТУДЕНТ - ВИДЯТ ТОЛЬКО ОПУБЛИКОВАНЫЕ И АКТИВНЫЕ
+        if ($user->hasAnyRole(['student', 'visitor'])) {
+            return $query->whereIn('status', [
+                self::STATUS_PUBLISHED,
+                self::STATUS_PAIRING,
+                self::STATUS_ASSIGNED,
+                self::STATUS_ACTIVE
+            ]);
         }
-
-        $myOrgIds = $user->organizations()->pluck('organizations.id');
-
-        return $query->where(function ($q) use ($myOrgIds) {
+        // ОРГАНИЗАЦИИ - ВИДЯТ ПУБЛИЧНЫЕ И СВОИ ЧЕРНОВИКИ
+        return $query->where(function ($q) use ($user) {
             $q->whereIn('status', [self::STATUS_PUBLISHED, self::STATUS_PAIRING, self::STATUS_ASSIGNED, self::STATUS_ACTIVE])
-                ->orWhere(function ($sub) use ($myOrgIds) {
+                ->orWhere(function ($sub) use ($user) {
                     $sub->where('status', self::STATUS_DRAFT)
-                        ->whereIn('organization_id', $myOrgIds);
+                        ->whereIn('organization_id', $user->organizations()->select('organizations.id'));
                 });
         });
     }
-
     public function isDraft(): bool     { return $this->status === self::STATUS_DRAFT; }
     public function isPublished(): bool { return $this->status === self::STATUS_PUBLISHED; }
     public function isPairing(): bool   { return $this->status === self::STATUS_PAIRING; }

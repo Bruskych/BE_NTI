@@ -4,72 +4,27 @@ namespace App\Policies;
 
 use App\Models\Evaluation;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 use App\Models\Application;
+use Illuminate\Auth\Access\Response;
 
 class EvaluationPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function create(User $user, Application $application): Response
     {
-        return false;
-    }
+        if (!$user->hasRole('expert')) {
+            return Response::deny('Only experts can evaluate.');
+        }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Evaluation $evaulation): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user, Application $application)
-    {
-        $isEvaluator = $user->isEvaluator();
-
-        $isReadyForEvaluation = $application->status === 'in_evaluation';
+        if ($application->status !== 'in_evaluation') {
+            return Response::deny('Application is not ready for evaluation.');
+        }
 
         $alreadyEvaluated = Evaluation::where('application_id', $application->id)
             ->where('evaluator_id', $user->id)
             ->exists();
 
-        return $isEvaluator && $isReadyForEvaluation && !$alreadyEvaluated;
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Evaluation $evaulation): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Evaluation $evaulation): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Evaluation $evaulation): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Evaluation $evaulation): bool
-    {
-        return false;
+        return !$alreadyEvaluated
+            ? Response::allow()
+            : Response::deny('You have already evaluated this application.');
     }
 }

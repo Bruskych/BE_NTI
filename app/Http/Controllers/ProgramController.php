@@ -4,26 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Program;
 use App\Http\Resources\ProgramResource;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProgramController extends Controller
 {
-    /**
-     * Получить список всех активных программ (Program A и Program B).
-     */
-    public function index(): JsonResponse
+    use AuthorizesRequests;
+
+    public function __construct()
     {
-        $programs = Program::where('is_active', true)->get();
-        return response()->json(ProgramResource::collection($programs));
+        $this->authorizeResource(Program::class, 'program');
     }
 
-    /**
-     * Посмотреть детальную информацию о конкретной программе.
-     */
-    public function show(int $id): JsonResponse
+    public function index(): JsonResponse
     {
-        $program = Program::where('is_active', true)->findOrFail($id);
-        return response()->json(new ProgramResource($program));
+        $programs = Program::active()->get();
+
+        return response()->api(ProgramResource::collection($programs));
+    }
+
+    public function show(Program $program): JsonResponse
+    {
+        return response()->api(new ProgramResource($program));
     }
 }

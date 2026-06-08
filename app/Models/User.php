@@ -125,79 +125,31 @@ class User extends Authenticatable implements HasMedia
     }
 
     // ---------------------------------------------------------
-    // Helpers
+    // Helpers (Role Checks)
     // ---------------------------------------------------------
 
-    public function isStudent(): bool
-    {
-        return $this->hasRole('student');
-    }
-
-    public function isTeamLeader(): bool
-    {
-        return $this->hasRole('team_leader');
-    }
-
-    public function isCompany(): bool
-    {
-        return $this->hasRole('company');
-    }
-
-    public function isMentor(): bool
-    {
-        return $this->hasRole('mentor');
-    }
-
-    public function isEvaluator(): bool
-    {
-        return $this->hasRole('evaluator');
-    }
-
-    public function isContentEditor(): bool
-    {
-        return $this->hasRole('content_editor');
-    }
-
-    public function isAdmin(): bool
-    {
-        return $this->hasRole('admin') || $this->hasRole('super_admin');
-    }
-
-    public function isSuperAdmin(): bool
-    {
-        return $this->hasRole('super_admin');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Group Helpers
-    |--------------------------------------------------------------------------
-    */
+    public function isStudent(): bool { return $this->hasRole('student'); }
+    public function isTeamLeader(): bool { return $this->hasRole('team_leader'); }
+    public function isCompany(): bool { return $this->hasRole('company'); }
+    public function isMentor(): bool { return $this->hasRole('mentor'); }
+    public function isEvaluator(): bool { return $this->hasRole('evaluator'); }
+    public function isContentEditor(): bool { return $this->hasRole('content_editor'); }
+    public function isAdmin(): bool { return $this->hasRole('admin') || $this->hasRole('super_admin'); }
+    public function isSuperAdmin(): bool { return $this->hasRole('super_admin'); }
 
     public function isStaff(): bool
     {
-        return $this->hasAnyRole([
-            'admin',
-            'super_admin',
-            'content_editor',
-            'evaluator',
-            'mentor'
-        ]);
+        return $this->hasAnyRole(['admin', 'super_admin', 'content_editor', 'evaluator', 'mentor']);
     }
 
     public function isManagement(): bool
     {
-        return $this->hasAnyRole([
-            'admin',
-            'super_admin'
-        ]);
+        return $this->hasAnyRole(['admin', 'super_admin']);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Accessors & Mutators
-    |--------------------------------------------------------------------------
-    */
+    // ---------------------------------------------------------
+    // Accessors & Logic Helpers
+    // ---------------------------------------------------------
 
     public function getAvatarUrlAttribute(): ?string
     {
@@ -205,13 +157,6 @@ class User extends Authenticatable implements HasMedia
             return null;
         }
         return Storage::disk('public')->url($this->avatar_path);
-    }
-
-    public function updateProfileData(string $name): bool
-    {
-        return $this->update([
-            'name' => trim($name)
-        ]);
     }
 
     public function isOwnerOf(Organization $organization): bool
@@ -229,5 +174,8 @@ class User extends Authenticatable implements HasMedia
             ->exists();
     }
 
-
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->notifications()->whereNull('read_at')->count();
+    }
 }

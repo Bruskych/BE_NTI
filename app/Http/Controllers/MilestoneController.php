@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Milestone;
-use App\Models\Project;
+use App\Models\{Milestone, Project};
 use App\Http\Resources\MilestoneResource;
-use App\Http\Requests\StoreMilestoneRequest;
-use App\Http\Requests\UpdateMilestoneRequest;
+use App\Http\Requests\{StoreMilestoneRequest, UpdateMilestoneRequest};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -14,21 +12,16 @@ class MilestoneController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct()
+    {
+        $this->authorizeResource(Milestone::class, 'milestone');
+    }
 
     public function index(Project $project): JsonResponse
     {
-        $this->authorize('viewAny', Milestone::class);
+        $this->authorize('viewAny', [Milestone::class, $project]);
 
-        $milestones = $project->milestones()->with('approvedBy')->get();
-
-        return response()->json(MilestoneResource::collection($milestones));
-    }
-
-    public function show(Milestone $milestone): JsonResponse
-    {
-        $this->authorize('view', $milestone);
-
-        return response()->json(new MilestoneResource($milestone->load('approvedBy')));
+        return response()->api(MilestoneResource::collection($project->milestones()->with('approvedBy')->get()));
     }
 
     public function store(StoreMilestoneRequest $request, Project $project): JsonResponse
@@ -40,16 +33,19 @@ class MilestoneController extends Controller
             'completion_percentage' => 0,
         ]));
 
-        return response()->json(new MilestoneResource($milestone), 201);
+        return response()->api(new MilestoneResource($milestone), 201);
+    }
+
+    public function show(Milestone $milestone): JsonResponse
+    {
+        return response()->api(new MilestoneResource($milestone->load('approvedBy')));
     }
 
     public function update(UpdateMilestoneRequest $request, Milestone $milestone): JsonResponse
     {
-        $this->authorize('update', $milestone);
-
         $milestone->update($request->validated());
 
-        return response()->json(new MilestoneResource($milestone->load('approvedBy')));
+        return response()->api(new MilestoneResource($milestone->load('approvedBy')));
     }
 
     public function approve(Milestone $milestone): JsonResponse
@@ -58,7 +54,7 @@ class MilestoneController extends Controller
 
         $milestone->markAsApproved(auth()->id());
 
-        return response()->json([
+        return response()->api([
             'message' => 'Milestone approved successfully',
             'data'    => new MilestoneResource($milestone->load('approvedBy'))
         ]);

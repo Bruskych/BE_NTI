@@ -1,43 +1,30 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Http\Resources\OrganizationResource;
-use App\Http\Requests\UpdateOrganizationRequest;
-use App\Http\Requests\StoreOrganizationRequest;
+use App\Http\Requests\{StoreOrganizationRequest, UpdateOrganizationRequest};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OrganizationController extends Controller
 {
-    public function show(Organization $organization): JsonResponse
-    {
-        $this->authorize('view', $organization);
+    use AuthorizesRequests;
 
-        return response()->json(new OrganizationResource($organization->load(['users'])));
+    public function __construct()
+    {
+        $this->authorizeResource(Organization::class, 'organization');
     }
 
-    public function update(UpdateOrganizationRequest $request, Organization $organization): JsonResponse
+    public function show(Organization $organization): JsonResponse
     {
-        $this->authorize('update', $organization);
-
-        $organization->update($request->validated());
-
-        if ($request->hasFile('logo')) {
-            $organization->clearMediaCollection('logo');
-            $organization->addMediaFromRequest('logo')->toMediaCollection('logo');
-        }
-
-        return response()->json(
-            new OrganizationResource($organization->load(['users']))
-        );
+        return response()->api(new OrganizationResource($organization->load(['users'])));
     }
 
     public function store(StoreOrganizationRequest $request): JsonResponse
     {
-        $this->authorize('create', Organization::class);
-
         $organization = DB::transaction(function () use ($request) {
             $org = Organization::create($request->validated());
             $org->users()->attach($request->user(), ['role' => 'owner']);
@@ -48,15 +35,24 @@ class OrganizationController extends Controller
             $organization->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        return response()->json(new OrganizationResource($organization->load(['users'])), 201);
+        return response()->api(new OrganizationResource($organization->load(['users'])), 201);
+    }
+
+    public function update(UpdateOrganizationRequest $request, Organization $organization): JsonResponse
+    {
+        $organization->update($request->validated());
+
+        if ($request->hasFile('logo')) {
+            $organization->clearMediaCollection('logo');
+            $organization->addMediaFromRequest('logo')->toMediaCollection('logo');
+        }
+
+        return response()->api(new OrganizationResource($organization->load(['users'])));
     }
 
     public function destroy(Organization $organization): JsonResponse
     {
-        $this->authorize('delete', $organization);
-
         $organization->delete();
-
-        return response()->json(null, 204);
+        return response()->api(null, 204);
     }
 }

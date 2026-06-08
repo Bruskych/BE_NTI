@@ -8,56 +8,60 @@ use Illuminate\Auth\Access\Response;
 
 class ChallengePolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response
     {
-        return true;
+        return Response::allow();
     }
 
-    public function view(User $user, Challenge $challenge): bool
+    public function view(User $user, Challenge $challenge): Response
     {
+        if ($user->can('challenges.view-all')) {
+            return Response::allow();
+        }
+
         if ($challenge->isDraft()) {
-            return $user->can('challenges.view-all') ||
-                $user->organizations->contains($challenge->organization_id);
-        }
-        return true;
-    }
-
-    public function create(User $user): bool
-    {
-        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
-        if ($user->hasAnyRole(['admin', 'super_admin'])) {
-            return true;
+            return $user->organizations()->where('organizations.id', $challenge->organization_id)->exists()
+                ? Response::allow()
+                : Response::deny('You cannot view this draft.');
         }
 
-        $organization = $user->organizations()->first();
-        return $organization && $organization->isActive();
+        return Response::allow();
     }
 
-    public function update(User $user, Challenge $challenge): bool
+    public function create(User $user): Response
     {
-        if ($user->can('challenges.edit-all')) return true;
-
-        return $user->organizations->contains($challenge->organization_id);
-    }
-
-    public function delete(User $user, Challenge $challenge): bool
-    {
-        //    РАЗРЕШЕНИЕ ЗАСИДИТЬ НУЖНО
-        if ($user->hasAnyRole(['admin', 'super_admin'])) {
-            return true;
+        if (!$user->can('challenges.create')) {
+            return Response::deny('You do not have permission to create challenges.');
         }
 
-        return $user->organizations->contains($challenge->organization_id)
-            && $challenge->isDraft();
+        return $user->organizations()->where('is_active', true)->exists()
+            ? Response::allow()
+            : Response::deny('Active organization is required to create a challenge.');
     }
 
-    public function restore(User $user, Challenge $challenge): bool
+    public function update(User $user, Challenge $challenge): Response
     {
-        return false;
+        if ($user->can('challenges.edit-all')) {
+            return Response::allow();
+        }
+
+        return $user->organizations()->where('organizations.id', $challenge->organization_id)->exists()
+            ? Response::allow()
+            : Response::deny('You do not own this challenge.');
     }
 
-    public function forceDelete(User $user, Challenge $challenge): bool
+    public function delete(User $user, Challenge $challenge): Response
     {
-        return false;
+        if (!$user->can('challenges.delete')) {
+            return Response::deny('You do not have permission to delete challenges.');
+        }
+
+        if (!$challenge->isDraft()) {
+            return Response::deny('Only drafts can be deleted.');
+        }
+
+        return $user->organizations()->where('organizations.id', $challenge->organization_id)->exists()
+            ? Response::allow()
+            : Response::deny('You do not own this challenge.');
     }
 }

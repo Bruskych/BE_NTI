@@ -8,60 +8,52 @@ use Illuminate\Auth\Access\Response;
 
 class ConsultationPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    private function isOwner(User $user, Consultation $consultation): bool
     {
-        return false;
+        return (int) $user->id === (int) $consultation->mentor_id;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Consultation $consultation): bool
+    public function viewAny(User $user): Response
     {
-        return $user->id === $consultation->mentor_id ||
-            $consultation->mentorship->team->members->contains($user->id);
+        return $user->can('consultations.view')
+            ? Response::allow()
+            : Response::deny('You do not have permission to view consultations.');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function view(User $user, Consultation $consultation): Response
     {
-        return false;
+        // Доступ открыт если:
+        // 1 У пользователя есть глобальное право view
+        // 2 ИЛИ пользователь ментор
+        // 3 ИЛИ пользователь участник команды
+
+        $isTeamMember = $consultation->mentorship->team->hasMember($user->id);
+
+        if ($user->can('consultations.view') || $this->isOwner($user, $consultation) || $isTeamMember) {
+            return Response::allow();
+        }
+
+        return Response::deny('You do not have access to this consultation.');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Consultation $consultation): bool
+    public function create(User $user): Response
     {
-        return $user->id === $consultation->mentor_id;
+        return $user->can('consultations.create')
+            ? Response::allow()
+            : Response::deny('You do not have permission to create consultations.');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Consultation $consultation): bool
+    public function update(User $user, Consultation $consultation): Response
     {
-        return false;
+        return ($user->can('consultations.edit-own') && $this->isOwner($user, $consultation))
+            ? Response::allow()
+            : Response::deny('Only the mentor can update this consultation.');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Consultation $consultation): bool
+    public function delete(User $user, Consultation $consultation): Response
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Consultation $consultation): bool
-    {
-        return false;
+        return ($user->can('consultations.delete-own') && $this->isOwner($user, $consultation))
+            ? Response::allow()
+            : Response::deny('Only the mentor can delete this consultation.');
     }
 }
