@@ -5,6 +5,7 @@ namespace App\Actions;
 
 use App\Models\Application;
 use App\Models\ApplicationHistory;
+use App\Models\AuditEvent;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +26,17 @@ class RejectApplicationAction
                 'new_status' => 'rejected',
                 'changed_by' => $changedBy,
                 'comment' => $comment,
+            ]);
+
+            AuditEvent::create([
+                'user_id'         => $changedBy,
+                'action'          => $application->organization_id ? 'company_application_rejected' : 'student_application_rejected',
+                'object_type'     => 'application',
+                'object_id'       => $application->id,
+                'old_values_json' => ['status' => 'submitted'],
+                'new_values_json' => ['status' => 'rejected', 'comment' => $comment],
+                'result'          => 'success',
+                'created_at'      => now(),
             ]);
 
             $owner = $application->team ? $application->team->leader : null;

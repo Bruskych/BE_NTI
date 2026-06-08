@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Application, Evaluation, EvaluationCriteria, EvaluationScore};
+use App\Models\{Application, AuditEvent, Evaluation, EvaluationCriteria, EvaluationScore};
 use Illuminate\Support\Facades\DB;
 
 class EvaluationService
@@ -35,7 +35,22 @@ class EvaluationService
 
             $evaluation->update(['total_score' => $totalScore]);
 
-            return $evaluation;
+            AuditEvent::create([
+                'user_id'         => $evaluatorId,
+                'action'          => 'evaluation_submitted',
+                'object_type'     => 'evaluation',
+                'object_id'       => $evaluation->id,
+                'old_values_json' => [],
+                'new_values_json' => [
+                    'application_id' => $application->id,
+                    'recommendation' => $evaluation->recommendation,
+                    'total_score'    => $totalScore,
+                ],
+                'result'          => 'success',
+                'created_at'      => now(),
+            ]);
+
+            return $evaluation->load('scores.criteria', 'evaluator');
         });
     }
 }
