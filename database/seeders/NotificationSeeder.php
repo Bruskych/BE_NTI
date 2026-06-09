@@ -37,16 +37,40 @@ class NotificationSeeder extends Seeder
         // ------------------------------
 
         EmailTemplate::create([
-            'name'              => 'project_approved',
-            'subject'           => 'Your project application has been approved!',
-            'body'              => 'Dear {{ leader_name }}, your request on the topic "{{ project_title }}" has been successfully moderated.',
-            'variables_json'    => ['leader_name', 'project_title'],
+            'name'           => 'project_approved',
+            'subject'        => 'Your project application has been approved!',
+            'body'           => 'Dear {{ leader_name }}, your application for "{{ project_title }}" has been approved. Comment: {{ comment }}',
+            'variables_json' => ['leader_name', 'project_title', 'comment'],
         ]);
         EmailTemplate::create([
-            'name'              => 'milestone_deadline',
-            'subject'           => 'The stage deadline is approaching',
-            'body'              => 'We remind you that the deadline for stage "{{ milestone_title }}" is {{ deadline }}.',
-            'variables_json'    => ['milestone_title', 'deadline'],
+            'name'           => 'project_rejected',
+            'subject'        => 'Update on your project application',
+            'body'           => 'Dear {{ leader_name }}, unfortunately your application for "{{ project_title }}" was not approved. Reason: {{ comment }}',
+            'variables_json' => ['leader_name', 'project_title', 'comment'],
+        ]);
+        EmailTemplate::create([
+            'name'           => 'application_approved',
+            'subject'        => 'Your application has been approved!',
+            'body'           => 'Dear {{ user_name }}, congratulations! Your application (ID: {{ application_id }}) has been approved. Comment: {{ comment }}',
+            'variables_json' => ['user_name', 'application_id', 'comment'],
+        ]);
+        EmailTemplate::create([
+            'name'           => 'application_rejected',
+            'subject'        => 'Update on your application',
+            'body'           => 'Dear {{ user_name }}, your application (ID: {{ application_id }}) was not approved. Reason: {{ comment }}',
+            'variables_json' => ['user_name', 'application_id', 'comment'],
+        ]);
+        EmailTemplate::create([
+            'name'           => 'mentor_assigned',
+            'subject'        => 'You have been assigned as a mentor',
+            'body'           => 'Dear {{ user_name }}, you have been assigned as a mentor for the project "{{ project_title }}".',
+            'variables_json' => ['user_name', 'project_title'],
+        ]);
+        EmailTemplate::create([
+            'name'           => 'milestone_deadline',
+            'subject'        => 'The stage deadline is approaching',
+            'body'           => 'We remind you that the deadline for stage "{{ milestone_title }}" is {{ deadline }}.',
+            'variables_json' => ['milestone_title', 'deadline'],
         ]);
 
         // ------------------------------
