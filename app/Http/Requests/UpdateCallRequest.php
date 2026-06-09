@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос обновления данных конкурсного отбора */
 class UpdateCallRequest extends FormRequest
 {
     public function authorize(): bool

@@ -10,6 +10,10 @@ use App\Models\EvaluationTemplate;
 use App\Models\EvaluationCriteria;
 use App\Models\Program;
 
+/**
+ * Сидер шаблонов оценивания: создаёт шаблоны и критерии для экспертной оценки заявок.
+ * Зависит от ProgramSeeder — шаблон привязывается к программе.
+ */
 class EvaluationTemplateSeeder extends Seeder
 {
     /**

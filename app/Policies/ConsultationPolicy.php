@@ -6,6 +6,7 @@ use App\Models\Consultation;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к консультациям: просмотр для ментора и участников команды проекта */
 class ConsultationPolicy
 {
     private function isOwner(User $user, Consultation $consultation): bool

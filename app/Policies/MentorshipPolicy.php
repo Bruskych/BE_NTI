@@ -6,6 +6,7 @@ use App\Models\Mentorship;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к менторствам: ментор и участники команды проекта */
 class MentorshipPolicy
 {
     private function isMentor(User $user, Mentorship $mentorship): bool

@@ -4,10 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблицы документов: documents и milestone_documents.
+ * Документы могут быть привязаны к заявке, проекту или этапу разработки.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы documents и сводную milestone_documents.
+     */
     public function up(): void
     {
+        // Документы платформы (контракты, отчёты, спецификации, паспорта)
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->nullable()->constrained()->cascadeOnDelete();
@@ -25,6 +33,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        // Сводная таблица: документы, прикреплённые к этапу разработки
         Schema::create('milestone_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('milestone_id')->constrained()->cascadeOnDelete();
@@ -33,6 +42,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы milestone_documents и documents.
+     */
     public function down(): void
     {
         Schema::dropIfExists('milestone_documents');

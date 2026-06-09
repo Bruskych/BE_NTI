@@ -13,6 +13,7 @@ return [
     |
     */
 
+    // Диск файловой системы по умолчанию
     'default' => env('FILESYSTEM_DISK', 'local'),
 
     /*
@@ -28,8 +29,10 @@ return [
     |
     */
 
+    // Все доступные диски хранилища
     'disks' => [
 
+        // Локальный приватный диск — для конфиденциальных файлов (CV, документы)
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
@@ -38,6 +41,7 @@ return [
             'report' => false,
         ],
 
+        // Публичный диск — для файлов, доступных через /storage (аватары, логотипы)
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -47,6 +51,7 @@ return [
             'report' => false,
         ],
 
+        // Amazon S3 — облачное хранилище для продакшн-среды
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -73,6 +78,7 @@ return [
     |
     */
 
+    // Символические ссылки: public/storage → storage/app/public
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],

@@ -6,6 +6,7 @@ use Spatie\Permission\Models\Role;
 
 return [
 
+    // Модели Eloquent, используемые пакетом Spatie Permission
     'models' => [
 
         /*
@@ -17,6 +18,7 @@ return [
          * `Spatie\Permission\Contracts\Permission` contract.
          */
 
+        // Модель разрешений (Permission)
         'permission' => Permission::class,
 
         /*
@@ -28,6 +30,7 @@ return [
          * `Spatie\Permission\Contracts\Role` contract.
          */
 
+        // Модель ролей (Role)
         'role' => Role::class,
 
         /*
@@ -35,6 +38,8 @@ return [
          * Eloquent model should be used to retrieve your teams. Of course, it
          * is often just the "Team" model but you may use whatever you like.
          */
+
+        // Модель команд для функционала Teams (не используется в проекте)
         'team' => null,
 
         /*
@@ -42,9 +47,12 @@ return [
          * attachModels, or detachModels, this model class will be used to
          * resolve those IDs. If null, defaults to the guard's model.
          */
+
+        // Модель по умолчанию при передаче ID в syncModels/attachModels
         'default_model' => null,
     ],
 
+    // Имена таблиц базы данных для ролей и разрешений
     'table_names' => [
 
         /*
@@ -53,6 +61,7 @@ return [
          * default value but you may easily change it to any table you like.
          */
 
+        // Таблица ролей
         'roles' => 'roles',
 
         /*
@@ -61,6 +70,7 @@ return [
          * default value but you may easily change it to any table you like.
          */
 
+        // Таблица разрешений
         'permissions' => 'permissions',
 
         /*
@@ -69,6 +79,7 @@ return [
          * basic default value but you may easily change it to any table you like.
          */
 
+        // Сводная таблица: разрешения модели (полиморфная)
         'model_has_permissions' => 'model_has_permissions',
 
         /*
@@ -77,6 +88,7 @@ return [
          * basic default value but you may easily change it to any table you like.
          */
 
+        // Сводная таблица: роли модели (полиморфная)
         'model_has_roles' => 'model_has_roles',
 
         /*
@@ -85,9 +97,11 @@ return [
          * basic default value but you may easily change it to any table you like.
          */
 
+        // Сводная таблица: разрешения, назначенные роли
         'role_has_permissions' => 'role_has_permissions',
     ],
 
+    // Имена столбцов в сводных таблицах
     'column_names' => [
         /*
          * Change this if you want to name the related pivots other than defaults
@@ -103,6 +117,7 @@ return [
          * that case, name this `model_uuid`.
          */
 
+        // Поле полиморфного ключа модели (по умолчанию model_id)
         'model_morph_key' => 'model_id',
 
         /*
@@ -110,6 +125,7 @@ return [
          * foreign key is other than `team_id`.
          */
 
+        // Внешний ключ команды для функционала Teams
         'team_foreign_key' => 'team_id',
     ],
 
@@ -118,6 +134,7 @@ return [
      * Set this to false if you want to implement custom logic for checking permissions.
      */
 
+    // Регистрировать проверку разрешений через Gate Laravel
     'register_permission_check_method' => true,
 
     /*
@@ -125,6 +142,8 @@ return [
      * this will refresh permissions on every TickTerminated, TaskTerminated and RequestTerminated
      * NOTE: This should not be needed in most cases, but an Octane/Vapor combination benefited from it.
      */
+
+    // Сбрасывать кэш разрешений при каждом запросе в Octane (не нужно в большинстве случаев)
     'register_octane_reset_listener' => false,
 
     /*
@@ -136,6 +155,8 @@ return [
      *
      * To enable, set to true, and then create listeners to watch these events.
      */
+
+    // Генерировать события при назначении/снятии ролей и разрешений
     'events_enabled' => false,
 
     /*
@@ -148,11 +169,14 @@ return [
      * (view the latest version of this package's migration file)
      */
 
+    // Функционал Teams — разрешения в контексте команды (отключено)
     'teams' => false,
 
     /*
      * The class to use to resolve the permissions team id
      */
+
+    // Класс для определения ID команды при проверке разрешений
     'team_resolver' => DefaultTeamResolver::class,
 
     /*
@@ -160,6 +184,7 @@ return [
      * When set to true the package will use Passports Client to check permissions
      */
 
+    // Использовать Passport Client Credentials для проверки разрешений
     'use_passport_client_credentials' => false,
 
     /*
@@ -168,6 +193,7 @@ return [
      * setting is false here for optimum safety.
      */
 
+    // Включать имя разрешения в текст исключения (отключено из соображений безопасности)
     'display_permission_in_exception' => false,
 
     /*
@@ -176,6 +202,7 @@ return [
      * setting is false here for optimum safety.
      */
 
+    // Включать имя роли в текст исключения (отключено из соображений безопасности)
     'display_role_in_exception' => false,
 
     /*
@@ -183,6 +210,7 @@ return [
      * See documentation to understand supported syntax.
      */
 
+    // Поддержка шаблонных (wildcard) разрешений вида "posts.*" (отключено)
     'enable_wildcard_permission' => false,
 
     /*
@@ -193,6 +221,7 @@ return [
 
     /* Cache-specific settings */
 
+    // Настройки кэширования разрешений
     'cache' => [
 
         /*
@@ -200,12 +229,14 @@ return [
          * When permissions or roles are updated the cache is flushed automatically.
          */
 
+        // Время жизни кэша разрешений — 24 часа (сбрасывается при обновлении)
         'expiration_time' => DateInterval::createFromDateString('24 hours'),
 
         /*
          * The cache key used to store all permissions.
          */
 
+        // Ключ кэша для хранения всех разрешений
         'key' => 'spatie.permission.cache',
 
         /*
@@ -214,6 +245,7 @@ return [
          * file. Using 'default' here means to use the `default` set in cache.php.
          */
 
+        // Хранилище кэша для разрешений (default = хранилище из cache.php)
         'store' => 'default',
     ],
 ];

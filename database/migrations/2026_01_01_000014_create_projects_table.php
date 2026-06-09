@@ -4,8 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица проектов — создаётся для одобренных заявок.
+ * Проект является рабочей фазой после одобрения заявки командой.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу projects с привязкой один-к-одному к заявке.
+     */
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
@@ -22,6 +29,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицу projects.
+     */
     public function down(): void
     {
         Schema::dropIfExists('projects');

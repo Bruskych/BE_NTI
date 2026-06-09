@@ -10,6 +10,10 @@ use App\Models\Document;
 use App\Models\Project;
 use App\Models\User;
 
+/**
+ * Сидер документов: создаёт тестовые документы (контракты, отчёты, паспорта) для проектов и заявок.
+ * Зависит от ProjectSeeder и MilestoneSeeder.
+ */
 class DocumentSeeder extends Seeder
 {
     /**

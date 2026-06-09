@@ -6,6 +6,7 @@ use App\Models\NotificationPreference;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к настройкам уведомлений: только сам пользователь */
 class NotificationPreferencePolicy
 {
 

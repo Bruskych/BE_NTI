@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель программы инкубатора (грант, практика и т.д.) с конкурсными отборами и полями заявки */
 class Program extends Model
 {
     use SoftDeletes, HasFactory;

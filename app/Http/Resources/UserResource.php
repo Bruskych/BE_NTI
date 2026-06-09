@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс пользователя с ролями, аватаром и основными данными профиля */
 class UserResource extends JsonResource
 {
     public function toArray(Request $request): array

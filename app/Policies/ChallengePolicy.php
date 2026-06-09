@@ -6,6 +6,7 @@ use App\Models\Challenge;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к задачам компании: создание только для активных организаций, редактирование — только для владельца */
 class ChallengePolicy
 {
     public function viewAny(User $user): Response

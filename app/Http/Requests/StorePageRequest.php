@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос создания новой CMS-страницы */
 class StorePageRequest extends FormRequest
 {
     public function authorize(): bool

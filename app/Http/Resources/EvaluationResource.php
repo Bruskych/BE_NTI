@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс оценки заявки с итоговым баллом, баллами по критериям и рекомендацией */
 class EvaluationResource extends JsonResource
 {
     public function toArray(Request $request): array

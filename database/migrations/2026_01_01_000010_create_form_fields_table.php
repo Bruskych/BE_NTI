@@ -4,14 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица полей анкеты заявки (конструктор форм).
+ * Позволяет администратору настраивать поля формы для каждой программы или вызова.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу form_fields для динамических полей анкеты.
+     */
     public function up(): void
     {
         Schema::create('form_fields', function (Blueprint $table) {
             $table->id();
             $table->foreignId('program_id')->constrained();
-            // null = platné pre celý program; not null = špecifické pre danú výzvu
+            // null = платné для целой программы; not null = специфично для данного вызова
             $table->foreignId('call_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('name')->nullable();
             $table->string('label')->nullable();
@@ -25,6 +32,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицу form_fields.
+     */
     public function down(): void
     {
         Schema::dropIfExists('form_fields');

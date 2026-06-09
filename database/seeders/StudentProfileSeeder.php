@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\StudentProfile;
 
+/**
+ * Сидер профилей студентов: создаёт академические данные для тестовых пользователей.
+ * Зависит от UserSeeder — должен выполняться после него.
+ */
 class StudentProfileSeeder extends Seeder
 {
     /**

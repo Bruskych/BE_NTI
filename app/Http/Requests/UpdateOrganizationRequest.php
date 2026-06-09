@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/** Запрос обновления данных организации */
 class UpdateOrganizationRequest extends FormRequest
 {
     public function authorize(): bool

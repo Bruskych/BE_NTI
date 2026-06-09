@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс заявки с полным набором связанных данных */
 class ApplicationResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -13,6 +13,7 @@ return [
     |
     */
 
+    // Подключение к очереди задач по умолчанию
     'default' => env('QUEUE_CONNECTION', 'database'),
 
     /*
@@ -29,12 +30,15 @@ return [
     |
     */
 
+    // Все доступные подключения к брокерам очередей
     'connections' => [
 
+        // Sync — задачи выполняются немедленно (без очереди), удобно при разработке
         'sync' => [
             'driver' => 'sync',
         ],
 
+        // Database — задачи хранятся в таблице jobs базы данных
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_QUEUE_CONNECTION'),
@@ -44,6 +48,7 @@ return [
             'after_commit' => false,
         ],
 
+        // Beanstalkd — высокопроизводительный брокер очередей
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
@@ -53,6 +58,7 @@ return [
             'after_commit' => false,
         ],
 
+        // Amazon SQS — облачный брокер очередей AWS
         'sqs' => [
             'driver' => 'sqs',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -64,6 +70,7 @@ return [
             'after_commit' => false,
         ],
 
+        // Redis — высокопроизводительная очередь на основе Redis
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
@@ -73,14 +80,17 @@ return [
             'after_commit' => false,
         ],
 
+        // Deferred — отложенное выполнение (встроенный Laravel-драйвер)
         'deferred' => [
             'driver' => 'deferred',
         ],
 
+        // Background — фоновое выполнение (встроенный Laravel-драйвер)
         'background' => [
             'driver' => 'background',
         ],
 
+        // Failover — пробует database, при ошибке переключается на deferred
         'failover' => [
             'driver' => 'failover',
             'connections' => [
@@ -102,6 +112,7 @@ return [
     |
     */
 
+    // Настройки пакетной обработки задач (batch jobs)
     'batching' => [
         'database' => env('DB_CONNECTION', 'sqlite'),
         'table' => 'job_batches',
@@ -120,6 +131,7 @@ return [
     |
     */
 
+    // Настройки хранения упавших задач очереди
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
         'database' => env('DB_CONNECTION', 'sqlite'),

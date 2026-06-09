@@ -12,6 +12,10 @@ use App\Models\Application;
 use App\Models\EvaluationScore;
 use App\Models\EvaluationCriteria;
 
+/**
+ * Сидер оценок: создаёт оценки экспертов по критериям для поданных заявок.
+ * Зависит от ApplicationSeeder и EvaluationTemplateSeeder — должен выполняться после них.
+ */
 class EvaluationSeeder extends Seeder
 {
     /**

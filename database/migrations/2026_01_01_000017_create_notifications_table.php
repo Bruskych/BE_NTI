@@ -4,10 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблицы уведомлений: notifications, notification_preferences, email_templates, bulk_messages.
+ * Обеспечивает систему оповещений пользователей через email и системные каналы.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы уведомлений, настроек, шаблонов писем и массовых рассылок.
+     */
     public function up(): void
     {
+        // Системные и email-уведомления для пользователей
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -21,6 +29,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        // Индивидуальные настройки каналов уведомлений (один-к-одному с пользователем)
         Schema::create('notification_preferences', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
@@ -31,6 +40,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Шаблоны писем с переменными для подстановки
         Schema::create('email_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
@@ -41,6 +51,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        // Массовые рассылки администратора по группам пользователей
         Schema::create('bulk_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sender_id')->nullable()->constrained('users')->nullOnDelete();
@@ -52,6 +63,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        // Получатели массовой рассылки с отметкой о доставке
         Schema::create('bulk_message_recipients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bulk_message_id')->constrained()->cascadeOnDelete();
@@ -61,6 +73,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы уведомлений и рассылок.
+     */
     public function down(): void
     {
         Schema::dropIfExists('bulk_message_recipients');

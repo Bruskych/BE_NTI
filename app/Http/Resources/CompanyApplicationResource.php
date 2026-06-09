@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 
+/** Ресурс заявки компании на регистрацию в инкубаторе */
 class CompanyApplicationResource extends JsonResource
 {
     public function toArray($request)

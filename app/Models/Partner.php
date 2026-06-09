@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель партнёра инкубатора с логотипом, ссылкой и флагом выделенного отображения */
 class Partner extends Model
 {
     use SoftDeletes, HasFactory;

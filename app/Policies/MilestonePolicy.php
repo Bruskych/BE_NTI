@@ -6,6 +6,7 @@ use App\Models\Milestone;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к контрольным точкам: участники команды управляют, сторонний staff подтверждает */
 class MilestonePolicy
 {
     public function before(User $user, string $ability): ?bool

@@ -9,8 +9,10 @@ use App\Models\AuditEvent;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 
+/** Действие отклонения заявки: устанавливает статус rejected, фиксирует историю и уведомляет лидера */
 class RejectApplicationAction
 {
+    /** Отклоняет заявку, создаёт записи истории, аудита и системного уведомления */
     public function execute(Application $application, string $comment, ?int $changedBy = null): void
     {
         DB::transaction(function () use ($application, $comment, $changedBy) {

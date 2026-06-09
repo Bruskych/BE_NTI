@@ -4,11 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблицы заявок: applications, application_history, application_answers, application_pairing_submissions.
+ * Заявка — основная транзакционная сущность платформы.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы заявок и связанных данных (история, ответы, документы паринга).
+     */
     public function up(): void
     {
-        // Stavový automat (sekcia 7.4):
+        // Ставовий автомат (секция 7.4):
         // draft → submitted → verified → in_evaluation → needs_supplement
         // → approved / rejected → onboarding → active → suspended → archived
         Schema::create('applications', function (Blueprint $table) {
@@ -28,6 +35,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        // История изменений статуса заявки
         Schema::create('application_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->constrained()->cascadeOnDelete();
@@ -38,6 +46,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
+        // Ответы на поля анкеты (form_fields)
         Schema::create('application_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->constrained()->cascadeOnDelete();
@@ -49,7 +58,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Program B párovanie: CV, motivačný list, návrh riešenia
+        // Документы паринга Программы Б: CV, мотивационное письмо, предложение решения
         Schema::create('application_pairing_submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->constrained()->cascadeOnDelete();
@@ -61,6 +70,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы заявок и связанных данных.
+     */
     public function down(): void
     {
         Schema::dropIfExists('application_pairing_submissions');

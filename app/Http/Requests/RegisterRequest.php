@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос регистрации нового пользователя (студент или компания) с GDPR-согласием */
 class RegisterRequest extends FormRequest
 {
     public function rules(): array

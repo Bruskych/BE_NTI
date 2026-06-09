@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к уведомлениям: только владелец уведомления может просматривать и управлять им */
 class NotificationPolicy
 {
     public function view(User $user, Notification $notification): bool

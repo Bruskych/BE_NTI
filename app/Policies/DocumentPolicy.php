@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Document;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к документам: учитывает классификацию, владельца и принадлежность к команде */
 class DocumentPolicy
 {
     private function isOwner(User $user, Document $document): bool

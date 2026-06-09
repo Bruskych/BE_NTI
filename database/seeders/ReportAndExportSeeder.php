@@ -8,6 +8,10 @@ use Illuminate\Database\Seeder;
 
 use App\Models\ExportsLog;
 
+/**
+ * Сидер отчётов и экспортов: создаёт тестовые записи в журнале экспорта данных.
+ * Не зависит от других сидеров — может выполняться на последнем этапе.
+ */
 class ReportAndExportSeeder extends Seeder
 {
     /**

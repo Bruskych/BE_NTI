@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель документа парного отбора (CV, мотивационное письмо, предложение решения) для программы B */
 class ApplicationPairingSubmission extends Model
 {
     use SoftDeletes, HasFactory;

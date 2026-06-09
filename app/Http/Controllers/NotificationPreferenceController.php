@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\NotificationPreference;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes as OA;
 
+/** Контроллер настроек уведомлений: просмотр и обновление предпочтений пользователя */
 class NotificationPreferenceController extends Controller
 {
+    /** Возвращает настройки уведомлений текущего пользователя */
+    #[OA\Get(
+        path: '/settings/notifications',
+        summary: 'Get the current user\'s notification preferences',
+        tags: ['Notification Preferences'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Notification preferences'),
+        ]
+    )]
     public function show(Request $request): JsonResponse
     {
         $prefs = $request->user()->notificationPreference ?? new NotificationPreference([
@@ -21,9 +33,20 @@ class NotificationPreferenceController extends Controller
             $this->authorize('view', $prefs);
         }
 
-        return response()->json(['data' => $prefs]);
+        return $this->apiJson(['data' => $prefs]);
     }
 
+    /** Обновляет настройки уведомлений текущего пользователя */
+    #[OA\Patch(
+        path: '/settings/notifications',
+        summary: 'Update the current user\'s notification preferences',
+        tags: ['Notification Preferences'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Preferences updated'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function update(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -44,7 +67,7 @@ class NotificationPreferenceController extends Controller
             $validated
         );
 
-        return response()->json([
+        return $this->apiJson([
             'message' => 'Preferences updated successfully.',
             'data'    => $prefs
         ]);

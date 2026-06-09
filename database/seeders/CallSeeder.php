@@ -12,6 +12,10 @@ use App\Models\Program;
 use App\Models\Specialization;
 use App\Models\EvaluationTemplate;
 
+/**
+ * Сидер конкурсных вызовов (Calls): создаёт открытые периоды для приёма заявок Программы А.
+ * Зависит от ProgramSeeder, SpecializationSeeder, EvaluationTemplateSeeder.
+ */
 class CallSeeder extends Seeder
 {
     /**

@@ -8,11 +8,13 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
+/** Сервис для управления жизненным циклом заявки: создание, сохранение ответов, отправка и принятие решений */
 class ApplicationService
 {
     const ANSWER_FILES_PATH = 'answers';
     const PAIRING_FILES_PATH = 'pairing';
 
+    /** Создаёт черновик заявки и фиксирует начальный статус в истории */
     public function createApplication(array $data, int $teamId, int $userId): Application
     {
         return \DB::transaction(function () use ($data, $teamId, $userId) {
@@ -27,9 +29,7 @@ class ApplicationService
         });
     }
 
-    /**
-     * Persist (or update) answers to the program/call's configurable form fields.
-     */
+    /** Сохраняет или обновляет ответы на поля формы заявки, включая загружаемые файлы */
     public function saveAnswers(Application $application, array $answers): Application
     {
         \DB::transaction(function () use ($application, $answers) {
@@ -53,9 +53,7 @@ class ApplicationService
         return $application->fresh(['answers.field']);
     }
 
-    /**
-     * Persist (or update) Program B pairing submissions (CV, motivation letter, solution proposal).
-     */
+    /** Сохраняет документы парного отбора Programme B (CV, мотивационное письмо, предложение решения) */
     public function savePairingSubmissions(Application $application, array $submissions): Application
     {
         \DB::transaction(function () use ($application, $submissions) {
@@ -78,6 +76,7 @@ class ApplicationService
         return $application->fresh(['pairingSubmissions']);
     }
 
+    /** Переводит заявку в статус «submitted» после проверки обязательных требований */
     public function submitApplication(Application $application, int $userId): void
     {
         $this->ensureSubmissionRequirementsAreMet($application);
@@ -90,10 +89,7 @@ class ApplicationService
         });
     }
 
-    /**
-     * Spec 6.3: "validácia povinných polí a príloh pred odoslaním" — required form
-     * fields and Program B pairing documents must be present before submission.
-     */
+    /** Проверяет заполнение обязательных полей и документов Programme B перед отправкой */
     private function ensureSubmissionRequirementsAreMet(Application $application): void
     {
         $errors = [];
@@ -140,6 +136,7 @@ class ApplicationService
         }
     }
 
+    /** Принимает или отклоняет заявку, фиксирует аудит-событие и отправляет email при одобрении */
     public function decideApplication(Application $application, string $decision, ?string $comment, int $userId): Application
     {
         return \DB::transaction(function () use ($application, $decision, $comment, $userId) {
@@ -176,10 +173,7 @@ class ApplicationService
         });
     }
 
-    /**
-     * Spec 6.4: notifies the team leader using the admin-managed "project_approved" email template.
-     * Silently skipped when the template hasn't been configured or the leader has no email.
-     */
+    /** Отправляет email лидеру команды через шаблон «project_approved» при одобрении заявки */
     private function sendApprovalNotificationEmail(Application $application): void
     {
         $template = EmailTemplate::where('name', 'project_approved')->first();
@@ -195,6 +189,7 @@ class ApplicationService
         ]));
     }
 
+    /** Записывает строку истории изменений статуса заявки */
     private function logHistory(Application $app, ?string $old, string $new, int $userId, string $comment): void
     {
         ApplicationHistory::create([

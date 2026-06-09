@@ -10,6 +10,10 @@ use App\Models\Milestone;
 use App\Models\Project;
 use App\Models\User;
 
+/**
+ * Сидер этапов разработки: создаёт контрольные точки (milestones) для каждого проекта.
+ * Зависит от ProjectSeeder — должен выполняться после него.
+ */
 class MilestoneSeeder extends Seeder
 {
     /**

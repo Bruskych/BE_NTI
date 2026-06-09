@@ -4,8 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица медиа-файлов пакета Spatie Media Library.
+ * Обеспечивает полиморфное хранение и конвертации изображений и файлов для любых моделей.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу media для хранения медиа-вложений через Spatie Media Library.
+     */
     public function up(): void
     {
         Schema::create('media', function (Blueprint $table) {

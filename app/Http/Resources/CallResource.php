@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс конкурсного отбора с датами, бюджетом и специализациями */
 class CallResource extends JsonResource
 {
     public function toArray(Request $request): array

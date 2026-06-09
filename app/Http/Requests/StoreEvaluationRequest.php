@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос сохранения оценки заявки экспертом с баллами по критериям */
 class StoreEvaluationRequest extends FormRequest
 {
 

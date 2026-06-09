@@ -17,6 +17,7 @@ return [
     |
     */
 
+    // Подключение к БД по умолчанию
     'default' => env('DB_CONNECTION', 'sqlite'),
 
     /*
@@ -30,8 +31,10 @@ return [
     |
     */
 
+    // Все доступные подключения к базам данных
     'connections' => [
 
+        // SQLite — удобно для локальной разработки и тестов
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -44,6 +47,7 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        // MySQL — основная реляционная СУБД проекта
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
@@ -64,6 +68,7 @@ return [
             ]) : [],
         ],
 
+        // MariaDB — совместимый форк MySQL
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
@@ -84,6 +89,7 @@ return [
             ]) : [],
         ],
 
+        // PostgreSQL — альтернативная реляционная СУБД
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
@@ -99,6 +105,7 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        // SQL Server — подключение к Microsoft SQL Server
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
@@ -127,6 +134,7 @@ return [
     |
     */
 
+    // Настройки таблицы учёта выполненных миграций
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
@@ -143,16 +151,20 @@ return [
     |
     */
 
+    // Настройки подключений к Redis (кэш, очереди, общее хранилище)
     'redis' => [
 
+        // Клиент Redis (phpredis или predis)
         'client' => env('REDIS_CLIENT', 'phpredis'),
 
+        // Глобальные параметры: кластеризация, префикс ключей, персистентность
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
+        // Основное подключение Redis (БД 0)
         'default' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
@@ -166,6 +178,7 @@ return [
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
 
+        // Подключение Redis для кэша (БД 1 — изолировано от основного)
         'cache' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),

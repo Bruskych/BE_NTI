@@ -4,8 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица конкурсных вызовов (Calls) — Программа А.
+ * Вызов открывает временное окно для приёма заявок с определённым бюджетом и дедлайном.
+ * Жизненный цикл статуса: draft → open → closed.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу calls с привязкой к программе и шаблону оценки.
+     */
     public function up(): void
     {
         Schema::create('calls', function (Blueprint $table) {
@@ -25,6 +33,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицу calls.
+     */
     public function down(): void
     {
         Schema::dropIfExists('calls');

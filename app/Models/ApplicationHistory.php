@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель записи истории изменений статуса заявки */
 class ApplicationHistory extends Model
 {
     use SoftDeletes, HasFactory;

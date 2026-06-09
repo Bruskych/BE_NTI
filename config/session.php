@@ -18,6 +18,7 @@ return [
     |
     */
 
+    // Драйвер хранения сессий (database — надёжно для многосерверного окружения)
     'driver' => env('SESSION_DRIVER', 'database'),
 
     /*
@@ -32,8 +33,10 @@ return [
     |
     */
 
+    // Время жизни сессии в минутах при бездействии
     'lifetime' => (int) env('SESSION_LIFETIME', 120),
 
+    // Закрывать сессию при закрытии браузера
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
     /*
@@ -47,6 +50,7 @@ return [
     |
     */
 
+    // Шифрование данных сессии перед сохранением
     'encrypt' => env('SESSION_ENCRYPT', false),
 
     /*
@@ -60,6 +64,7 @@ return [
     |
     */
 
+    // Папка для файловых сессий (используется при driver=file)
     'files' => storage_path('framework/sessions'),
 
     /*
@@ -73,6 +78,7 @@ return [
     |
     */
 
+    // Подключение к БД для хранения сессий (null = подключение по умолчанию)
     'connection' => env('SESSION_CONNECTION'),
 
     /*
@@ -86,6 +92,7 @@ return [
     |
     */
 
+    // Таблица БД для хранения сессий
     'table' => env('SESSION_TABLE', 'sessions'),
 
     /*
@@ -101,6 +108,7 @@ return [
     |
     */
 
+    // Хранилище кэша для сессий (актуально при driver=redis/memcached/dynamodb)
     'store' => env('SESSION_STORE'),
 
     /*
@@ -114,6 +122,7 @@ return [
     |
     */
 
+    // Вероятность автоочистки устаревших сессий: 2 из 100 запросов
     'lottery' => [2, 100],
 
     /*
@@ -127,6 +136,7 @@ return [
     |
     */
 
+    // Имя cookie сессии
     'cookie' => env(
         'SESSION_COOKIE',
         Str::slug((string) env('APP_NAME', 'laravel')).'-session'
@@ -143,6 +153,7 @@ return [
     |
     */
 
+    // Путь, в рамках которого действует cookie сессии
     'path' => env('SESSION_PATH', '/'),
 
     /*
@@ -156,6 +167,7 @@ return [
     |
     */
 
+    // Домен, для которого действует cookie сессии
     'domain' => env('SESSION_DOMAIN'),
 
     /*
@@ -169,6 +181,7 @@ return [
     |
     */
 
+    // Передавать cookie только по защищённому HTTPS-соединению
     'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*
@@ -182,6 +195,7 @@ return [
     |
     */
 
+    // Запрет доступа к cookie через JavaScript (защита от XSS)
     'http_only' => env('SESSION_HTTP_ONLY', true),
 
     /*
@@ -199,6 +213,7 @@ return [
     |
     */
 
+    // Политика SameSite для защиты от CSRF-атак
     'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
     /*
@@ -212,6 +227,7 @@ return [
     |
     */
 
+    // Разделённые cookie (CHIPS) — для кросс-сайтового контекста
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
     /*
@@ -228,6 +244,7 @@ return [
     |
     */
 
+    // Формат сериализации данных сессии (json — безопаснее, чем php)
     'serialization' => 'json',
 
 ];

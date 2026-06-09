@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель документа с классификацией доступа и поддержкой версионирования */
 class Document extends Model
 {
     use SoftDeletes, HasFactory;
@@ -16,11 +17,11 @@ class Document extends Model
     const CLASSIFICATION_INTERNAL     = 'internal';
     const CLASSIFICATION_CONFIDENTIAL = 'confidential';
 
-    /**
-     * Spec 13: "Antivírusová alebo aspoň MIME / príponová kontrola uploadovaných príloh"
-     * — minimum baseline of accepted attachment extensions for uploaded documents.
-     */
+    // Spec 13: допустимые расширения файлов при загрузке
     const ALLOWED_UPLOAD_EXTENSIONS = 'pdf,doc,docx,jpg,jpeg,png';
+
+    // Реальные MIME-типы по содержимому файла (magic bytes) — для правила mimetypes
+    const ALLOWED_UPLOAD_MIMETYPES = 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png';
 
     protected $fillable = [
         'application_id',

@@ -4,10 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица персональных токенов доступа Laravel Sanctum.
+ * Хранит токены API для аутентификации запросов фронтенда.
+ */
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Создаёт таблицу personal_access_tokens для хранения Sanctum-токенов.
      */
     public function up(): void
     {
@@ -24,7 +28,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Удаляет таблицу personal_access_tokens.
      */
     public function down(): void
     {

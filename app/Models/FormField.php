@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель поля формы заявки с типом, правилами валидации и порядком отображения */
 class FormField extends Model
 {
     use SoftDeletes, HasFactory;

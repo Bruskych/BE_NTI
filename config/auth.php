@@ -15,6 +15,7 @@ return [
     |
     */
 
+    // Настройки по умолчанию: используемый охранник и брокер сброса паролей
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
@@ -37,7 +38,9 @@ return [
     |
     */
 
+    // Охранники аутентификации — определяют механизм проверки подлинности
     'guards' => [
+        // Стандартный веб-охранник: использует сессии
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
@@ -61,7 +64,9 @@ return [
     |
     */
 
+    // Провайдеры пользователей — источник данных для аутентификации
     'providers' => [
+        // Eloquent-провайдер: использует модель User
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
@@ -92,12 +97,13 @@ return [
     |
     */
 
+    // Настройки сброса пароля: таблица токенов, срок действия, ограничение частоты
     'passwords' => [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
-            'throttle' => 60,
+            'expire' => 60,    // Срок действия токена сброса — 60 минут
+            'throttle' => 60,  // Задержка перед повторной генерацией токена — 60 секунд
         ],
     ],
 
@@ -112,6 +118,7 @@ return [
     |
     */
 
+    // Время жизни подтверждения пароля в секундах (по умолчанию — 3 часа)
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
 ];

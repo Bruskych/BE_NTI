@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс поля формы заявки с типом, правилами и порядком отображения */
 class FormFieldResource extends JsonResource
 {
     public function toArray(Request $request): array

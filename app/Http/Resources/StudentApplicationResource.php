@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 
+/** Ресурс заявки студента для публичного просмотра со статусом и командой */
 class StudentApplicationResource extends JsonResource
 {
     public function toArray($request)

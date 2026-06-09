@@ -6,11 +6,19 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к проектам: участники команды и staff с соответствующими правами */
 class ProjectPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
         return $user->hasRole(['super_admin', 'admin']) ? true : null;
+    }
+
+    public function viewAny(User $user): Response
+    {
+        return ($user->can('projects.view-all') || $user->can('projects.view-own'))
+            ? Response::allow()
+            : Response::deny('You do not have permission to view projects.');
     }
 
     private function isMember(User $user, Project $project): bool

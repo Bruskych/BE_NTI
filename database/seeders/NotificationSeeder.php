@@ -13,6 +13,10 @@ use App\Models\Notification;
 use App\Models\BulkMessage;
 use App\Models\User;
 
+/**
+ * Сидер уведомлений: создаёт системные уведомления, настройки, шаблоны писем и массовые рассылки.
+ * Зависит от UserSeeder — привязывается ко всем существующим пользователям.
+ */
 class NotificationSeeder extends Seeder
 {
     /**

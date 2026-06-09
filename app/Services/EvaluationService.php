@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\{Application, AuditEvent, Evaluation, EvaluationCriteria, EvaluationScore};
 use Illuminate\Support\Facades\DB;
 
+/** Сервис сохранения оценки заявки: вычисляет взвешенный итоговый балл и фиксирует аудит-событие */
 class EvaluationService
 {
+    /** Создаёт оценку с баллами по критериям, вычисляет итоговый балл и логирует аудит */
     public function storeEvaluation(Application $application, int $evaluatorId, array $data): Evaluation
     {
         return DB::transaction(function () use ($application, $evaluatorId, $data) {

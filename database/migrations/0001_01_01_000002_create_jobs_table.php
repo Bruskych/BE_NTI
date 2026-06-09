@@ -4,8 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблицы очередей задач: jobs, job_batches, failed_jobs.
+ * Используются при driver=database в config/queue.php.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы для очереди задач, пакетной обработки и хранения упавших задач.
+     */
     public function up(): void
     {
         Schema::create('jobs', function (Blueprint $table) {
@@ -42,6 +49,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы jobs, job_batches и failed_jobs.
+     */
     public function down(): void
     {
         Schema::dropIfExists('jobs');

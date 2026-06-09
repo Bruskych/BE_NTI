@@ -6,6 +6,10 @@ use Illuminate\Database\Seeder;
 
 use App\Models\Specialization;
 
+/**
+ * Сидер специализаций: заполняет справочник направлений (Frontend, Backend, AI, IoT и др.).
+ * Используется для фильтрации вызовов, челленджей и команд.
+ */
 class SpecializationSeeder extends Seeder
 {
     /**
@@ -47,26 +51,31 @@ class SpecializationSeeder extends Seeder
                 'name'        => 'Qualification Stack 01 — Object Technologies',
                 'slug'        => 'stack-01-object-technologies',
                 'description' => 'Object technologies, mobile applications, testing.',
+                'stack'       => '01',
             ],
             [
                 'name'        => 'Qualification Stack 02 — AI and Data',
                 'slug'        => 'stack-02-ai-data',
                 'description' => 'Database systems, AI, machine learning, neural networks.',
+                'stack'       => '02',
             ],
             [
                 'name'        => 'Qualification Stack 03 — Web',
                 'slug'        => 'stack-03-web',
                 'description' => 'Web languages, FE/BE technologies, web applications.',
+                'stack'       => '03',
             ],
             [
                 'name'        => 'Qualification Stack 04 — Game Development and VR',
                 'slug'        => 'stack-04-game-development-vr',
                 'description' => 'Game development environments, VR and augmented reality.',
+                'stack'       => '04',
             ],
             [
                 'name'        => 'Qualification Stack 05 — IoT and Robotics',
                 'slug'        => 'stack-05-iot-robotics',
                 'description' => 'C programming, Internet of Things, robotic systems.',
+                'stack'       => '05',
             ],
         ];
         foreach ($specializations as $item) {
@@ -75,6 +84,7 @@ class SpecializationSeeder extends Seeder
                 [
                     'name'        => $item['name'],
                     'description' => $item['description'],
+                    'stack'       => $item['stack'] ?? null,
                 ]
             );
         }

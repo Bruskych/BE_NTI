@@ -9,10 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-/**
- * Renders an admin-managed EmailTemplate (spec 6.4: "e-mailové šablóny spravované administrátorom")
- * with the given variables and sends it through the shared transactional email layout.
- */
+/** Письмо на основе управляемого администратором шаблона с подстановкой переменных */
 class TemplatedNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;

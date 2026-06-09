@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
+/** Модель задачи от компании (Programme B) с машиной состояний и ограничением по заявкам */
 class Challenge extends Model
 {
     use SoftDeletes, HasFactory;

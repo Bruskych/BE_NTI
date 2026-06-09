@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+/** Действие регистрации пользователя: создаёт аккаунт, фиксирует GDPR-согласие и отправляет код верификации email */
 class RegisterUserAction
 {
     // Spec 6.2: GDPR consent must be captured at registration time
@@ -27,6 +28,7 @@ class RegisterUserAction
     {
     }
 
+    /** Создаёт пользователя, настройки уведомлений, GDPR-согласия и инициирует верификацию email */
     public function execute(array $data, ?string $ipAddress = null): User
     {
         return DB::transaction(function () use ($data, $ipAddress) {
@@ -60,11 +62,7 @@ class RegisterUserAction
         });
     }
 
-    /**
-     * Spec 6.2: "registrácia e-mailom s overením adresy" — sends a one-time code
-     * (Redis-backed via EmailConfirmationService, same mechanism as document access codes)
-     * that the user must submit to POST /auth/email/verify before email_verified_at is set.
-     */
+    /** Генерирует и отправляет одноразовый код верификации email через очередь */
     private function sendEmailVerificationCode(User $user): void
     {
         $code = $this->confirmation->generateCode($user->email, [], self::EMAIL_VERIFICATION_PURPOSE);
@@ -72,6 +70,7 @@ class RegisterUserAction
         Mail::to($user->email)->queue(new EmailVerificationMail($user->name, $code, EmailConfirmationService::DEFAULT_EXPIRES_IN));
     }
 
+    /** Сохраняет обязательные GDPR-согласия (privacy_policy и terms_of_service) для нового пользователя */
     private function recordGdprConsent(User $user, array $data, ?string $ipAddress): void
     {
         $version = $data['consent_version'] ?? '1.0';
@@ -89,6 +88,7 @@ class RegisterUserAction
         }
     }
 
+    /** Создаёт команду для студента и черновую заявку на участие в программе */
     private function createStudentTeam(User $user): void
     {
         $team = Team::create([
@@ -107,6 +107,7 @@ class RegisterUserAction
         ]);
     }
 
+    /** Создаёт организацию, привязывает пользователя как владельца и подаёт заявку на регистрацию компании */
     private function createCompanyRegistration(User $user, array $data): void
     {
         $organization = Organization::create([

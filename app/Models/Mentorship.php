@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель менторства: связь ментора с проектом и список консультаций */
 class Mentorship extends Model
 {
     use SoftDeletes, HasFactory;

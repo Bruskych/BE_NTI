@@ -6,6 +6,7 @@ use App\Models\BulkMessage;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к массовым рассылкам: только отправитель или администратор */
 class BulkMessagePolicy
 {
     public function before(User $user, string $ability): ?bool

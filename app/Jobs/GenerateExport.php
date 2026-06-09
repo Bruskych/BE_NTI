@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 use PhpOffice\PhpWord\PhpWord;
 
+/** Задание экспорта данных в форматах CSV, XLSX, PDF и DOCX с поддержкой фильтров */
 class GenerateExport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -29,6 +30,7 @@ class GenerateExport implements ShouldQueue
         $this->exportId = $exportId;
     }
 
+    /** Определяет тип экспорта и запускает соответствующий обработчик */
     public function handle()
     {
         $log = ExportsLog::find($this->exportId);
@@ -64,6 +66,7 @@ class GenerateExport implements ShouldQueue
         $log->save();
     }
 
+    /** Экспортирует пользователей в заданном формате */
     protected function exportUsers(string $format, string $filename, ExportsLog $log): void
     {
         $filters = $log->filters_json ?? [];
@@ -144,6 +147,7 @@ class GenerateExport implements ShouldQueue
         }
     }
 
+    /** Экспортирует проекты в заданном формате */
     protected function exportProjects(string $format, string $filename, ExportsLog $log): void
     {
         $filters = $log->filters_json ?? [];
@@ -230,6 +234,7 @@ class GenerateExport implements ShouldQueue
         }
     }
 
+    /** Экспортирует заявки в заданном формате */
     protected function exportApplications(string $format, string $filename, ExportsLog $log): void
     {
         $filters = $log->filters_json ?? [];
@@ -313,6 +318,7 @@ class GenerateExport implements ShouldQueue
         }
     }
 
+    /** Применяет фильтры к запросу в зависимости от типа ресурса */
     protected function applyFilters($query, string $resource, array $filters)
     {
         if (isset($filters['active'])) {
@@ -347,6 +353,7 @@ class GenerateExport implements ShouldQueue
         return $query;
     }
 
+    /** Экспортирует персональные данные пользователя в JSON для GDPR-запроса */
     protected function exportPersonalDataJson(ExportsLog $log, string $filename): void
     {
         $filename .= '.json';
@@ -411,10 +418,7 @@ class GenerateExport implements ShouldQueue
         $this->saveLog($log, $filename);
     }
 
-    /**
-     * Spec: "exporty do CSV, XLSX a PDF / DOCX reportov podľa filtra" — builds a
-     * simple titled-table DOCX report, mirroring the columns used by the CSV/XLSX/PDF variants.
-     */
+    /** Генерирует DOCX-отчёт с заголовком и таблицей данных */
     protected function generateDocxReport(string $title, array $headers, array $rows, string $filename, ExportsLog $log): void
     {
         $filename .= '.docx';
@@ -441,6 +445,7 @@ class GenerateExport implements ShouldQueue
         $this->saveLog($log, $filename);
     }
 
+    /** Сохраняет путь к сгенерированному файлу в записи журнала экспорта */
     protected function saveLog(ExportsLog $log, string $filename): void
     {
         $log->file_path = $filename;

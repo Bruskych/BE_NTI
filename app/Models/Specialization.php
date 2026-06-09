@@ -7,14 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель специализации для связки с конкурсными отборами, задачами и командами */
 class Specialization extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // Допустимые значения stack (квалификационные стеки Программы А)
+    const STACKS = ['01', '02', '03', '04', '05'];
 
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'stack',
     ];
 
     // ---------------------------------------------------------

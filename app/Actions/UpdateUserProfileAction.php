@@ -7,8 +7,10 @@ use Illuminate\Http\UploadedFile;
 
 use App\Models\User;
 
+/** Действие обновления профиля пользователя: имя, email и аватар */
 class UpdateUserProfileAction
 {
+    /** Применяет изменения профиля и обнуляет email_verified_at при смене адреса */
     public function execute(User $user, array $data): bool
     {
         if (isset($data['name'])) {

@@ -4,8 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица челленджей — задания компаний для студенческих команд (Программа Б).
+ * Компания публикует техническое задание, студенческие команды подают заявки.
+ * Жизненный цикл: draft → published → pairing → assigned → active → closed.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу challenges с привязкой к организации и программе.
+     */
     public function up(): void
     {
         Schema::create('challenges', function (Blueprint $table) {
@@ -30,6 +38,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицу challenges.
+     */
     public function down(): void
     {
         Schema::dropIfExists('challenges');

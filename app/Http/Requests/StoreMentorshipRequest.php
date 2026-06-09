@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос создания менторства для проекта */
 class StoreMentorshipRequest extends FormRequest
 {
     public function authorize(): bool

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Application;
 use Illuminate\Auth\Access\Response;
 
+/** Политика оценки заявок: только эксперты могут оценивать, каждый — не более одного раза */
 class EvaluationPolicy
 {
     public function create(User $user, Application $application): Response

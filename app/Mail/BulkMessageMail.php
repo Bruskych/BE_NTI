@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/** Письмо массовой рассылки с произвольной темой и телом */
 class BulkMessageMail extends Mailable
 {
     use Queueable, SerializesModels;

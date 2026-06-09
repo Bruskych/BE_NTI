@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель команды студентов с лидером, участниками, специализациями и заявками */
 class Team extends Model
 {
     use SoftDeletes, HasFactory;

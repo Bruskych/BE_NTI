@@ -13,6 +13,7 @@ return [
     |
     */
 
+    // Название приложения (используется в уведомлениях и интерфейсах)
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
@@ -26,6 +27,7 @@ return [
     |
     */
 
+    // Текущее окружение: local / staging / production
     'env' => env('APP_ENV', 'production'),
 
     /*
@@ -39,6 +41,7 @@ return [
     |
     */
 
+    // Режим отладки — в production должен быть false
     'debug' => (bool) env('APP_DEBUG', false),
 
     /*
@@ -52,7 +55,22 @@ return [
     |
     */
 
+    // Базовый URL API-сервера
     'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Public Frontend URL
+    |--------------------------------------------------------------------------
+    |
+    | Base URL of the public-facing website (CMS pages, posts, programs, ...).
+    | Used to build absolute links in generated artifacts such as sitemap.xml,
+    | which must point at the public site rather than this API.
+    |
+    */
+
+    // URL публичного фронтенда — используется в sitemap.xml и других абсолютных ссылках
+    'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,6 +83,7 @@ return [
     |
     */
 
+    // Часовой пояс по умолчанию для всех операций с датой и временем
     'timezone' => 'UTC',
 
     /*
@@ -78,10 +97,13 @@ return [
     |
     */
 
+    // Основной язык локализации приложения
     'locale' => env('APP_LOCALE', 'en'),
 
+    // Резервный язык, если перевод не найден для основного
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    // Язык для генерации тестовых данных через Faker
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
@@ -95,10 +117,13 @@ return [
     |
     */
 
+    // Алгоритм шифрования для зашифрованных данных
     'cipher' => 'AES-256-CBC',
 
+    // Главный ключ шифрования приложения (32 символа, задаётся в .env)
     'key' => env('APP_KEY'),
 
+    // Предыдущие ключи шифрования — используются при ротации ключа
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
@@ -118,6 +143,7 @@ return [
     |
     */
 
+    // Настройки режима технического обслуживания (maintenance mode)
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),

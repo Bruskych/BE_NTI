@@ -10,6 +10,10 @@ use App\Models\FormField;
 use App\Models\Program;
 use App\Models\Call;
 
+/**
+ * Сидер полей анкеты: создаёт динамические поля форм для подачи заявок.
+ * Зависит от ProgramSeeder и CallSeeder.
+ */
 class FormFieldSeeder extends Seeder
 {
     /**

@@ -15,6 +15,7 @@ return [
     |
     */
 
+    // Хранилище кэша по умолчанию
     'default' => env('CACHE_STORE', 'database'),
 
     /*
@@ -32,13 +33,16 @@ return [
     |
     */
 
+    // Все доступные хранилища кэша
     'stores' => [
 
+        // Кэш в памяти (только в рамках одного запроса)
         'array' => [
             'driver' => 'array',
             'serialize' => false,
         ],
 
+        // Кэш в базе данных — используется по умолчанию
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_CACHE_CONNECTION'),
@@ -47,12 +51,14 @@ return [
             'lock_table' => env('DB_CACHE_LOCK_TABLE'),
         ],
 
+        // Файловый кэш — хранится в storage/framework/cache/data
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
             'lock_path' => storage_path('framework/cache/data'),
         ],
 
+        // Кэш на основе Memcached
         'memcached' => [
             'driver' => 'memcached',
             'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
@@ -72,12 +78,14 @@ return [
             ],
         ],
 
+        // Кэш на основе Redis
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
             'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
         ],
 
+        // Кэш на основе Amazon DynamoDB
         'dynamodb' => [
             'driver' => 'dynamodb',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -87,10 +95,12 @@ return [
             'endpoint' => env('DYNAMODB_ENDPOINT'),
         ],
 
+        // Кэш Laravel Octane (хранится в памяти воркера)
         'octane' => [
             'driver' => 'octane',
         ],
 
+        // Резервное хранилище: пробует database, затем array
         'failover' => [
             'driver' => 'failover',
             'stores' => [
@@ -112,6 +122,7 @@ return [
     |
     */
 
+    // Префикс ключей кэша для изоляции от других приложений
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
     /*
@@ -125,6 +136,7 @@ return [
     |
     */
 
+    // Разрешение десериализации PHP-объектов из кэша (отключено для безопасности)
     'serializable_classes' => false,
 
 ];

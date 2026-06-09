@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс публикации блога с SEO-полями, автором и статусом публикации */
 class PostResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель аудит-события: фиксирует административные изменения, решения и экспорты */
 class AuditEvent extends Model
 {
     use SoftDeletes, HasFactory;

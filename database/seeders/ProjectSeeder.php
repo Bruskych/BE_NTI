@@ -9,6 +9,10 @@ use Illuminate\Database\Seeder;
 use App\Models\Application;
 use App\Models\Project;
 
+/**
+ * Сидер проектов: создаёт проекты для одобренных заявок (статус approved/active).
+ * Зависит от ApplicationSeeder — должен выполняться строго после него.
+ */
 class ProjectSeeder extends Seeder
 {
     /**

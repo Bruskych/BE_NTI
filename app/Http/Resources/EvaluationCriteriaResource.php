@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс критерия оценки с весовым коэффициентом и порядком отображения */
 class EvaluationCriteriaResource extends JsonResource
 {
     public function toArray(Request $request): array

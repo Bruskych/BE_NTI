@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель email-шаблона с подстановкой переменных */
 class EmailTemplate extends Model
 {
     use SoftDeletes, HasFactory;

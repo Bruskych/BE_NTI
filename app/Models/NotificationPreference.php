@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
+/** Модель настроек уведомлений пользователя по каналам */
 class NotificationPreference extends Model
 {
     use HasFactory;

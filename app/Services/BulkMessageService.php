@@ -7,8 +7,10 @@ use App\Models\AuditEvent;
 use App\Models\BulkMessage;
 use App\Models\User;
 
+/** Сервис создания массовой рассылки с аудит-событием и постановкой задания в очередь */
 class BulkMessageService
 {
+    /** Создаёт запись рассылки, логирует аудит и диспатчит задание SendBulkMessage */
     public function create(User $sender, array $data): BulkMessage
     {
         $bulkMessage = BulkMessage::create([

@@ -6,6 +6,7 @@ use App\Models\Application;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к заявкам: просмотр, создание, редактирование, удаление и принятие решений */
 class ApplicationPolicy
 {
 

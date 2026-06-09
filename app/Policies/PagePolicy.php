@@ -6,25 +6,26 @@ use App\Models\Page;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к CMS-страницам: опубликованные видны всем, черновики — только редакторам */
 class PagePolicy
 {
-    public function before(User $user, string $ability): ?bool
+    public function before(?User $user, string $ability): ?bool
     {
-        return $user->hasRole(['super_admin', 'admin']) ? true : null;
+        return $user?->hasRole(['super_admin', 'admin']) ? true : null;
     }
 
-    public function viewAny(User $user): Response
+    public function viewAny(?User $user): Response
     {
         return Response::allow();
     }
 
-    public function view(User $user, Page $page): Response
+    public function view(?User $user, Page $page): Response
     {
-        // Опубликованные страницы видят все
+        // Опубликованные страницы видят все, включая гостей
         if ($page->is_published) return Response::allow();
 
         // Черновики — только редакторы с правом просмотра
-        return $user->can('cms.pages.view')
+        return $user?->can('cms.pages.view')
             ? Response::allow()
             : Response::deny('This page is not published.');
     }

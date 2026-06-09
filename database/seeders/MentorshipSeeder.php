@@ -11,10 +11,14 @@ use App\Models\Mentorship;
 use App\Models\Project;
 use App\Models\User;
 
+/**
+ * Сидер менторства и консультаций: закрепляет менторов за проектами и создаёт записи консультаций.
+ * Зависит от ProjectSeeder и MilestoneSeeder — должен выполняться после них.
+ */
 class MentorshipSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Создание менторских связей и консультаций по этапам проекта.
      */
     public function run(): void
     {

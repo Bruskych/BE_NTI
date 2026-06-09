@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель профиля студента с академическими данными, навыками и документами о праве участия */
 class StudentProfile extends Model
 {
     use SoftDeletes, HasFactory;

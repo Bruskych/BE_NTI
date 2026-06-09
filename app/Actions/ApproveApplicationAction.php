@@ -8,8 +8,10 @@ use App\Models\AuditEvent;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 
+/** Действие одобрения заявки: обновляет статус, назначает роль лидеру и отправляет уведомление */
 class ApproveApplicationAction
 {
+    /** Одобряет заявку, синхронизирует роль пользователя и создаёт системное уведомление */
     public function execute(Application $application, string $comment, string $role, ?int $changedBy = null): void
     {
         DB::transaction(function () use ($application, $comment, $role, $changedBy) {

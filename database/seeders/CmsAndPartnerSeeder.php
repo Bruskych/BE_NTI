@@ -11,6 +11,10 @@ use App\Models\Partner;
 use App\Models\Post;
 use App\Models\Page;
 
+/**
+ * Сидер CMS-контента: создаёт статические страницы, посты блога и партнёров платформы.
+ * Не зависит от других сидеров — может выполняться на любом этапе.
+ */
 class CmsAndPartnerSeeder extends Seeder
 {
     /**

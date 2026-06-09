@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель заявки с машиной состояний статусов и связями с командой, организацией и оценками */
 class Application extends Model
 {
     use SoftDeletes, HasFactory;

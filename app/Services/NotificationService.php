@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\{Notification, Team, User};
 use Illuminate\Support\Facades\DB;
 
+/** Сервис системных уведомлений: отправка, удаление и обработка приглашений в команду */
 class NotificationService
 {
+    /** Создаёт системное уведомление, если пользователь не отключил системный канал */
     public function send(User $user, array $data): ?Notification
     {
         $pref = $user->notificationPreference;
@@ -24,11 +26,13 @@ class NotificationService
         ]);
     }
 
+    /** Удаляет уведомление */
     public function deleteNotification(Notification $notification): void
     {
         $notification->delete();
     }
 
+    /** Принимает приглашение в команду: добавляет пользователя и помечает уведомление как прочитанное */
     public function acceptInvitation(Notification $notification, User $user): Team
     {
         if (!$notification->isActionable()) {
@@ -49,6 +53,7 @@ class NotificationService
         return $team;
     }
 
+    /** Отклоняет приглашение в команду, помечая уведомление как прочитанное */
     public function rejectInvitation(Notification $notification): void
     {
         if (!$notification->isActionable()) {

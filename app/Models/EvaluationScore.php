@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель балла по отдельному критерию в рамках оценки заявки */
 class EvaluationScore extends Model
 {
     use SoftDeletes, HasFactory;

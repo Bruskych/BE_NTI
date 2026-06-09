@@ -14,6 +14,7 @@ return [
     |
     */
 
+    // Почтовый транспорт по умолчанию
     'default' => env('MAIL_MAILER', 'log'),
 
     /*
@@ -35,8 +36,10 @@ return [
     |
     */
 
+    // Все настроенные почтовые транспорты
     'mailers' => [
 
+        // SMTP — стандартная отправка через SMTP-сервер
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
@@ -49,10 +52,12 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        // Amazon SES — облачный сервис отправки писем
         'ses' => [
             'transport' => 'ses',
         ],
 
+        // Postmark — транзакционный email-сервис
         'postmark' => [
             'transport' => 'postmark',
             // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
@@ -61,24 +66,29 @@ return [
             // ],
         ],
 
+        // Resend — современный email-сервис
         'resend' => [
             'transport' => 'resend',
         ],
 
+        // Sendmail — отправка через локальный sendmail
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
+        // Log — письма записываются в лог (используется при разработке)
         'log' => [
             'transport' => 'log',
             'channel' => env('MAIL_LOG_CHANNEL'),
         ],
 
+        // Array — письма сохраняются в массиве (используется в тестах)
         'array' => [
             'transport' => 'array',
         ],
 
+        // Failover — пробует smtp, при ошибке переключается на log
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
@@ -88,6 +98,7 @@ return [
             'retry_after' => 60,
         ],
 
+        // Round-robin — распределяет нагрузку между несколькими транспортами
         'roundrobin' => [
             'transport' => 'roundrobin',
             'mailers' => [
@@ -110,6 +121,7 @@ return [
     |
     */
 
+    // Глобальный адрес отправителя для всех писем приложения
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),

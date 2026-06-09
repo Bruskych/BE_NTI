@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель контрольной точки проекта с процентом выполнения и подтверждением */
 class Milestone extends Model
 {
     use SoftDeletes, HasFactory;

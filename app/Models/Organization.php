@@ -11,6 +11,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/** Модель организации-партнёра с медиа-логотипом, пользователями и задачами */
 class Organization extends Model implements HasMedia
 {
     use SoftDeletes, HasFactory, InteractsWithMedia;

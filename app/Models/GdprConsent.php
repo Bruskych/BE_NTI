@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель записи согласия пользователя с политикой GDPR */
 class GdprConsent extends Model
 {
     use SoftDeletes, HasFactory;

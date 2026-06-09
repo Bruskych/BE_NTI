@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель проекта, созданного по одобренной заявке, с контрольными точками и менторством */
 class Project extends Model
 {
     use SoftDeletes, HasFactory;

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Application;
 use App\Models\Evaluation;
 use App\Models\EvaluationCriteria;
+use App\Models\ExportsLog;
 use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Team;
@@ -19,6 +20,8 @@ class AuditLogTest extends TestCase
 
     protected Program $program;
 
+    private ?int $generatedExportLogId = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,6 +35,19 @@ class AuditLogTest extends TestCase
             'type' => 'practice',
             'is_active' => true,
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        // GenerateExport runs synchronously in tests and writes to storage_path('app/...')
+        if ($this->generatedExportLogId) {
+            $log = ExportsLog::find($this->generatedExportLogId);
+            if ($log && $log->file_path && file_exists(storage_path('app/' . $log->file_path))) {
+                unlink(storage_path('app/' . $log->file_path));
+            }
+        }
+
+        parent::tearDown();
     }
 
     public function test_approving_student_application_logs_audit_events_and_assigns_role()
@@ -97,6 +113,32 @@ class AuditLogTest extends TestCase
             'action' => 'company_application_rejected',
             'object_type' => 'application',
             'object_id' => $application->id,
+            'result' => 'success',
+        ]);
+    }
+
+    /**
+     * Spec 13: "Audit log pre administratívne zmeny, rozhodnutia komisie,
+     * zmeny rolí a exporty" — exports must be captured in the audit trail.
+     */
+    public function test_generating_an_export_logs_audit_event()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $response = $this->actingAs($admin)
+            ->postJson('/api/admin/export/users/csv');
+
+        $response->assertStatus(202);
+
+        $exportId = $response->json('export.id');
+        $this->generatedExportLogId = $exportId;
+
+        $this->assertDatabaseHas('audit_events', [
+            'user_id' => $admin->id,
+            'action' => 'export_generated',
+            'object_type' => 'exports_log',
+            'object_id' => $exportId,
             'result' => 'success',
         ]);
     }

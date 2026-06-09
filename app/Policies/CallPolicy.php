@@ -6,11 +6,12 @@ use App\Models\Call;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к конкурсным отборам: публичное чтение, управление только для staff */
 class CallPolicy
 {
-    private function isOrganizationOwner(User $user, Call $call): bool
+    public function before(?User $user, string $ability): ?bool
     {
-        return $user->organizations()->where('organizations.id', $call->organization_id)->exists();
+        return $user?->hasRole(['super_admin', 'admin']) ? true : null;
     }
 
     public function viewAny(User $user): Response
@@ -20,13 +21,11 @@ class CallPolicy
 
     public function view(User $user, Call $call): Response
     {
-        if ($user->can('calls.view-all') || $call->status !== 'draft') {
+        if ($call->status !== 'draft' || $user->can('calls.view')) {
             return Response::allow();
         }
 
-        return $this->isOrganizationOwner($user, $call)
-            ? Response::allow()
-            : Response::deny('You do not have access to this draft call.');
+        return Response::deny('You do not have access to this draft call.');
     }
 
     public function create(User $user): Response
@@ -38,9 +37,7 @@ class CallPolicy
 
     public function update(User $user, Call $call): Response
     {
-        if ($user->can('calls.edit-all')) return Response::allow();
-
-        return ($user->can('calls.edit') && $this->isOrganizationOwner($user, $call))
+        return $user->can('calls.edit')
             ? Response::allow()
             : Response::deny('You cannot edit this call.');
     }
@@ -51,9 +48,9 @@ class CallPolicy
             return Response::deny('No permission to delete.');
         }
 
-        return ($call->isDraft() && $this->isOrganizationOwner($user, $call))
+        return $call->isDraft()
             ? Response::allow()
-            : Response::deny('Only draft calls owned by your organization can be deleted.');
+            : Response::deny('Only draft calls can be deleted.');
     }
 
     public function open(User $user, Call $call): Response

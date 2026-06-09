@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к командам: просмотр для участников, управление — только для лидера */
 class TeamPolicy
 {
     private function isLeader(User $user, Team $team): bool

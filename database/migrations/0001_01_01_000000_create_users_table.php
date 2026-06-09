@@ -4,8 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Базовые таблицы пользователей: users, password_reset_tokens, sessions.
+ * Первая миграция — выполняется перед всеми остальными.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы пользователей, токенов сброса пароля и сессий.
+     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -35,6 +42,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы users, password_reset_tokens и sessions.
+     */
     public function down(): void
     {
         Schema::dropIfExists('users');

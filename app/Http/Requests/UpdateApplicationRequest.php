@@ -6,6 +6,7 @@ use App\Models\Document;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос обновления данных заявки (ответы на поля формы) */
 class UpdateApplicationRequest extends FormRequest
 {
 

@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/** Запрос создания контрольной точки проекта */
 class StoreMilestoneRequest extends FormRequest
 {
     public function authorize(): bool

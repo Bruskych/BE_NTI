@@ -7,6 +7,10 @@ use Illuminate\Database\Seeder;
 
 use App\Models\Program;
 
+/**
+ * Сидер программ: создаёт Программу А (гранты) и Программу Б (практика).
+ * Является базовой сущностью — должен выполняться до конкурсов и заявок.
+ */
 class ProgramSeeder extends Seeder
 {
     /**

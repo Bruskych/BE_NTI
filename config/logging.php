@@ -18,6 +18,7 @@ return [
     |
     */
 
+    // Канал логирования по умолчанию
     'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
@@ -31,6 +32,7 @@ return [
     |
     */
 
+    // Канал для записи предупреждений об устаревших функциях
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
         'trace' => env('LOG_DEPRECATIONS_TRACE', false),
@@ -50,14 +52,17 @@ return [
     |
     */
 
+    // Все доступные каналы логирования
     'channels' => [
 
+        // Stack — объединяет несколько каналов в один (задаётся через LOG_STACK)
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 
+        // Single — один файл laravel.log (удобно при разработке)
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
@@ -65,6 +70,7 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Daily — ротация логов по дням, хранит файлы за 14 дней
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
@@ -73,6 +79,7 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Slack — отправляет критические ошибки в Slack-канал через webhook
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
@@ -82,6 +89,7 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Papertrail — облачный сервис для централизованного сбора логов
         'papertrail' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
@@ -94,6 +102,7 @@ return [
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
+        // Stderr — вывод логов в стандартный поток ошибок (удобно в Docker)
         'stderr' => [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
@@ -105,6 +114,7 @@ return [
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
+        // Syslog — системный журнал операционной системы
         'syslog' => [
             'driver' => 'syslog',
             'level' => env('LOG_LEVEL', 'debug'),
@@ -112,17 +122,20 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Errorlog — стандартный error_log PHP
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
 
+        // Null — поглощает все сообщения (используется для отключения логов)
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
         ],
 
+        // Emergency — аварийный канал для критических сбоёв фреймворка
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],

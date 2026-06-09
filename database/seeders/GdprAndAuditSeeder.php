@@ -10,6 +10,10 @@ use App\Models\GdprConsent;
 use App\Models\AuditEvent;
 use App\Models\User;
 
+/**
+ * Сидер GDPR и аудита: создаёт записи согласий с политиками и события журнала аудита.
+ * Зависит от UserSeeder — согласия GDPR создаются для всех пользователей.
+ */
 class GdprAndAuditSeeder extends Seeder
 {
     /**

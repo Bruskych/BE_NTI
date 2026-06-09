@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/** Письмо верификации email с одноразовым кодом подтверждения */
 class EmailVerificationMail extends Mailable
 {
     use Queueable, SerializesModels;

@@ -11,6 +11,10 @@ use App\Models\Specialization;
 use App\Models\Team;
 use App\Models\User;
 
+/**
+ * Сидер студенческих команд: создаёт команды с лидерами, участниками и специализациями.
+ * Зависит от UserSeeder и SpecializationSeeder.
+ */
 class TeamSeeder extends Seeder
 {
     /**

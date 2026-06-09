@@ -15,6 +15,10 @@ use App\Models\Call;
 use App\Models\Team;
 use App\Models\User;
 
+/**
+ * Сидер заявок: создаёт заявки команд на вызовы (Программа А) и челленджи (Программа Б).
+ * Зависит от TeamSeeder, CallSeeder, ChallengeSeeder и FormFieldSeeder.
+ */
 class ApplicationSeeder extends Seeder
 {
     /**

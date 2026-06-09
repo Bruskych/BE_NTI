@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
+/** Политика доступа к публикациям блога: опубликованные видны всем, редактирование — только автору */
 class PostPolicy
 {
     private function isAuthor(User $user, Post $post): bool
@@ -13,25 +14,25 @@ class PostPolicy
         return $user->id === $post->author_id;
     }
 
-    public function before(User $user, string $ability): ?bool
+    public function before(?User $user, string $ability): ?bool
     {
-        return $user->hasRole(['super_admin', 'admin']) ? true : null;
+        return $user?->hasRole(['super_admin', 'admin']) ? true : null;
     }
 
-    public function viewAny(User $user): Response
+    public function viewAny(?User $user): Response
     {
         return Response::allow();
     }
 
-    public function view(User $user, Post $post): Response
+    public function view(?User $user, Post $post): Response
     {
-        // Опубликованные посты видят все
+        // Опубликованные посты видят все, включая гостей
         if ($post->is_published) {
             return Response::allow();
         }
 
         // Черновики — только автор или редактор с правом просмотра
-        return ($this->isAuthor($user, $post) || $user->can('cms.posts.view'))
+        return ($user && ($this->isAuthor($user, $post) || $user->can('cms.posts.view')))
             ? Response::allow()
             : Response::deny('This post is not published yet.');
     }

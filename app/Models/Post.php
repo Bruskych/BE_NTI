@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель публикации блога с SEO-полями, slug и управлением статусом публикации */
 class Post extends Model
 {
     use SoftDeletes, HasFactory;

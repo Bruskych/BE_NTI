@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель массовой рассылки с отслеживанием получателей и статуса доставки */
 class BulkMessage extends Model
 {
     use SoftDeletes, HasFactory;

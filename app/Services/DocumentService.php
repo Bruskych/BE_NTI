@@ -8,13 +8,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+/** Сервис управления документами: загрузка, скачивание, версионирование и генерация PDF из DOCX-шаблонов */
 class DocumentService
 {
     const STORAGE_PATH = 'documents';
 
-    /**
-     * Upload document to storage
-     */
+    /** Загружает файл в хранилище и создаёт запись документа */
     public function upload(UploadedFile $file, array $data): Document
     {
         $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
@@ -35,9 +34,7 @@ class DocumentService
         ]);
     }
 
-    /**
-     * Download document
-     */
+    /** Возвращает файловый ответ для скачивания документа */
     public function download(Document $document)
     {
         if (!Storage::disk('public')->exists($document->file_path)) {
@@ -47,17 +44,13 @@ class DocumentService
         return Storage::disk('public')->download($document->file_path, $document->file_name);
     }
 
-    /**
-     * Get document preview URL
-     */
+    /** Возвращает публичный URL для предварительного просмотра документа */
     public function getPreviewUrl(Document $document): string
     {
         return asset('storage/' . $document->file_path);
     }
 
-    /**
-     * Delete document
-     */
+    /** Удаляет файл из хранилища и мягко удаляет запись документа */
     public function delete(Document $document): bool
     {
         if (Storage::disk('public')->exists($document->file_path)) {
@@ -67,9 +60,7 @@ class DocumentService
         return $document->delete();
     }
 
-    /**
-     * Create new version of document
-     */
+    /** Заменяет файл документа новой версией, инкрементируя счётчик версий */
     public function updateVersion(UploadedFile $file, Document $document, int $uploadedBy): Document
     {
         // Delete old file
@@ -93,9 +84,7 @@ class DocumentService
         return $document;
     }
 
-    /**
-     * Generate document from template with user data
-     */
+    /** Рендерит Blade-шаблон с данными и сохраняет результирующий HTML в хранилище */
     public function generateFromTemplate(string $templateName, array $data): string
     {
         // Render Blade template to HTML
@@ -109,9 +98,7 @@ class DocumentService
         return $filePath;
     }
 
-    /**
-     * Generate PDF from DOCX template with student data
-     */
+    /** Генерирует PDF из DOCX-шаблона с подстановкой данных студента */
     public function generatePdfFromDocx(string $docxPath, array $data, ?string $outputName = null): Document
     {
         // Read DOCX and prepare HTML
@@ -140,9 +127,7 @@ class DocumentService
         ]);
     }
 
-    /**
-     * Generate PDF from template document by ID
-     */
+    /** Генерирует PDF из документа-шаблона по его записи в БД */
     public function generatePdfFromTemplate(Document $template, array $data, ?string $outputName = null): Document
     {
         if ($template->type !== 'template') {
@@ -153,9 +138,7 @@ class DocumentService
         return $this->generatePdfFromDocx($docxPath, $data, $outputName);
     }
 
-    /**
-     * Convert DOCX to HTML with data substitution
-     */
+    /** Извлекает XML из DOCX-архива и конвертирует его в HTML с подстановкой данных */
     private function docxToHtml(string $docxPath, array $data): string
     {
         // Read DOCX file
@@ -183,9 +166,7 @@ class DocumentService
         return $html;
     }
 
-    /**
-     * Parse DOCX XML and replace placeholders with data
-     */
+    /** Парсит XML документа DOCX и заменяет плейсхолдеры {{key}} / ${key} значениями из массива данных */
     private function parseDocxXml(string $xml, array $data): string
     {
         // Load and parse XML
@@ -235,10 +216,7 @@ class DocumentService
         return $html;
     }
 
-    /**
-     * Render submitted form data as a visible table, used as a fallback when the
-     * source template has no placeholder tokens to substitute values into.
-     */
+    /** Рендерит данные формы в виде HTML-таблицы — резервный вариант при отсутствии плейсхолдеров в шаблоне */
     private function renderSubmittedDataTable(array $data): string
     {
         $rows = '';

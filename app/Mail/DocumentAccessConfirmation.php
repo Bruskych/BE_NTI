@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
+/** Письмо подтверждения доступа к документу с одноразовым кодом */
 class DocumentAccessConfirmation extends Mailable
 {
     use Queueable, SerializesModels;

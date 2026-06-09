@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** Ресурс документа парного отбора Programme B */
 class ApplicationPairingSubmissionResource extends JsonResource
 {
     public function toArray(Request $request): array

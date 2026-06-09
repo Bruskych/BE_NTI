@@ -4,8 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблица профилей студентов: академические данные, навыки, документы.
+ * Расширяет базовую запись users дополнительными полями студента.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицу student_profiles с учёбными и квалификационными данными.
+     */
     public function up(): void
     {
         Schema::create('student_profiles', function (Blueprint $table) {
@@ -25,6 +32,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицу student_profiles.
+     */
     public function down(): void
     {
         Schema::dropIfExists('student_profiles');

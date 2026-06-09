@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель оценки заявки экспертом с итоговым баллом и рекомендацией */
 class Evaluation extends Model
 {
     use SoftDeletes, HasFactory;

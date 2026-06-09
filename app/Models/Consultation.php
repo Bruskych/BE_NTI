@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель консультации ментора с привязкой к менторству и контрольной точке */
 class Consultation extends Model
 {
     use SoftDeletes, HasFactory;

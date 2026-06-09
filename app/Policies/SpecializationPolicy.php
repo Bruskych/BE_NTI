@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Specialization;
 use App\Models\User;
 
+/** Политика доступа к специализациям: публичное чтение для всех */
 class SpecializationPolicy
 {
     public function viewAny(?User $user): bool

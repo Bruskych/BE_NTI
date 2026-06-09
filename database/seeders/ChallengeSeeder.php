@@ -13,6 +13,10 @@ use App\Models\Challenge;
 use App\Models\Program;
 use App\Models\User;
 
+/**
+ * Сидер челленджей: создаёт задания компаний для студенческих команд (Программа Б).
+ * Зависит от ProgramSeeder, OrganizationSeeder, SpecializationSeeder.
+ */
 class ChallengeSeeder extends Seeder
 {
     /**

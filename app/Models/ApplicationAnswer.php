@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель ответа на поле формы заявки */
 class ApplicationAnswer extends Model
 {
     use SoftDeletes, HasFactory;

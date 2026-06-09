@@ -14,6 +14,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Storage;
 
+/** Модель пользователя системы: Sanctum-токены, роли Spatie, аватар и все связанные сущности */
 class User extends Authenticatable implements HasMedia
 {
     use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable;

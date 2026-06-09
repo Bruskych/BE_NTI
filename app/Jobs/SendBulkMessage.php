@@ -13,6 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
+/** Задание отправки массовой рассылки по целевой группе с отслеживанием доставки */
 class SendBulkMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -28,6 +29,7 @@ class SendBulkMessage implements ShouldQueue
 
     public function __construct(public int $bulkMessageId) {}
 
+    /** Разрешает получателей по целевой группе, отправляет письма и фиксирует время доставки */
     public function handle(): void
     {
         $bulkMessage = BulkMessage::find($this->bulkMessageId);
@@ -53,6 +55,7 @@ class SendBulkMessage implements ShouldQueue
         $bulkMessage->update(['sent_at' => now()]);
     }
 
+    /** Возвращает коллекцию получателей по целевой группе или роли */
     private function resolveRecipients(string $targetGroup): Collection
     {
         if ($targetGroup === 'all') {

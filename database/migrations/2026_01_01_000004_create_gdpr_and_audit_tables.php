@@ -4,10 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Таблицы GDPR и аудита: gdpr_consents и audit_events.
+ * Обеспечивает соответствие требованиям GDPR и журналирование действий.
+ */
 return new class extends Migration
 {
+    /**
+     * Создаёт таблицы согласий GDPR и журнала аудита действий пользователей.
+     */
     public function up(): void
     {
+        // Согласия пользователей с политиками конфиденциальности
         Schema::create('gdpr_consents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -18,6 +26,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
+        // Журнал аудита: все значимые действия в системе
         Schema::create('audit_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
@@ -33,6 +42,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Удаляет таблицы audit_events и gdpr_consents.
+     */
     public function down(): void
     {
         Schema::dropIfExists('audit_events');

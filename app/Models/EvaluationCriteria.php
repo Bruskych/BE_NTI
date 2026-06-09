@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** Модель критерия оценки с весовым коэффициентом и порядком отображения */
 class EvaluationCriteria extends Model
 {
     use SoftDeletes, HasFactory;

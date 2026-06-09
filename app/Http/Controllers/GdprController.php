@@ -10,9 +10,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use OpenApi\Attributes as OA;
 
+/** Контроллер GDPR: экспорт и анонимизация персональных данных пользователей */
 class GdprController extends Controller
 {
+    /** Ставит задание на экспорт персональных данных текущего пользователя */
+    #[OA\Post(
+        path: '/auth/gdpr/export',
+        summary: 'Schedule a GDPR export of the current user\'s personal data',
+        tags: ['GDPR'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 202, description: 'Export scheduled'),
+        ]
+    )]
     public function exportMyData(Request $request)
     {
         $user = $request->user();
@@ -26,12 +38,23 @@ class GdprController extends Controller
 
         GenerateExport::dispatch($log->id);
 
-        return response()->json([
+        return $this->apiJson([
             'message' => 'GDPR personal data export scheduled',
             'export' => $log,
         ], 202);
     }
 
+    /** Анонимизирует персональные данные текущего пользователя (право на забвение) */
+    #[OA\Delete(
+        path: '/auth/gdpr/erase',
+        summary: 'Anonymize/erase the current user\'s personal data ("right to be forgotten")',
+        tags: ['GDPR'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Personal data anonymized'),
+            new OA\Response(response: 403, description: 'Not authorized'),
+        ]
+    )]
     public function eraseMyData(Request $request)
     {
         $user = $request->user();
@@ -39,11 +62,25 @@ class GdprController extends Controller
 
         $this->anonymizeUser($user, $request->ip(), $request->userAgent());
 
-        return response()->json([
+        return $this->apiJson([
             'message' => 'Personal data anonymization completed',
         ]);
     }
 
+    /** Ставит задание на экспорт персональных данных указанного пользователя (для администратора) */
+    #[OA\Post(
+        path: '/admin/gdpr/users/{user}/export',
+        summary: '[Admin] Schedule a GDPR export of a specific user\'s personal data',
+        tags: ['GDPR'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'user', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 202, description: 'Export scheduled'),
+            new OA\Response(response: 403, description: 'Admin privileges required'),
+        ]
+    )]
     public function exportUserData(User $user, Request $request)
     {
         $this->authorizeAdmin($request->user());
@@ -57,23 +94,38 @@ class GdprController extends Controller
 
         GenerateExport::dispatch($log->id);
 
-        return response()->json([
+        return $this->apiJson([
             'message' => 'GDPR personal data export scheduled for user',
             'export' => $log,
         ], 202);
     }
 
+    /** Анонимизирует персональные данные указанного пользователя (только для администратора) */
+    #[OA\Delete(
+        path: '/admin/gdpr/users/{user}',
+        summary: '[Admin] Anonymize/erase a specific user\'s personal data',
+        tags: ['GDPR'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'user', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'User personal data anonymized'),
+            new OA\Response(response: 403, description: 'Admin privileges required'),
+        ]
+    )]
     public function eraseUserData(User $user, Request $request)
     {
         $this->authorizeAdmin($request->user());
         $this->anonymizeUser($user, $request->ip(), $request->userAgent());
 
-        return response()->json([
+        return $this->apiJson([
             'message' => 'User personal data anonymized by admin',
             'user_id' => $user->id,
         ]);
     }
 
+    /** Удаляет связанные данные пользователя и заменяет личную информацию на анонимные значения */
     protected function anonymizeUser(User $user, ?string $ipAddress = null, ?string $userAgent = null): void
     {
         DB::transaction(function () use ($user, $ipAddress, $userAgent) {
@@ -113,6 +165,7 @@ class GdprController extends Controller
         });
     }
 
+    /** Прерывает выполнение с 403, если пользователь не является администратором */
     protected function authorizeAdmin(User $user): void
     {
         if (!$user->isAdmin()) {
@@ -120,6 +173,7 @@ class GdprController extends Controller
         }
     }
 
+    /** Прерывает выполнение с 403, если текущий пользователь не является владельцем аккаунта или администратором */
     protected function authorizeAdminOrSelf(User $currentUser, User $targetUser): void
     {
         if ($currentUser->id !== $targetUser->id && !$currentUser->isAdmin()) {

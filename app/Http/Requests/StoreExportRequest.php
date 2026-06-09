@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/** Запрос на создание нового экспорта данных */
 class StoreExportRequest extends FormRequest
 {
     public static function availableExportOptions(): array
