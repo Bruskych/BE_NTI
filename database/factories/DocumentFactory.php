@@ -44,7 +44,7 @@ class DocumentFactory extends Factory
             'milestone_id'   => null,
             'type'           => 'specification',
             'file_name'      => fake()->words(2, true) . '.' . $ext,
-            'file_path'      => 'storage/documents/' . fake()->uuid() . '.' . $ext,
+            'file_path'      => 'documents/' . fake()->uuid() . '.' . $ext,
             'mime_type'      => $this->mimeTypes[$ext],
             'size'           => fake()->numberBetween(51200, 5242880),
             'version'        => 1,

@@ -52,6 +52,7 @@ class ApplicationController extends Controller
     {
         return $this->apiJson(new ApplicationResource($application->load([
             'team', 'organization', 'answers.field', 'pairingSubmissions',
+            'call.evaluationTemplate.criteria',
         ])));
     }
 
