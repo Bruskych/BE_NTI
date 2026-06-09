@@ -36,7 +36,7 @@ services:
         volumes:
             - ./:/var/www
             - ./docker/nginx:/etc/nginx/conf.d/
-            - ./storage/app/public:/var/www/storage/app/public:ro
+            - ./storage/app/public:/var/www/public/storage:ro
         depends_on:
             - app
         networks:
