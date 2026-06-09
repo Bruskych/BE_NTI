@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     // Сначало проверка языка, потом проверка роли
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo(fn () => null);
         $middleware->prepend(
             \App\Http\Middleware\SetLocale::class
         );
@@ -21,5 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        });
     })->create();

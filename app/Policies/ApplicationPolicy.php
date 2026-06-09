@@ -23,9 +23,7 @@ class ApplicationPolicy
 
     public function viewAny(User $user): Response
     {
-        return $user->can('applications.view-all')
-            ? Response::allow()
-            : Response::deny('You do not have permission to view the list of applications.');
+        return Response::allow();
     }
 
     public function view(User $user, Application $application): Response

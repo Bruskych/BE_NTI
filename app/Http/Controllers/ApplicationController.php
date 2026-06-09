@@ -28,9 +28,20 @@ class ApplicationController extends Controller
             new OA\Response(response: 200, description: 'Paginated list of applications'),
         ]
     )]
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->apiJson(ApplicationResource::collection(Application::paginate()));
+        $user = $request->user();
+
+        if ($user->hasRole(['admin', 'super_admin']) || $user->can('applications.view-all')) {
+            $apps = Application::with(['program', 'call', 'team'])->paginate();
+        } else {
+            $teamIds = $user->teams()->pluck('teams.id');
+            $apps = Application::with(['program', 'call', 'team'])
+                ->whereIn('team_id', $teamIds)
+                ->get();
+        }
+
+        return $this->apiJson(ApplicationResource::collection($apps));
     }
 
     /** Возвращает детали одной заявки со связанными данными */
@@ -71,7 +82,7 @@ class ApplicationController extends Controller
     public function store(StoreApplicationRequest $request, ApplicationService $service): JsonResponse
     {
         $this->authorize('create', Application::class);
-        $team = $request->user()->teams()->first();
+        $team = $request->user()->teams()->where('leader_id', $request->user()->id)->first();
 
         $application = $service->createApplication($request->validated(), $team->id, $request->user()->id);
 

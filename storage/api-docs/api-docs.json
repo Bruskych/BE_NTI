@@ -18,6 +18,7 @@
                     "Admin"
                 ],
                 "summary": "[Admin] Get dashboard summary stats (user count, pending applications, latest users)",
+                "description": "Возвращает сводную статистику для дашборда администратора",
                 "operationId": "7cfa73c7f4bc906c66043dac50a3d549",
                 "responses": {
                     "200": {
@@ -37,6 +38,7 @@
                     "Admin"
                 ],
                 "summary": "[Admin] List submitted student applications awaiting review",
+                "description": "Возвращает список студенческих заявок, ожидающих рассмотрения",
                 "operationId": "4ec325cc93f3237be77c818b05aec245",
                 "responses": {
                     "200": {
@@ -56,6 +58,7 @@
                     "Admin"
                 ],
                 "summary": "[Admin] List submitted company applications awaiting review",
+                "description": "Возвращает список заявок компаний, ожидающих рассмотрения",
                 "operationId": "1719ac71ea47fb5faa9368da85893bbb",
                 "responses": {
                     "200": {
@@ -69,16 +72,17 @@
                 ]
             }
         },
-        "/admin/students/{user}/approve": {
+        "/admin/students/{id}/approve": {
             "post": {
                 "tags": [
                     "Admin"
                 ],
                 "summary": "[Admin] Approve a pending student application",
-                "operationId": "3bad2e894632672bf3696d79bbc1382f",
+                "description": "Одобряет студенческую заявку по идентификатору",
+                "operationId": "257fa21161d32c4798cca928e360ed61",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "id",
                         "in": "path",
                         "description": "Application ID",
                         "required": true,
@@ -102,16 +106,17 @@
                 ]
             }
         },
-        "/admin/students/{user}/reject": {
+        "/admin/students/{id}/reject": {
             "post": {
                 "tags": [
                     "Admin"
                 ],
                 "summary": "[Admin] Reject a pending student application",
-                "operationId": "676abc34d2bbbe9d5134c59077912a6f",
+                "description": "Отклоняет студенческую заявку по идентификатору",
+                "operationId": "99c4b7fb6f4d109618758b28292a2604",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "id",
                         "in": "path",
                         "description": "Application ID",
                         "required": true,
@@ -141,6 +146,7 @@
                     "Admin"
                 ],
                 "summary": "[Admin] Approve a pending company application",
+                "description": "Одобряет заявку компании по идентификатору",
                 "operationId": "a8cb91599ed04f05702e509557738860",
                 "parameters": [
                     {
@@ -174,6 +180,7 @@
                     "Admin"
                 ],
                 "summary": "[Admin] Reject a pending company application",
+                "description": "Отклоняет заявку компании по идентификатору",
                 "operationId": "98284c24c15cca2d2ef7b73d337a5e52",
                 "parameters": [
                     {
@@ -207,6 +214,7 @@
                     "Applications"
                 ],
                 "summary": "List applications (paginated)",
+                "description": "Возвращает постраничный список заявок",
                 "operationId": "53a774224a5bb97dd3d5e1c1d0055cd9",
                 "responses": {
                     "200": {
@@ -224,6 +232,7 @@
                     "Applications"
                 ],
                 "summary": "Create a draft application for the current team and an open call",
+                "description": "Создаёт черновик заявки для текущей команды",
                 "operationId": "c8746709b6a737b932ae65fd891652ad",
                 "responses": {
                     "201": {
@@ -249,6 +258,7 @@
                     "Applications"
                 ],
                 "summary": "Get a single application with team, organization, answers and pairing submissions",
+                "description": "Возвращает детали одной заявки со связанными данными",
                 "operationId": "31160acc92874271b270a5e8211410f7",
                 "parameters": [
                     {
@@ -282,6 +292,7 @@
                     "Applications"
                 ],
                 "summary": "Update an application's answers, pairing submissions or organization",
+                "description": "Обновляет ответы, документы для парного отбора или организацию заявки",
                 "operationId": "abea4f6d9a3d4ec0ec92743ab38aad49",
                 "parameters": [
                     {
@@ -315,6 +326,7 @@
                     "Applications"
                 ],
                 "summary": "Delete an application",
+                "description": "Удаляет заявку",
                 "operationId": "96ae1ef06f193366689c077802986df3",
                 "parameters": [
                     {
@@ -347,6 +359,7 @@
                     "Applications"
                 ],
                 "summary": "Submit a draft application for committee review",
+                "description": "Подаёт черновик заявки на рассмотрение комиссией",
                 "operationId": "010fc1a431178d8567a60d2911a2ebbf",
                 "parameters": [
                     {
@@ -379,6 +392,7 @@
                     "Applications"
                 ],
                 "summary": "[Committee] Approve, reject or request supplements for a submitted application",
+                "description": "Фиксирует решение комиссии по поданной заявке",
                 "operationId": "d425853b83e31a3d71b1f9cffd591149",
                 "parameters": [
                     {
@@ -560,7 +574,7 @@
                     "Bulk Messages"
                 ],
                 "summary": "[Admin] List bulk messages (paginated) with recipient counts and sender",
-                "description": "List bulk messages",
+                "description": "Возвращает постраничный список массовых рассылок",
                 "operationId": "bffb8618c689cd138fc715ed2fb86385",
                 "responses": {
                     "200": {
@@ -581,7 +595,7 @@
                     "Bulk Messages"
                 ],
                 "summary": "[Admin] Queue a bulk message for sending to a target group",
-                "description": "Create and queue a bulk message for sending",
+                "description": "Создаёт и ставит в очередь массовую рассылку для указанной группы получателей",
                 "operationId": "763d484d279048bec267f136fe1648c2",
                 "responses": {
                     "202": {
@@ -607,7 +621,7 @@
                     "Bulk Messages"
                 ],
                 "summary": "[Admin] Get a single bulk message with recipient counts and sender",
-                "description": "Get single bulk message with delivery details",
+                "description": "Возвращает детали одной массовой рассылки с данными о доставке",
                 "operationId": "47e298106cf4bfef2d8fb904e7fdfc4c",
                 "parameters": [
                     {
@@ -643,6 +657,7 @@
                     "Calls"
                 ],
                 "summary": "List calls with program and specializations",
+                "description": "Возвращает список всех конкурсных отборов с программой и специализациями",
                 "operationId": "33a4f39d71f646f958d6c1c7950a9dac",
                 "responses": {
                     "200": {
@@ -660,6 +675,7 @@
                     "Calls"
                 ],
                 "summary": "Create a call, optionally linking specializations",
+                "description": "Создаёт конкурсный отбор, при необходимости связывая специализации",
                 "operationId": "a4157d2849a432e2f799009027cab7b8",
                 "responses": {
                     "201": {
@@ -685,6 +701,7 @@
                     "Calls"
                 ],
                 "summary": "Get a single call with program, specializations and evaluation template",
+                "description": "Возвращает детали одного конкурсного отбора",
                 "operationId": "e121ea39fa7c7ab7611b6faf1ee8a332",
                 "parameters": [
                     {
@@ -718,6 +735,7 @@
                     "Calls"
                 ],
                 "summary": "Update a call, optionally re-syncing specializations",
+                "description": "Обновляет конкурсный отбор и при необходимости синхронизирует специализации",
                 "operationId": "f8f8334a98187d2a2c823867254e0b7a",
                 "parameters": [
                     {
@@ -751,6 +769,7 @@
                     "Calls"
                 ],
                 "summary": "Delete a draft call (only the owning organization may delete its own draft calls)",
+                "description": "Удаляет черновой конкурсный отбор",
                 "operationId": "01e5151a8dcd3483ff5ccc6562c13a79",
                 "parameters": [
                     {
@@ -783,6 +802,7 @@
                     "Calls"
                 ],
                 "summary": "[Admin] Open a call for applications",
+                "description": "Открывает конкурсный отбор для приёма заявок",
                 "operationId": "b61ab8f39a954051e0c9fd548b8c41bf",
                 "parameters": [
                     {
@@ -815,6 +835,7 @@
                     "Calls"
                 ],
                 "summary": "[Admin] Close a call for applications",
+                "description": "Закрывает конкурсный отбор",
                 "operationId": "0843a124c58355800cb32c68459a0997",
                 "parameters": [
                     {
@@ -847,6 +868,7 @@
                     "Challenges"
                 ],
                 "summary": "List challenges visible to the current user",
+                "description": "Возвращает список задач, доступных текущему пользователю",
                 "operationId": "07f0c2a4bb27caa9de1ab3e309f884fd",
                 "responses": {
                     "200": {
@@ -864,6 +886,7 @@
                     "Challenges"
                 ],
                 "summary": "[Company/Admin] Create a challenge, optionally linking specializations",
+                "description": "Создаёт новую задачу от компании, при необходимости связывая специализации",
                 "operationId": "b7de3512ff4a261630fa5a164836a007",
                 "responses": {
                     "201": {
@@ -889,6 +912,7 @@
                     "Challenges"
                 ],
                 "summary": "Get a single challenge with program, organization, specializations and product owner",
+                "description": "Возвращает детали одной задачи от компании",
                 "operationId": "699d69addf053f934a13a2a8b90ed0ed",
                 "parameters": [
                     {
@@ -922,6 +946,7 @@
                     "Challenges"
                 ],
                 "summary": "Update a challenge, optionally re-syncing specializations",
+                "description": "Обновляет задачу от компании и синхронизирует специализации",
                 "operationId": "8031d6b33dc1fa277b727a22c3ddeffa",
                 "parameters": [
                     {
@@ -955,6 +980,7 @@
                     "Challenges"
                 ],
                 "summary": "Delete a challenge",
+                "description": "Удаляет задачу от компании",
                 "operationId": "b8cbdc676fdc04b9b165551e5e2521b6",
                 "parameters": [
                     {
@@ -987,6 +1013,7 @@
                     "Consultations"
                 ],
                 "summary": "List consultations (own as mentor/team member, all for holders of consultations.view)",
+                "description": "Возвращает список консультаций текущего пользователя или всех (при наличии права)",
                 "operationId": "a810cd7ce377aed815bdee3ff065c743",
                 "responses": {
                     "200": {
@@ -1004,6 +1031,7 @@
                     "Consultations"
                 ],
                 "summary": "[Mentor] Schedule a consultation for one of their mentorships",
+                "description": "Создаёт новую консультацию для ментора по одному из его менторств",
                 "operationId": "6f69814626fd4ad92e7058f676201279",
                 "responses": {
                     "201": {
@@ -1029,6 +1057,7 @@
                     "Consultations"
                 ],
                 "summary": "Get a single consultation with mentor and milestone",
+                "description": "Возвращает детали одной консультации",
                 "operationId": "7b8f07abc5eff70e939a3cfecffc04ae",
                 "parameters": [
                     {
@@ -1062,6 +1091,7 @@
                     "Consultations"
                 ],
                 "summary": "Update a consultation",
+                "description": "Обновляет данные консультации",
                 "operationId": "317f187bbcf4d955c2322f94ab7b6351",
                 "parameters": [
                     {
@@ -1095,6 +1125,7 @@
                     "Consultations"
                 ],
                 "summary": "Delete a consultation",
+                "description": "Удаляет консультацию",
                 "operationId": "fcb4af7b6dff277f757abfff03cfcb95",
                 "parameters": [
                     {
@@ -1127,7 +1158,7 @@
                     "Documents"
                 ],
                 "summary": "List documents (paginated), optionally filtered by application/project/milestone/type/classification",
-                "description": "List documents for a resource",
+                "description": "Возвращает постраничный список документов с возможностью фильтрации",
                 "operationId": "cf58d1781992e8292fd9914b24487fdc",
                 "parameters": [
                     {
@@ -1187,7 +1218,7 @@
                     "Documents"
                 ],
                 "summary": "Upload a document, optionally linked to an application/project/milestone",
-                "description": "Store uploaded document",
+                "description": "Загружает файл документа и сохраняет запись в БД",
                 "operationId": "1c3ad2906b68a58de1f603260ab271c4",
                 "responses": {
                     "201": {
@@ -1216,7 +1247,7 @@
                     "Documents"
                 ],
                 "summary": "Get a single document with application and project",
-                "description": "Get single document",
+                "description": "Возвращает детали одного документа",
                 "operationId": "9ea040b157f7bb5c163d3c1673c17a86",
                 "parameters": [
                     {
@@ -1250,7 +1281,7 @@
                     "Documents"
                 ],
                 "summary": "Upload a new version of an existing document",
-                "description": "Update document (new version)",
+                "description": "Загружает новую версию существующего документа",
                 "operationId": "b1a347cb0624abf2cbef76e29e8c29c1",
                 "parameters": [
                     {
@@ -1287,7 +1318,7 @@
                     "Documents"
                 ],
                 "summary": "Delete a document",
-                "description": "Delete document",
+                "description": "Удаляет документ из хранилища и базы данных",
                 "operationId": "db1edaf25b7a4411d450e0e52e4d0171",
                 "parameters": [
                     {
@@ -1323,7 +1354,7 @@
                     "Documents"
                 ],
                 "summary": "Request an email confirmation code needed to download a confidential document",
-                "description": "Send an email confirmation code required to download confidential documents",
+                "description": "Отправляет код подтверждения на email для доступа к конфиденциальному документу",
                 "operationId": "7791b042fd478a89460abeebcec356f1",
                 "parameters": [
                     {
@@ -1359,7 +1390,7 @@
                     "Documents"
                 ],
                 "summary": "Download a document (confidential documents require a ?code= confirmation code)",
-                "description": "Download document. Confidential documents require a verified email confirmation code first\n(see requestAccessCode), obtained via Redis-backed EmailConfirmationService.",
+                "description": "Скачивает документ; конфиденциальные требуют предварительно полученный код подтверждения",
                 "operationId": "7f1df5aa3f7d3cd65ad4a7f009ea25a3",
                 "parameters": [
                     {
@@ -1410,7 +1441,7 @@
                     "Documents"
                 ],
                 "summary": "Get a temporary preview URL for a document",
-                "description": "Get document preview URL",
+                "description": "Возвращает временный URL для предпросмотра документа",
                 "operationId": "49dcbf2c08df23cf76597b2c36188617",
                 "parameters": [
                     {
@@ -1446,7 +1477,7 @@
                     "Documents"
                 ],
                 "summary": "Generate an internship agreement PDF from a DOCX template",
-                "description": "Generate internship agreement PDF from template",
+                "description": "Генерирует PDF договора о практике на основе DOCX-шаблона",
                 "operationId": "42085e73a9624a22d2a6199b3eef9026",
                 "responses": {
                     "201": {
@@ -1475,7 +1506,7 @@
                     "Documents"
                 ],
                 "summary": "Upload a DOCX document template",
-                "description": "Upload document template (DOCX)",
+                "description": "Загружает DOCX-шаблон документа",
                 "operationId": "6ec98767e203aa154b9aa3f587416574",
                 "responses": {
                     "201": {
@@ -1504,7 +1535,7 @@
                     "Documents"
                 ],
                 "summary": "Generate a PDF document by filling in an uploaded template with data",
-                "description": "Generate document from uploaded template",
+                "description": "Генерирует PDF-документ, заполняя загруженный шаблон предоставленными данными",
                 "operationId": "e3c7aadc51d48eb9592d9c3c58197c9a",
                 "responses": {
                     "201": {
@@ -1536,6 +1567,7 @@
                     "Email Templates"
                 ],
                 "summary": "[Admin] List email templates",
+                "description": "Возвращает список всех email-шаблонов",
                 "operationId": "0587bef646cf0cc8c645f8f465f14fcd",
                 "responses": {
                     "200": {
@@ -1553,6 +1585,7 @@
                     "Email Templates"
                 ],
                 "summary": "[Admin] Create an email template",
+                "description": "Создаёт новый email-шаблон",
                 "operationId": "02142e5bcea45ebeef89303c0330ed6c",
                 "responses": {
                     "201": {
@@ -1575,6 +1608,7 @@
                     "Email Templates"
                 ],
                 "summary": "[Admin] Get a single email template",
+                "description": "Возвращает один email-шаблон по идентификатору",
                 "operationId": "580308bb5512d299dbadbc6e2ed1ba2e",
                 "parameters": [
                     {
@@ -1605,6 +1639,7 @@
                     "Email Templates"
                 ],
                 "summary": "[Admin] Update an email template",
+                "description": "Обновляет существующий email-шаблон",
                 "operationId": "81bf3f9a7dd7f334be6adc222f0fc19f",
                 "parameters": [
                     {
@@ -1635,6 +1670,7 @@
                     "Email Templates"
                 ],
                 "summary": "[Admin] Delete an email template",
+                "description": "Удаляет email-шаблон",
                 "operationId": "6b39672861a896b7cb19ba7c7f78f6b3",
                 "parameters": [
                     {
@@ -1664,6 +1700,7 @@
                     "Evaluations"
                 ],
                 "summary": "[Evaluator] Submit a scored evaluation with recommendation for an application",
+                "description": "Сохраняет оценку эксперта по заявке с баллами по критериям и рекомендацией",
                 "operationId": "307fff23b5fd8b6826f1d3352ab66b27",
                 "parameters": [
                     {
@@ -1699,6 +1736,7 @@
                     "Exports"
                 ],
                 "summary": "[Admin] List export logs (paginated)",
+                "description": "Возвращает постраничный журнал экспортов",
                 "operationId": "f67b6201ca7b94859f63a30f8d3d91e1",
                 "responses": {
                     "200": {
@@ -1719,6 +1757,7 @@
                     "Exports"
                 ],
                 "summary": "[Admin] Schedule a data export job",
+                "description": "Ставит задание на экспорт данных в очередь",
                 "operationId": "df4b53a81559ba266d7fc83727dbd778",
                 "responses": {
                     "202": {
@@ -1741,6 +1780,7 @@
                     "Exports"
                 ],
                 "summary": "[Admin] List available export types grouped by resource",
+                "description": "Возвращает доступные типы экспорта, сгруппированные по ресурсу",
                 "operationId": "a91319f2f5040524442b144cd02f4e6c",
                 "responses": {
                     "200": {
@@ -1760,6 +1800,7 @@
                     "Exports"
                 ],
                 "summary": "[Admin] Schedule a data export job by resource and format shorthand",
+                "description": "Ставит задание на экспорт по сокращённому маршруту ресурс/формат",
                 "operationId": "24be2507e1f7bb3e7abc493512c46530",
                 "parameters": [
                     {
@@ -1803,6 +1844,7 @@
                     "GDPR"
                 ],
                 "summary": "Schedule a GDPR export of the current user's personal data",
+                "description": "Ставит задание на экспорт персональных данных текущего пользователя",
                 "operationId": "09507ad8ddb2a0c64e381509674aebd3",
                 "responses": {
                     "202": {
@@ -1822,6 +1864,7 @@
                     "GDPR"
                 ],
                 "summary": "Anonymize/erase the current user's personal data (\"right to be forgotten\")",
+                "description": "Анонимизирует персональные данные текущего пользователя (право на забвение)",
                 "operationId": "ca69bc5523a97b1c81bfb3b9f07d297d",
                 "responses": {
                     "200": {
@@ -1844,6 +1887,7 @@
                     "GDPR"
                 ],
                 "summary": "[Admin] Schedule a GDPR export of a specific user's personal data",
+                "description": "Ставит задание на экспорт персональных данных указанного пользователя (для администратора)",
                 "operationId": "9df6747dee1dce6d6502b87c08d608e8",
                 "parameters": [
                     {
@@ -1876,6 +1920,7 @@
                     "GDPR"
                 ],
                 "summary": "[Admin] Anonymize/erase a specific user's personal data",
+                "description": "Анонимизирует персональные данные указанного пользователя (только для администратора)",
                 "operationId": "4aa8aafa37f6d40907a3e650d6016c5a",
                 "parameters": [
                     {
@@ -1908,6 +1953,7 @@
                     "Mentorships"
                 ],
                 "summary": "List mentorships with project and mentor",
+                "description": "Возвращает список всех менторств с проектом и ментором",
                 "operationId": "6ce443f08a5ab56cb17b6f449baa4994",
                 "responses": {
                     "200": {
@@ -1928,9 +1974,10 @@
                     "Mentorships"
                 ],
                 "summary": "[Admin] Assign a mentor to a project",
+                "description": "Создаёт новое менторство, назначая ментора проекту",
                 "operationId": "7727f4fd2613feb96fd03708e3b9f1b0",
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Mentorship created"
                     },
                     "403": {
@@ -1953,6 +2000,7 @@
                     "Mentorships"
                 ],
                 "summary": "Get a single mentorship with project, mentor and consultations",
+                "description": "Возвращает детали одного менторства с консультациями",
                 "operationId": "dfca49e1414f5635258f69ad5e5c30b1",
                 "parameters": [
                     {
@@ -1986,6 +2034,7 @@
                     "Mentorships"
                 ],
                 "summary": "Update a mentorship",
+                "description": "Обновляет данные менторства",
                 "operationId": "289a5a3f908484d8993d2d17e067fedc",
                 "parameters": [
                     {
@@ -2019,6 +2068,7 @@
                     "Mentorships"
                 ],
                 "summary": "Delete a mentorship",
+                "description": "Удаляет менторство",
                 "operationId": "5c87324b9f2d04277bb4dc46c5d7b3be",
                 "parameters": [
                     {
@@ -2051,6 +2101,7 @@
                     "Milestones"
                 ],
                 "summary": "List milestones for a project",
+                "description": "Возвращает список контрольных точек для указанного проекта",
                 "operationId": "b292112328e381b2f9fbd9c932e18f78",
                 "parameters": [
                     {
@@ -2081,6 +2132,7 @@
                     "Milestones"
                 ],
                 "summary": "[Mentor] Create a new pending milestone for a project",
+                "description": "Создаёт новую контрольную точку для проекта со статусом «ожидает»",
                 "operationId": "d522eb08ab15600a2bdfbf09f5fe0bef",
                 "parameters": [
                     {
@@ -2116,6 +2168,7 @@
                     "Milestones"
                 ],
                 "summary": "Get a single milestone",
+                "description": "Возвращает детали одной контрольной точки",
                 "operationId": "88876195ae448b0a0f676f9c7f8820df",
                 "parameters": [
                     {
@@ -2149,6 +2202,7 @@
                     "Milestones"
                 ],
                 "summary": "Update a milestone",
+                "description": "Обновляет данные контрольной точки",
                 "operationId": "fed8266e6299803737c22bed63cc8647",
                 "parameters": [
                     {
@@ -2184,6 +2238,7 @@
                     "Milestones"
                 ],
                 "summary": "[Mentor/Admin] Approve a milestone",
+                "description": "Подтверждает выполнение контрольной точки (ментор или администратор)",
                 "operationId": "89b183d77e9214258c3cd6a661823e11",
                 "parameters": [
                     {
@@ -2216,6 +2271,7 @@
                     "Notifications"
                 ],
                 "summary": "List the current user's unread notifications",
+                "description": "Возвращает непрочитанные уведомления текущего пользователя",
                 "operationId": "0f031f66cd8c52bf73e89fb2d050ad83",
                 "responses": {
                     "200": {
@@ -2233,6 +2289,7 @@
                     "Notifications"
                 ],
                 "summary": "Clear all of the current user's notifications",
+                "description": "Удаляет все уведомления текущего пользователя",
                 "operationId": "ce884d5ad97e4c8c92fd3f415544073a",
                 "responses": {
                     "200": {
@@ -2252,6 +2309,7 @@
                     "Notifications"
                 ],
                 "summary": "Accept a team invitation notification",
+                "description": "Принимает приглашение в команду из уведомления",
                 "operationId": "0b4f14b0fcefdb908e7f0ea572977acc",
                 "parameters": [
                     {
@@ -2287,6 +2345,7 @@
                     "Notifications"
                 ],
                 "summary": "Decline a team invitation notification",
+                "description": "Отклоняет приглашение в команду из уведомления",
                 "operationId": "77953585d2d423fd7c394d2171cae64e",
                 "parameters": [
                     {
@@ -2322,6 +2381,7 @@
                     "Notifications"
                 ],
                 "summary": "Delete a single notification",
+                "description": "Удаляет одно уведомление",
                 "operationId": "5b055554e24b9e67dd912035016cea0e",
                 "parameters": [
                     {
@@ -2354,6 +2414,7 @@
                     "Notification Preferences"
                 ],
                 "summary": "Get the current user's notification preferences",
+                "description": "Возвращает настройки уведомлений текущего пользователя",
                 "operationId": "d7011c2c6ec491beb6cece1b55a9dba9",
                 "responses": {
                     "200": {
@@ -2371,6 +2432,7 @@
                     "Notification Preferences"
                 ],
                 "summary": "Update the current user's notification preferences",
+                "description": "Обновляет настройки уведомлений текущего пользователя",
                 "operationId": "76f4914d94603ed2578d8c3014bbb7d9",
                 "responses": {
                     "200": {
@@ -2393,6 +2455,7 @@
                     "Organizations"
                 ],
                 "summary": "List organizations (active organizations and own organizations; all for holders of organizations.view)",
+                "description": "Возвращает список организаций с учётом прав доступа текущего пользователя",
                 "operationId": "3952cb0969bc8305f39882b2637f9b12",
                 "responses": {
                     "200": {
@@ -2410,6 +2473,7 @@
                     "Organizations"
                 ],
                 "summary": "Create an organization (current user becomes owner)",
+                "description": "Создаёт организацию и назначает текущего пользователя её владельцем",
                 "operationId": "73444d3d0c39d645824c15720b7fb98a",
                 "responses": {
                     "201": {
@@ -2435,6 +2499,7 @@
                     "Organizations"
                 ],
                 "summary": "Get a single organization with its users",
+                "description": "Возвращает детали одной организации со списком пользователей",
                 "operationId": "c0d4bab9fe7d2e1c7f2512135f9abb93",
                 "parameters": [
                     {
@@ -2468,6 +2533,7 @@
                     "Organizations"
                 ],
                 "summary": "Update an organization (and optionally its logo)",
+                "description": "Обновляет данные организации и при необходимости заменяет логотип",
                 "operationId": "c28160db0127a0a1bb9b3878cdff0f15",
                 "parameters": [
                     {
@@ -2501,6 +2567,7 @@
                     "Organizations"
                 ],
                 "summary": "Delete an organization",
+                "description": "Удаляет организацию",
                 "operationId": "2ca51eeec0464f5bf98701ad774b4660",
                 "parameters": [
                     {
@@ -2527,12 +2594,135 @@
                 ]
             }
         },
+        "/organizations/{organization}/members": {
+            "post": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Add a user to the organization (owner only)",
+                "description": "Добавляет пользователя в организацию с указанной ролью",
+                "operationId": "a7bd6f6654637af9d4f94214a3ffa900",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member added"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/organizations/{organization}/members/{user}": {
+            "put": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Update a member's role in the organization (owner only)",
+                "description": "Изменяет роль участника в организации",
+                "operationId": "a9e5ddb30029be6abdccc5dc4684adb8",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role updated"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Remove a member from the organization (owner only)",
+                "description": "Удаляет пользователя из организации",
+                "operationId": "15293aa8ffe74349860c1685461e9e3f",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member removed"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/pages": {
             "get": {
                 "tags": [
                     "Pages"
                 ],
                 "summary": "List pages (published only for visitors, all for staff with cms.pages.view)",
+                "description": "Возвращает список страниц: опубликованные для всех, все — для сотрудников",
                 "operationId": "0bc70b78a0faaba84e97cf676c7cbbec",
                 "responses": {
                     "200": {
@@ -2545,6 +2735,7 @@
                     "Pages"
                 ],
                 "summary": "Create a CMS page",
+                "description": "Создаёт новую CMS-страницу",
                 "operationId": "2d8cba23d42b631326e496b1edcc77c1",
                 "responses": {
                     "201": {
@@ -2570,6 +2761,7 @@
                     "Pages"
                 ],
                 "summary": "Get a single page",
+                "description": "Возвращает одну страницу по идентификатору",
                 "operationId": "e7235240686d3fac939cb380b959de17",
                 "parameters": [
                     {
@@ -2598,6 +2790,7 @@
                     "Pages"
                 ],
                 "summary": "Update a CMS page",
+                "description": "Обновляет содержимое CMS-страницы",
                 "operationId": "39c58d0f0672cec942aab5111a83d17a",
                 "parameters": [
                     {
@@ -2631,6 +2824,7 @@
                     "Pages"
                 ],
                 "summary": "Delete a CMS page",
+                "description": "Удаляет CMS-страницу",
                 "operationId": "c0d0f763ba37cda5462e2bef6f3f187e",
                 "parameters": [
                     {
@@ -2663,7 +2857,7 @@
                     "Partners"
                 ],
                 "summary": "List partners and mentors (public directory), featured first",
-                "description": "Spec 9: public \"Partners and mentors\" directory — list of partners with references.",
+                "description": "Возвращает список партнёров, отсортированных по признаку избранного",
                 "operationId": "96719bf5ea724a6c6eb645fcb75517ad",
                 "responses": {
                     "200": {
@@ -2678,6 +2872,7 @@
                     "Partners"
                 ],
                 "summary": "Get a single partner with organization details",
+                "description": "Возвращает детали одного партнёра с данными об организации",
                 "operationId": "c30020e844e0d89039b828ab1aa559d1",
                 "parameters": [
                     {
@@ -2705,6 +2900,7 @@
                     "Posts"
                 ],
                 "summary": "List published posts",
+                "description": "Возвращает список опубликованных блог-постов",
                 "operationId": "5f292ed47bdbfa79356750be0807450c",
                 "responses": {
                     "200": {
@@ -2717,6 +2913,7 @@
                     "Posts"
                 ],
                 "summary": "Create a blog post (authored by the current user)",
+                "description": "Создаёт новый блог-пост от имени текущего пользователя",
                 "operationId": "c2e0b0e26215e6d34ece33ebae25f7df",
                 "responses": {
                     "201": {
@@ -2742,6 +2939,7 @@
                     "Posts"
                 ],
                 "summary": "Get a single post",
+                "description": "Возвращает один блог-пост",
                 "operationId": "19d7b55d7d5efd7bc27ed7c01d74ca95",
                 "parameters": [
                     {
@@ -2770,6 +2968,7 @@
                     "Posts"
                 ],
                 "summary": "Update a blog post",
+                "description": "Обновляет блог-пост",
                 "operationId": "97ae61bfc5c99543e90d6f4136332c12",
                 "parameters": [
                     {
@@ -2803,6 +3002,7 @@
                     "Posts"
                 ],
                 "summary": "Delete a blog post",
+                "description": "Удаляет блог-пост",
                 "operationId": "f5991cc3c6e9a5fcb5b97135fbe27b0c",
                 "parameters": [
                     {
@@ -2898,12 +3098,52 @@
                 ]
             }
         },
+        "/settings/student-profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get the current student's onboarding profile",
+                "operationId": "d18d3929eaac21917a3e3ce4b8349949",
+                "responses": {
+                    "200": {
+                        "description": "Student profile (null if not yet filled)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Create or update the current student's onboarding profile",
+                "operationId": "158cca5cc82ef46ee60a8d711bd68a56",
+                "responses": {
+                    "200": {
+                        "description": "Profile saved"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/programs": {
             "get": {
                 "tags": [
                     "Programs"
                 ],
                 "summary": "List active programs",
+                "description": "Возвращает список активных программ",
                 "operationId": "c3bb77153f2117d65a80a27eb16cbce1",
                 "responses": {
                     "200": {
@@ -2923,6 +3163,7 @@
                     "Programs"
                 ],
                 "summary": "Get a single program",
+                "description": "Возвращает детали одной программы",
                 "operationId": "ad779df687fe94f98a907286fbd06e3f",
                 "parameters": [
                     {
@@ -2955,7 +3196,7 @@
                     "Programs"
                 ],
                 "summary": "Get the application form fields for a program (and optionally a specific call)",
-                "description": "Spec 6.3: configurable application form per program/call/applicant type.\nReturns the program-wide fields plus, when a call is given, that call's specific fields.",
+                "description": "Возвращает поля формы заявки для программы и опционально для конкретного конкурсного отбора",
                 "operationId": "3c13e49fb731b8b7a787c372473f6650",
                 "parameters": [
                     {
@@ -2993,6 +3234,7 @@
                     "Projects"
                 ],
                 "summary": "List projects (all for admins/holders of projects.view-all, own team/mentored projects otherwise)",
+                "description": "Возвращает список проектов с учётом прав доступа пользователя",
                 "operationId": "07f276c6e629646d087ee4b728e1234c",
                 "responses": {
                     "200": {
@@ -3010,6 +3252,7 @@
                     "Projects"
                 ],
                 "summary": "Create a project from an approved application",
+                "description": "Создаёт проект на основе одобренной заявки",
                 "operationId": "d91af95183d5934b42aec1325d5165db",
                 "responses": {
                     "201": {
@@ -3035,6 +3278,7 @@
                     "Projects"
                 ],
                 "summary": "Get a single project with milestones and team members",
+                "description": "Возвращает детали одного проекта с контрольными точками и участниками команды",
                 "operationId": "a8d796d6ef9e7ecc37934df870dc68cf",
                 "parameters": [
                     {
@@ -3068,6 +3312,7 @@
                     "Projects"
                 ],
                 "summary": "Update a project",
+                "description": "Обновляет данные проекта",
                 "operationId": "6d9ff23b79a456a9d18a3e2d6ebb73f1",
                 "parameters": [
                     {
@@ -3101,6 +3346,7 @@
                     "Projects"
                 ],
                 "summary": "Delete a project",
+                "description": "Удаляет проект",
                 "operationId": "31b7a0bd7545f2fe2f768180ffe4f15b",
                 "parameters": [
                     {
@@ -3132,8 +3378,20 @@
                 "tags": [
                     "Specializations"
                 ],
-                "summary": "List all specializations",
+                "summary": "List all specializations (optionally filter by qualification stack)",
+                "description": "Возвращает список специализаций; фильтр ?stack=01…05 для квалификационных стеков",
                 "operationId": "02eaba0559ebe7905b357128d3cd2fe9",
+                "parameters": [
+                    {
+                        "name": "stack",
+                        "in": "query",
+                        "description": "Filter by qualification stack (01–05)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of specializations"
@@ -3147,6 +3405,7 @@
                     "Teams"
                 ],
                 "summary": "List all teams with members and leader",
+                "description": "Возвращает список всех команд с участниками и лидером",
                 "operationId": "f44e2fcbf1cbf47247272fa5e2632ecb",
                 "responses": {
                     "200": {
@@ -3164,6 +3423,7 @@
                     "Teams"
                 ],
                 "summary": "Create a team and become its leader",
+                "description": "Создаёт команду и назначает текущего пользователя лидером",
                 "operationId": "b86cd7af54a3695d92ddfbd0c2747e71",
                 "responses": {
                     "201": {
@@ -3189,6 +3449,7 @@
                     "Teams"
                 ],
                 "summary": "Get a single team with members and leader",
+                "description": "Возвращает детали одной команды",
                 "operationId": "3fd5d824a52e827ee21e0990363c926b",
                 "parameters": [
                     {
@@ -3219,6 +3480,7 @@
                     "Teams"
                 ],
                 "summary": "Update a team",
+                "description": "Обновляет данные команды",
                 "operationId": "9b28b3ac008af734a21af181a05850ee",
                 "parameters": [
                     {
@@ -3252,6 +3514,7 @@
                     "Teams"
                 ],
                 "summary": "Delete a team (only if it has no other members)",
+                "description": "Удаляет команду, если в ней нет других участников",
                 "operationId": "a9fad615460e82e5f6051865f17b9b91",
                 "parameters": [
                     {
@@ -3287,6 +3550,7 @@
                     "Teams"
                 ],
                 "summary": "[Leader] Invite a user to the team by email",
+                "description": "Отправляет приглашение в команду пользователю по email",
                 "operationId": "4624da4313993063f62334aa78df9952",
                 "parameters": [
                     {
@@ -3325,6 +3589,7 @@
                     "Teams"
                 ],
                 "summary": "Get the current user's own team",
+                "description": "Возвращает команду текущего пользователя",
                 "operationId": "397839bc34bfba55a94b14380640890b",
                 "responses": {
                     "200": {
@@ -3347,6 +3612,7 @@
                     "Teams"
                 ],
                 "summary": "Leave the current user's own team (leaders cannot leave)",
+                "description": "Выход текущего пользователя из команды",
                 "operationId": "2b6d180f8fc3a7585b858e51c0a05fe6",
                 "responses": {
                     "200": {
@@ -3372,6 +3638,7 @@
                     "Teams"
                 ],
                 "summary": "[Leader] Remove a member from the team",
+                "description": "Удаляет участника из команды (только лидер)",
                 "operationId": "320be8e77682bfaa83bbf3a1b7307968",
                 "parameters": [
                     {
@@ -3409,8 +3676,9 @@
         "securitySchemes": {
             "sanctum": {
                 "type": "http",
-                "description": "Sanctum personal access token (Authorization: Bearer {token})",
-                "scheme": "bearer"
+                "scheme": "bearer",
+                "bearerFormat": "Token",
+                "description": "Enter your Sanctum token (without \"Bearer \" prefix)"
             }
         }
     },
@@ -3514,6 +3782,11 @@
         {
             "name": "Teams",
             "description": "Teams"
+        }
+    ],
+    "security": [
+        {
+            "sanctum": []
         }
     ]
 }
