@@ -16,13 +16,13 @@ return [
     */
 
     // Пути, для которых применяются правила CORS
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'register', 'logout'],
+    'paths' => ['*'],
 
     // Разрешённые HTTP-методы (звёздочка = все методы)
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', '*'],
 
     // Разрешённые источники запросов (домены фронтенда)
-    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    'allowed_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
     // Паттерны разрешённых источников (регулярные выражения)
     'allowed_origins_patterns' => [],
