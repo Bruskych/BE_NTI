@@ -1,14 +1,25 @@
 services:
 
-    phpmyadmin:
-        image: phpmyadmin
-        container_name: nti-phpmyadmin
+    frontend:
+        build:
+            context: ../NTI_frontend
+        container_name: NTI_frontend
         restart: unless-stopped
+        working_dir: /app
+        volumes:
+            - ../NTI_frontend:/app:cached
+            - frontend_node_modules:/app/node_modules
+            - frontend_nuxt_cache:/app/.nuxt
         ports:
-            - "8080:80"
+            - "3000:3000"
         environment:
-            PMA_HOST: db
-            MYSQL_ROOT_PASSWORD: root
+            NUXT_HOST: 0.0.0.0
+            NUXT_PORT: 3000
+            NUXT_API_BASE: http://app:8000/api
+            NUXT_PUBLIC_API_BASE: http://localhost:8000/api
+            CHOKIDAR_USEPOLLING: "true"
+            CHOKIDAR_INTERVAL: "1000"
+            WATCHPACK_POLLING: "true"
         networks:
             - nti-network
 
@@ -21,6 +32,20 @@ services:
         working_dir: /var/www
         volumes:
             - ./:/var/www
+            - backend_vendor:/var/www/vendor
+        command: >
+            sh -c "
+            if [ ! -L public/storage ]; then
+              php artisan storage:link;
+            fi &&
+            exec php artisan serve --host=0.0.0.0 --port=8000"
+        env_file:
+            - .env
+        depends_on:
+            db:
+                condition: service_started
+            redis:
+                condition: service_started
         networks:
             - nti-network
 
@@ -33,15 +58,33 @@ services:
         volumes:
             - ./:/var/www
             - ./docker/nginx:/etc/nginx/conf.d/
+            - ./storage/app/public:/var/www/storage/app/public:ro
+        depends_on:
+            - frontend
+            - app
+        networks:
+            - nti-network
+
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: nti-phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: db
+            MYSQL_ROOT_PASSWORD: root
+        depends_on:
+            - db
         networks:
             - nti-network
 
     mailpit:
         image: 'axllent/mailpit:latest'
+        container_name: nti-mailpit
         ports:
-            - '1025:1025'
-            - '8025:8025'
-            - '8026:8025'
+            - '1025:1025' # Порт для отправки почты из Laravel (в .env укажи MAIL_PORT=1025)
+            - '8025:8025' # Интерфейс в браузере, чтобы смотреть письма
         networks:
             - nti-network
 
@@ -62,6 +105,45 @@ services:
     redis:
         image: redis:alpine
         container_name: nti-redis
+        restart: unless-stopped
+        networks:
+            - nti-network
+
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: nti-queue
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+            - backend_vendor:/var/www/vendor
+        command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+        env_file:
+            - .env
+        depends_on:
+            - db
+            - redis
+        networks:
+            - nti-network
+
+    scheduler:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: nti-scheduler
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+            - backend_vendor:/var/www/vendor
+        command: php artisan schedule:work
+        env_file:
+            - .env
+        depends_on:
+            - db
+            - redis
         networks:
             - nti-network
 
@@ -73,3 +155,6 @@ networks:
 volumes:
     dbdata:
         driver: local
+    frontend_node_modules:
+    frontend_nuxt_cache:
+    backend_vendor:
