@@ -1,58 +1,199 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# NTI Backend — Nitriansky technologický inkubátor
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+REST API backend for the NTI platform — a process and registration system for managing programs, applications, projects, mentoring, and evaluation.
 
-## About Laravel
+**Stack:** Laravel 13 · MySQL 8 · Redis · Docker · Sanctum · Spatie Permissions · OpenAPI/Swagger
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Quick Start (Docker)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Clone and configure environment
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url>
+cd BE_NTI
+cp .env.example .env
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Edit `.env` — set database, mail, Redis, and frontend URL:
 
-## Contributing
+```env
+DB_HOST=db
+DB_DATABASE=nti_database
+DB_USERNAME=root
+DB_PASSWORD=root
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+REDIS_HOST=redis
 
-## Code of Conduct
+MAIL_HOST=mailpit
+MAIL_PORT=1025
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+APP_FRONTEND_URL=http://localhost:5173
+```
 
-## Security Vulnerabilities
+### 2. Start containers
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+docker compose up -d --build
+```
 
-## License
+| Service | URL |
+|---|---|
+| API | http://localhost:8000/api |
+| Swagger UI | http://localhost:8000/api/documentation |
+| phpMyAdmin | http://localhost:8080 |
+| Mailpit (email preview) | http://localhost:8025 |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 3. Install dependencies
+
+```bash
+docker exec nti-app composer install
+docker exec nti-app php artisan key:generate
+```
+
+### 4. Run migrations and seeders
+
+```bash
+docker exec nti-app php artisan migrate:fresh --seed
+```
+
+### 5. Run queue worker (for email jobs)
+
+```bash
+docker exec nti-app php artisan queue:work
+```
+
+### 6. Run scheduled tasks (deadline reminders)
+
+Add to server crontab:
+
+```bash
+* * * * * docker exec nti-app php artisan schedule:run
+```
+
+Or run manually:
+
+```bash
+docker exec nti-app php artisan notifications:deadline-reminders --days=3
+```
+
+---
+
+## Running Tests
+
+```bash
+docker exec nti-app php artisan test
+```
+
+Test coverage includes unit tests, feature/integration tests, and security tests (401/403, XSS, SQL injection, rate limiting).
+
+---
+
+## API Documentation
+
+Swagger UI is available at `/api/documentation` after starting the server.
+
+To regenerate the OpenAPI spec from annotations:
+
+```bash
+docker exec nti-app php artisan l5-swagger:generate
+```
+
+---
+
+## Features
+
+### Authentication & Accounts
+- Email registration with OTP verification and password reset
+- 9 RBAC roles: `visitor`, `student`, `team_leader`, `company`, `mentor`, `evaluator`, `content_editor`, `admin`, `super_admin`
+- Sanctum Bearer token authentication
+- Student onboarding profile (study program, year, skills, GPA)
+
+### Organizations & Teams
+- Company organization management with member roles (owner / manager / member)
+- Student team creation, invitations, and membership management
+
+### Programs & Calls
+- Configurable programs (A — grant incubation, B — live practice)
+- Calls with open/close lifecycle management
+- Configurable form fields per program and call
+
+### Applications
+- Full application lifecycle: draft → submitted → in review → approved / rejected
+- 11-status state machine with history and audit trail
+- Required field validation before submission
+- Program B pairing submissions (CV, motivation letter, solution proposal)
+
+### Evaluation & Decisions
+- Evaluation templates with scoring criteria
+- Committee scoring and approval/rejection workflow
+- Automatic average score calculation on decision
+
+### Projects & Milestones
+- Project management linked to approved applications
+- Milestone tracking with approval and deadline monitoring
+- Daily deadline reminders via scheduled artisan command
+
+### Mentorship & Consultations
+- Mentor assignment to projects with email notification
+- Consultation records with scheduling
+
+### Documents
+- Versioned document uploads with classification (public / internal / confidential)
+- MIME type validation (magic bytes check) — PDF, DOC, DOCX, JPG, PNG
+- Document access codes, preview, and download
+- Template-based document generation (internship agreements)
+
+### Notifications
+- In-app notification center (accept/reject/read/delete)
+- Transactional emails: registration, application submitted, approved, rejected, mentor assigned
+- Deadline reminder emails (3 days before milestone deadline)
+- Admin-managed email templates with variable substitution
+- Bulk messaging to user groups via queue
+
+### CMS & Public Web
+- Pages, posts (articles / FAQ / success stories), and partners CRUD
+- SEO fields: `meta_title`, `meta_description`, `og_image`, `slug`
+- Sitemap.xml endpoint
+- Content filterable by type: `?type=faq`
+
+### Admin & Reporting
+- Admin dashboard with pending applications overview
+- CSV / XLSX / PDF exports with audit log
+- GDPR data export and erasure for any user
+- Audit trail for all critical operations (approvals, role changes, exports, GDPR)
+
+### Specializations (Program A)
+- Qualification stacks 01–05 per spec
+- Stack filter: `GET /api/specializations?stack=01`
+
+---
+
+## Project Structure
+
+```
+app/
+├── Actions/          # Single-responsibility business actions
+├── Console/Commands/ # Artisan commands (deadline reminders)
+├── Http/
+│   ├── Concerns/     # HasApiResponse trait
+│   ├── Controllers/  # API controllers
+│   ├── Requests/     # Form request validation
+│   └── Resources/    # API resource transformers
+├── Jobs/             # Queue jobs (exports, bulk messages)
+├── Mail/             # Mailable classes
+├── Models/           # Eloquent models
+├── Policies/         # Authorization policies
+└── Services/         # Business logic services
+```
+
+---
+
+## Authors
+
+| Name | Role |
+|---|---|
+| — | — |
+| — | — |
+| — | — |
