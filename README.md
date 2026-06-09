@@ -192,6 +192,8 @@ app/
 
 ## Authors
 
-Vladyslav Svider
-Vladyslav Shcherbyna
-Davyd Shapovalov
+| # | Name |
+|---|---|
+| 1 | Vladyslav Svider |
+| 2 | Vladyslav Shcherbyna |
+| 3 | Davyd Shapovalov |
