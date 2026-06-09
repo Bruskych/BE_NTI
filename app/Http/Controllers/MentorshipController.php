@@ -6,6 +6,7 @@ use App\Http\Requests\StoreMentorshipRequest;
 use App\Http\Requests\UpdateMentorshipRequest;
 use App\Http\Resources\MentorshipResource;
 use App\Models\Mentorship;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
@@ -41,10 +42,27 @@ class MentorshipController extends Controller
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
-    public function store(StoreMentorshipRequest $request): JsonResponse
+    public function store(StoreMentorshipRequest $request, NotificationService $notifications): JsonResponse
     {
         $this->authorize('create', Mentorship::class);
         $mentorship = Mentorship::create($request->validated());
+        $mentorship->load(['project', 'mentor']);
+
+        // Сповіщаємо ментора про призначення
+        if ($mentorship->mentor) {
+            $notifications->sendWithEmail(
+                $mentorship->mentor,
+                [
+                    'type'      => 'mentor_assigned',
+                    'title'     => 'You have been assigned as a mentor',
+                    'message'   => 'You have been assigned as a mentor for project: ' . ($mentorship->project?->title ?? 'N/A'),
+                    'data_json' => ['mentorship_id' => $mentorship->id, 'project_id' => $mentorship->project_id],
+                ],
+                'mentor_assigned',
+                ['project_title' => $mentorship->project?->title ?? 'N/A']
+            );
+        }
+
         return $this->apiJson(new MentorshipResource($mentorship), 201);
     }
 

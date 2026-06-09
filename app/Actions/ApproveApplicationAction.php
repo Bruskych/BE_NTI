@@ -1,17 +1,18 @@
 <?php
-// app/Actions/ApproveApplicationAction.php
 namespace App\Actions;
 
 use App\Models\Application;
 use App\Models\ApplicationHistory;
 use App\Models\AuditEvent;
-use App\Models\Notification;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 /** Действие одобрения заявки: обновляет статус, назначает роль лидеру и отправляет уведомление */
 class ApproveApplicationAction
 {
-    /** Одобряет заявку, синхронизирует роль пользователя и создаёт системное уведомление */
+    public function __construct(private NotificationService $notifications) {}
+
+    /** Одобряет заявку, синхронизирует роль пользователя и создаёт системное уведомление + email */
     public function execute(Application $application, string $comment, string $role, ?int $changedBy = null): void
     {
         DB::transaction(function () use ($application, $comment, $role, $changedBy) {
@@ -60,14 +61,17 @@ class ApproveApplicationAction
                     'created_at'      => now(),
                 ]);
 
-                Notification::create([
-                    'user_id' => $owner->id,
-                    'type'    => $role === 'student' ? 'student_application_approved' : 'company_registration_approved',
-                    'channel' => 'system',
-                    'title'   => 'Application approved ✅',
-                    'message' => 'Your application has been approved. Comment: ' . $comment,
-                    'data_json' => json_encode(['application_id' => $application->id]),
-                ]);
+                $this->notifications->sendWithEmail(
+                    $owner,
+                    [
+                        'type'      => $role === 'student' ? 'student_application_approved' : 'company_registration_approved',
+                        'title'     => 'Application approved',
+                        'message'   => 'Your application has been approved. Comment: ' . $comment,
+                        'data_json' => ['application_id' => $application->id],
+                    ],
+                    'application_approved',
+                    ['comment' => $comment, 'application_id' => $application->id]
+                );
             }
         });
     }

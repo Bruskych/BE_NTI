@@ -165,27 +165,31 @@ class ApplicationService
                 'created_at'      => now(),
             ]);
 
-            if ($newStatus === Application::STATUS_APPROVED) {
-                $this->sendApprovalNotificationEmail($application);
-            }
+            $this->sendDecisionEmail($application, $newStatus, $comment);
 
             return $application->fresh();
         });
     }
 
-    /** Отправляет email лидеру команды через шаблон «project_approved» при одобрении заявки */
-    private function sendApprovalNotificationEmail(Application $application): void
+    /** Отправляет email лидеру команды при одобрении или отклонении заявки */
+    private function sendDecisionEmail(Application $application, string $newStatus, ?string $comment): void
     {
-        $template = EmailTemplate::where('name', 'project_approved')->first();
         $leader = $application->team?->leader;
+        if (!$leader?->email) {
+            return;
+        }
 
-        if (!$template || !$leader?->email) {
+        $templateName = $newStatus === Application::STATUS_APPROVED ? 'project_approved' : 'project_rejected';
+        $template = EmailTemplate::where('name', $templateName)->first();
+
+        if (!$template) {
             return;
         }
 
         Mail::to($leader->email)->queue(new TemplatedNotificationMail($template, [
             'leader_name'   => $leader->name,
             'project_title' => $application->challenge?->title ?? $application->program?->name ?? 'your application',
+            'comment'       => $comment ?? '',
         ]));
     }
 

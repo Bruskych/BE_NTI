@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\{Notification, Team, User};
+use App\Mail\TemplatedNotificationMail;
+use App\Models\{EmailTemplate, Notification, Team, User};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 /** Сервис системных уведомлений: отправка, удаление и обработка приглашений в команду */
 class NotificationService
@@ -24,6 +26,29 @@ class NotificationService
             'message'   => $data['message'],
             'data_json' => $data['data_json'] ?? [],
         ]);
+    }
+
+    /**
+     * Создаёт системное уведомление И отправляет email через шаблон, если пользователь не отключил email-канал.
+     * Шаблон ищется по имени ($templateName); при отсутствии email всё равно отправляется с title/message.
+     */
+    public function sendWithEmail(User $user, array $data, string $templateName, array $vars = []): ?Notification
+    {
+        $notification = $this->send($user, $data);
+
+        $pref = $user->notificationPreference;
+        if ($pref && !$pref->email_enabled) {
+            return $notification;
+        }
+
+        $template = EmailTemplate::where('name', $templateName)->first();
+        if ($template) {
+            Mail::to($user->email)->queue(new TemplatedNotificationMail($template, array_merge([
+                'user_name' => $user->name,
+            ], $vars)));
+        }
+
+        return $notification;
     }
 
     /** Удаляет уведомление */

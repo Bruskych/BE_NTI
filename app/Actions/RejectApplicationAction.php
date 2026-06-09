@@ -6,13 +6,15 @@ namespace App\Actions;
 use App\Models\Application;
 use App\Models\ApplicationHistory;
 use App\Models\AuditEvent;
-use App\Models\Notification;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 /** Действие отклонения заявки: устанавливает статус rejected, фиксирует историю и уведомляет лидера */
 class RejectApplicationAction
 {
-    /** Отклоняет заявку, создаёт записи истории, аудита и системного уведомления */
+    public function __construct(private NotificationService $notifications) {}
+
+    /** Отклоняет заявку, создаёт записи истории, аудита, системного уведомления и email */
     public function execute(Application $application, string $comment, ?int $changedBy = null): void
     {
         DB::transaction(function () use ($application, $comment, $changedBy) {
@@ -43,14 +45,17 @@ class RejectApplicationAction
 
             $owner = $application->team ? $application->team->leader : null;
             if ($owner) {
-                Notification::create([
-                    'user_id' => $owner->id,
-                    'type' => $application->organization_id ? 'company_registration_rejected' : 'student_application_rejected',
-                    'channel' => 'system',
-                    'title' => 'Application rejected ❌',
-                    'message' => 'Your application has been rejected. Reason: ' . $comment,
-                    'data_json' => json_encode(['application_id' => $application->id]),
-                ]);
+                $this->notifications->sendWithEmail(
+                    $owner,
+                    [
+                        'type'      => $application->organization_id ? 'company_registration_rejected' : 'student_application_rejected',
+                        'title'     => 'Application rejected',
+                        'message'   => 'Your application has been rejected. Reason: ' . $comment,
+                        'data_json' => ['application_id' => $application->id],
+                    ],
+                    'application_rejected',
+                    ['comment' => $comment, 'application_id' => $application->id]
+                );
             }
         });
     }
