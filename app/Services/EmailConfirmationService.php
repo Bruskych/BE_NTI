@@ -20,7 +20,7 @@ class EmailConfirmationService
     /** Генерирует случайный 6-символьный код и сохраняет его в кэше на 1 час */
     public function generateCode(string $email, array $data = [], ?string $purpose = null): string
     {
-        $code = Str::random(6);
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         Cache::put($this->key($email, $purpose), [
             'code'       => $code,

@@ -3,6 +3,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Seeder;
 
 use App\Models\Application;
@@ -66,6 +67,25 @@ class DocumentSeeder extends Seeder
                 $staticMilestone->documents()->attach($milestoneDoc->id);
             }
         }
+
+        // Confidential test document with a real file for code-download testing
+        $sourceContent = Storage::disk('public')->exists('documents/static_spec.pdf')
+            ? Storage::disk('public')->get('documents/static_spec.pdf')
+            : '%PDF-1.4 test';
+        Storage::disk('public')->put('documents/static_confidential.pdf', $sourceContent);
+        Document::create([
+            'application_id'    => null,
+            'project_id'        => null,
+            'milestone_id'      => null,
+            'type'              => 'contract',
+            'file_name'         => 'confidential_test.pdf',
+            'file_path'         => 'documents/static_confidential.pdf',
+            'mime_type'         => 'application/pdf',
+            'size'              => 2048576,
+            'version'           => 1,
+            'classification'    => Document::CLASSIFICATION_CONFIDENTIAL,
+            'uploaded_by'       => $user?->id,
+        ]);
 
         // ------------------------------
         // Автосоздание с помощью фабрики
