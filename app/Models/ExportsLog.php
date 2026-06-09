@@ -14,6 +14,10 @@ class ExportsLog extends Model
 
     public $timestamps = false;
 
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
+
     protected $table = 'exports_log';
 
     protected $fillable = [

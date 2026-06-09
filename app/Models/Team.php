@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Team extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'name',
@@ -43,6 +48,12 @@ class Team extends Model
             ->withPivot('role', 'joined_at');
     }
 
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'team_user')
+            ->withPivot('role', 'joined_at');
+    }
+
     public function specializations(): BelongsToMany
     {
         return $this->belongsToMany(Specialization::class, 'team_specialization');
@@ -51,12 +62,6 @@ class Team extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class);
-    }
-
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'team_user')
-            ->withPivot('role', 'joined_at');
     }
 
     // ---------------------------------------------------------

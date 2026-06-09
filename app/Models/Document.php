@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Document extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
 
     const CLASSIFICATION_PUBLIC       = 'public';
     const CLASSIFICATION_INTERNAL     = 'internal';
@@ -70,6 +75,25 @@ class Document extends Model
     {
         return $this->belongsToMany(Milestone::class, 'milestone_documents')
             ->withTimestamps();
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopePublic(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_PUBLIC);
+    }
+
+    public function scopeInternal(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_INTERNAL);
+    }
+
+    public function scopeConfidential(Builder $query): Builder
+    {
+        return $query->where('classification', self::CLASSIFICATION_CONFIDENTIAL);
     }
 
     // ---------------------------------------------------------

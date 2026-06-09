@@ -8,7 +8,7 @@ use App\Http\Controllers\{
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
     NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController, DocumentController,
-    BulkMessageController, PartnerController, EmailTemplateController, SitemapController,
+    BulkMessageController, PartnerController, EmailTemplateController, SitemapController, CookieController,
 };
 
 // -------------------------------------------------------------------------
@@ -66,6 +66,11 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 // ЗАЩИЩЁННЫЕ МАРШРУТЫ — требуют аутентификации через Sanctum Bearer-токен
 // -------------------------------------------------------------------------
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Настройки темы через Cookie
+    Route::post('/set-theme', [CookieController::class, 'setCookie']);
+    Route::get('/get-theme', [CookieController::class, 'getCookie']);
+    Route::post('/delete-theme', [CookieController::class, 'deleteCookie']);
 
     // Профиль и аккаунт текущего пользователя
     // Верификация email, выход, экспорт и удаление данных GDPR
@@ -199,6 +204,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);                         // Список уведомлений
         Route::post('/{notification}/accept', [NotificationController::class, 'accept']); // Принять (напр. инвайт в команду)
         Route::post('/{notification}/reject', [NotificationController::class, 'reject']); // Отклонить
+        Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']); // Пометить как прочитанное
         Route::delete('/{notification}', [NotificationController::class, 'destroy']);     // Удалить одно
         Route::delete('/', [NotificationController::class, 'destroyAll']);                // Удалить все
     });

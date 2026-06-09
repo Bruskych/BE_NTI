@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,11 +13,18 @@ class ApplicationPairingSubmission extends Model
 {
     use SoftDeletes, HasFactory;
 
-    // Typy dokumentov pre Program B párovanie
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
     const TYPE_CV                  = 'cv';
     const TYPE_MOTIVATION_LETTER   = 'motivation_letter';
     const TYPE_SOLUTION_PROPOSAL   = 'solution_proposal';
     const TYPE_OTHER               = 'other';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'application_id',
@@ -32,6 +40,25 @@ class ApplicationPairingSubmission extends Model
     public function application(): BelongsTo
     {
         return $this->belongsTo(Application::class);
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeCv(Builder $query): Builder
+    {
+        return $query->where('type', self::TYPE_CV);
+    }
+
+    public function scopeMotivationLetter(Builder $query): Builder
+    {
+        return $query->where('type', self::TYPE_MOTIVATION_LETTER);
+    }
+
+    public function scopeSolutionProposal(Builder $query): Builder
+    {
+        return $query->where('type', self::TYPE_SOLUTION_PROPOSAL);
     }
 
     // ---------------------------------------------------------

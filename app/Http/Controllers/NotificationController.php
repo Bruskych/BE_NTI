@@ -25,7 +25,7 @@ class NotificationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $notifications = Notification::forUser($request->user()->id)
-            ->unread()
+            //->unread() - не отдаёт прочитанные сообщение (отключено)
             ->latest()
             ->get();
 
@@ -126,5 +126,19 @@ class NotificationController extends Controller
         return $this->apiJson([
             'message' => 'All notifications cleared successfully.'
         ], 200);
+    }
+
+    public function markAsRead(Notification $notification): JsonResponse
+    {
+        if ($notification->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $notification->markAsRead();
+
+        return response()->json([
+            'message' => 'Notification marked as read successfully.',
+            'data' => $notification
+        ]);
     }
 }

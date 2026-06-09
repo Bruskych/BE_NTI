@@ -2,17 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /** Модель конкурсного отбора с дедлайном, бюджетом и шаблоном оценки */
 class Call extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Constants
+    // ---------------------------------------------------------
+
+    const STATUS_OPEN   = 'open';
+    const STATUS_DRAFT  = 'draft';
+    const STATUS_CLOSED = 'closed';
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'program_id',
@@ -27,7 +40,6 @@ class Call extends Model
     protected $casts = [
         'deadline' => 'datetime',
         'budget'   => 'decimal:2',
-        'status'   => 'string',
     ];
 
     // ---------------------------------------------------------
@@ -60,22 +72,41 @@ class Call extends Model
     }
 
     // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_OPEN);
+    }
+
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_DRAFT);
+    }
+
+    public function scopeClosed(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_CLOSED);
+    }
+
+    // ---------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------
 
     public function isOpen(): bool
     {
-        return $this->status === 'open';
+        return $this->status === self::STATUS_OPEN;
     }
 
     public function isDraft(): bool
     {
-        return $this->status === 'draft';
+        return $this->status === self::STATUS_DRAFT;
     }
 
     public function isClosed(): bool
     {
-        return $this->status === 'closed';
+        return $this->status === self::STATUS_CLOSED;
     }
 
     public function isExpired(): bool

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BulkMessage extends Model
 {
     use SoftDeletes, HasFactory;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'sender_id',
@@ -38,6 +43,20 @@ class BulkMessage extends Model
     {
         return $this->belongsToMany(User::class, 'bulk_message_recipients')
             ->withPivot('delivered_at');
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeSent(Builder $query): Builder
+    {
+        return $query->whereNotNull('sent_at');
+    }
+
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->whereNull('sent_at');
     }
 
     // ---------------------------------------------------------

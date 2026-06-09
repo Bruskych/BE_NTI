@@ -58,7 +58,7 @@ class NotificationSeeder extends Seeder
             NotificationPreference::factory()->create([
                 'user_id' => $user->id,
             ]);
-            Notification::factory()->count(rand(2, 5))->create([
+            Notification::factory()->count(rand(15, 30))->create([
                 'user_id' => $user->id,
             ]);
         }

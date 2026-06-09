@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,10 @@ class AuditEvent extends Model
     use SoftDeletes, HasFactory;
 
     public $timestamps = false;
+
+    // ---------------------------------------------------------
+    // Configuration
+    // ---------------------------------------------------------
 
     protected $fillable = [
         'user_id',
@@ -40,6 +45,20 @@ class AuditEvent extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // ---------------------------------------------------------
+    // Query Scopes
+    // ---------------------------------------------------------
+
+    public function scopeSuccessful(Builder $query): Builder
+    {
+        return $query->where('result', 'success');
+    }
+
+    public function scopeFailed(Builder $query): Builder
+    {
+        return $query->where('result', 'failure');
     }
 
     // ---------------------------------------------------------
