@@ -16,7 +16,7 @@ return [
     */
 
     // Пути, для которых применяются правила CORS
-    'paths' => [],
+    'paths' => ['*'],
 
     // Разрешённые HTTP-методы (звёздочка = все методы)
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', '*'],

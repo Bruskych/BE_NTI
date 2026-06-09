@@ -22,7 +22,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 # Устанавливаем и включаем расширение Redis для очередей и кэша
 RUN pecl install redis && docker-php-ext-enable redis
 
-# Устанавливаем все необходимые PHP-расширения для Laravel 11+ и твоей MySQL базы
+# Устанавливаем все необходимые PHP-расширения для Laravel и MySQL
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip xml
 
 # Копируем свежую версию Composer из официального образа

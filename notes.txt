@@ -11,7 +11,10 @@
 5. docker compose down
 6. docker compose up -d --force-recreate                                -> Build and Start (With .env)
 7. docker compose logs frontend                                         -> Logs Frontend
-8. docker compose restart webserver                                     -> Restart WEB
+
+8. docker compose exec app php artisan config:clear                     -> Clean config
+9. docker compose exec app php artisan cache:clear                      -> Clean cache
+10. docker compose restart webserver                                    -> Restart WEB
 
 --- GIT ---
 git reset --soft HEAD~1             -> delete last commit
