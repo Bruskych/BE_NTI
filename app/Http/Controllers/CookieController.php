@@ -2,48 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cookie;
 
 class CookieController extends Controller
 {
-    /**
-     * Метод для установки куки файлы
-     */
-    public function setCookie(Request $request)
-    {
-        $minutes = 60 * 24 * 30; // 30 дней
+    private const COOKIE_TTL = 60 * 24 * 365; // 1 рік
 
-        $response = response()->json([
-            'status' => 'success',
-            'message' => 'Cookies have been successfully set on the backend side.'
+    /** Зберігає налаштування теми та мови для поточного користувача */
+    public function setCookie(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'theme' => 'nullable|in:light,dark',
+            'lang'  => 'nullable|in:sk,en',
         ]);
 
-        return $response->withCookie(cookie('user_theme', 'dark', $minutes));
+        $response = response()->json([
+            'message' => 'Preferences saved.',
+            'data'    => array_filter($validated),
+        ]);
+
+        if (isset($validated['theme'])) {
+            $response->withCookie(cookie('user_theme', $validated['theme'], self::COOKIE_TTL, '/', null, false, false));
+        }
+
+        if (isset($validated['lang'])) {
+            $response->withCookie(cookie('user_lang', $validated['lang'], self::COOKIE_TTL, '/', null, false, false));
+        }
+
+        return $response;
     }
 
-    /**
-     * Метод для чтения куки файлов
-     */
-    public function getCookie(Request $request)
+    /** Повертає збережені налаштування теми та мови */
+    public function getCookie(Request $request): JsonResponse
     {
-        $theme = $request->cookie('user_theme', 'default-light');
-
         return response()->json([
-            'current_theme' => $theme
+            'theme' => $request->cookie('user_theme', 'light'),
+            'lang'  => $request->cookie('user_lang', 'sk'),
         ]);
     }
 
-    /**
-     * Метод для удаления куки
-     */
-    public function deleteCookie()
+    /** Видаляє збережені налаштування */
+    public function deleteCookie(): JsonResponse
     {
-        $response = response()->json([
-            'message' => 'Куки удалены'
-        ]);
-
-        return $response->withoutCookie('user_theme');
+        return response()->json(['message' => 'Preferences cleared.'])
+            ->withoutCookie('user_theme')
+            ->withoutCookie('user_lang');
     }
 }
