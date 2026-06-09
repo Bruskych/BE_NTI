@@ -1,0 +1,3519 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "NTI API",
+        "description": "REST API pre platformu Národná technologická iniciatíva (NTI) — registrácie, prihlášky, hodnotenie, projekty, dokumenty, CMS a administráciu.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API server"
+        }
+    ],
+    "paths": {
+        "/admin/dashboard": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] Get dashboard summary stats (user count, pending applications, latest users)",
+                "operationId": "7cfa73c7f4bc906c66043dac50a3d549",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard summary"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/students/pending": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] List submitted student applications awaiting review",
+                "operationId": "4ec325cc93f3237be77c818b05aec245",
+                "responses": {
+                    "200": {
+                        "description": "List of pending student applications"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/companies/pending": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] List submitted company applications awaiting review",
+                "operationId": "1719ac71ea47fb5faa9368da85893bbb",
+                "responses": {
+                    "200": {
+                        "description": "List of pending company applications"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/students/{user}/approve": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] Approve a pending student application",
+                "operationId": "3bad2e894632672bf3696d79bbc1382f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Application ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student approved"
+                    },
+                    "404": {
+                        "description": "Application not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/students/{user}/reject": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] Reject a pending student application",
+                "operationId": "676abc34d2bbbe9d5134c59077912a6f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "Application ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student rejected"
+                    },
+                    "404": {
+                        "description": "Application not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/companies/{id}/approve": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] Approve a pending company application",
+                "operationId": "a8cb91599ed04f05702e509557738860",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Application ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company approved"
+                    },
+                    "404": {
+                        "description": "Application not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/companies/{id}/reject": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "[Admin] Reject a pending company application",
+                "operationId": "98284c24c15cca2d2ef7b73d337a5e52",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Application ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company rejected"
+                    },
+                    "404": {
+                        "description": "Application not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/applications": {
+            "get": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "List applications (paginated)",
+                "operationId": "53a774224a5bb97dd3d5e1c1d0055cd9",
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of applications"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "Create a draft application for the current team and an open call",
+                "operationId": "c8746709b6a737b932ae65fd891652ad",
+                "responses": {
+                    "201": {
+                        "description": "Application created (draft)"
+                    },
+                    "403": {
+                        "description": "Not authorized to create applications"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/applications/{application}": {
+            "get": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "Get a single application with team, organization, answers and pairing submissions",
+                "operationId": "31160acc92874271b270a5e8211410f7",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this application"
+                    },
+                    "404": {
+                        "description": "Application not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "Update an application's answers, pairing submissions or organization",
+                "operationId": "abea4f6d9a3d4ec0ec92743ab38aad49",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this application"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "Delete an application",
+                "operationId": "96ae1ef06f193366689c077802986df3",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Application deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this application"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/applications/{application}/submit": {
+            "post": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "Submit a draft application for committee review",
+                "operationId": "010fc1a431178d8567a60d2911a2ebbf",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application submitted"
+                    },
+                    "403": {
+                        "description": "Not authorized to submit this application"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/applications/{application}/decide": {
+            "post": {
+                "tags": [
+                    "Applications"
+                ],
+                "summary": "[Committee] Approve, reject or request supplements for a submitted application",
+                "operationId": "d425853b83e31a3d71b1f9cffd591149",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Decision recorded, application updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to decide on this application"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new account (student, mentor, company or internal role)",
+                "description": "Регистрация нового пользователя.",
+                "operationId": "ed42f392010c301892e640067141676e",
+                "responses": {
+                    "201": {
+                        "description": "Account created, returns auth token and user"
+                    },
+                    "422": {
+                        "description": "Validation error (e.g. missing GDPR consent)"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Authenticate with email and password and obtain an API token",
+                "description": "Авторизация пользователя (Вход системы).",
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated, returns token and user"
+                    },
+                    "422": {
+                        "description": "Invalid credentials"
+                    },
+                    "429": {
+                        "description": "Too many login attempts (rate limited)"
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get the currently authenticated user and their notifications",
+                "description": "Получение данных текущей сессии.",
+                "operationId": "a9c495788506b114956e3f509e5d90a2",
+                "responses": {
+                    "200": {
+                        "description": "Current user with roles and notifications"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Revoke the current API token (log out)",
+                "description": "Выход из системы.",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send a password reset link to the given email address",
+                "description": "Запрос на восстановление пароля.",
+                "operationId": "b13d5efc90e1de6d4e9900240fce9b4d",
+                "responses": {
+                    "200": {
+                        "description": "Reset link sent"
+                    },
+                    "422": {
+                        "description": "Validation error (unknown email)"
+                    },
+                    "500": {
+                        "description": "Failed to send email"
+                    }
+                }
+            }
+        },
+        "/auth/email/verify": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Confirm the email address using the verification code sent at registration",
+                "description": "Подтверждение e-mail адреса по коду, отправленному при регистрации.\nSpec 6.2: \"registrácia e-mailom s overením adresy\".",
+                "operationId": "ad27334c28c0575a588a2a838b353d44",
+                "responses": {
+                    "200": {
+                        "description": "Email verified (or already verified)"
+                    },
+                    "422": {
+                        "description": "Code is invalid or expired"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/email/resend": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Resend the email verification code",
+                "description": "Повторная отправка кода подтверждения e-mail.",
+                "operationId": "21e06bd5429a4c810b3a222c5a19e848",
+                "responses": {
+                    "200": {
+                        "description": "Verification code resent (or already verified)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/bulk-messages": {
+            "get": {
+                "tags": [
+                    "Bulk Messages"
+                ],
+                "summary": "[Admin] List bulk messages (paginated) with recipient counts and sender",
+                "description": "List bulk messages",
+                "operationId": "bffb8618c689cd138fc715ed2fb86385",
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of bulk messages"
+                    },
+                    "403": {
+                        "description": "Not authorized to view bulk messages"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Bulk Messages"
+                ],
+                "summary": "[Admin] Queue a bulk message for sending to a target group",
+                "description": "Create and queue a bulk message for sending",
+                "operationId": "763d484d279048bec267f136fe1648c2",
+                "responses": {
+                    "202": {
+                        "description": "Bulk message queued for sending"
+                    },
+                    "403": {
+                        "description": "Not authorized to create bulk messages"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/bulk-messages/{bulk_message}": {
+            "get": {
+                "tags": [
+                    "Bulk Messages"
+                ],
+                "summary": "[Admin] Get a single bulk message with recipient counts and sender",
+                "description": "Get single bulk message with delivery details",
+                "operationId": "47e298106cf4bfef2d8fb904e7fdfc4c",
+                "parameters": [
+                    {
+                        "name": "bulk_message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bulk message detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this bulk message"
+                    },
+                    "404": {
+                        "description": "Bulk message not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/calls": {
+            "get": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "List calls with program and specializations",
+                "operationId": "33a4f39d71f646f958d6c1c7950a9dac",
+                "responses": {
+                    "200": {
+                        "description": "List of calls"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "Create a call, optionally linking specializations",
+                "operationId": "a4157d2849a432e2f799009027cab7b8",
+                "responses": {
+                    "201": {
+                        "description": "Call created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create calls"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/calls/{call}": {
+            "get": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "Get a single call with program, specializations and evaluation template",
+                "operationId": "e121ea39fa7c7ab7611b6faf1ee8a332",
+                "parameters": [
+                    {
+                        "name": "call",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Call detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this call"
+                    },
+                    "404": {
+                        "description": "Call not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "Update a call, optionally re-syncing specializations",
+                "operationId": "f8f8334a98187d2a2c823867254e0b7a",
+                "parameters": [
+                    {
+                        "name": "call",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Call updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this call"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "Delete a draft call (only the owning organization may delete its own draft calls)",
+                "operationId": "01e5151a8dcd3483ff5ccc6562c13a79",
+                "parameters": [
+                    {
+                        "name": "call",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Call deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this call"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/calls/{call}/open": {
+            "post": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "[Admin] Open a call for applications",
+                "operationId": "b61ab8f39a954051e0c9fd548b8c41bf",
+                "parameters": [
+                    {
+                        "name": "call",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Call opened"
+                    },
+                    "403": {
+                        "description": "Not authorized to open this call"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/calls/{call}/close": {
+            "post": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "[Admin] Close a call for applications",
+                "operationId": "0843a124c58355800cb32c68459a0997",
+                "parameters": [
+                    {
+                        "name": "call",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Call closed"
+                    },
+                    "403": {
+                        "description": "Not authorized to close this call"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/challenges": {
+            "get": {
+                "tags": [
+                    "Challenges"
+                ],
+                "summary": "List challenges visible to the current user",
+                "operationId": "07f0c2a4bb27caa9de1ab3e309f884fd",
+                "responses": {
+                    "200": {
+                        "description": "List of challenges"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Challenges"
+                ],
+                "summary": "[Company/Admin] Create a challenge, optionally linking specializations",
+                "operationId": "b7de3512ff4a261630fa5a164836a007",
+                "responses": {
+                    "201": {
+                        "description": "Challenge created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create challenges"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/challenges/{challenge}": {
+            "get": {
+                "tags": [
+                    "Challenges"
+                ],
+                "summary": "Get a single challenge with program, organization, specializations and product owner",
+                "operationId": "699d69addf053f934a13a2a8b90ed0ed",
+                "parameters": [
+                    {
+                        "name": "challenge",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Challenge detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this challenge"
+                    },
+                    "404": {
+                        "description": "Challenge not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Challenges"
+                ],
+                "summary": "Update a challenge, optionally re-syncing specializations",
+                "operationId": "8031d6b33dc1fa277b727a22c3ddeffa",
+                "parameters": [
+                    {
+                        "name": "challenge",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Challenge updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this challenge"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Challenges"
+                ],
+                "summary": "Delete a challenge",
+                "operationId": "b8cbdc676fdc04b9b165551e5e2521b6",
+                "parameters": [
+                    {
+                        "name": "challenge",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Challenge deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this challenge"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/consultations": {
+            "get": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "List consultations (own as mentor/team member, all for holders of consultations.view)",
+                "operationId": "a810cd7ce377aed815bdee3ff065c743",
+                "responses": {
+                    "200": {
+                        "description": "List of consultations"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "[Mentor] Schedule a consultation for one of their mentorships",
+                "operationId": "6f69814626fd4ad92e7058f676201279",
+                "responses": {
+                    "201": {
+                        "description": "Consultation created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create consultations, or not the mentor of this mentorship"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/consultations/{consultation}": {
+            "get": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Get a single consultation with mentor and milestone",
+                "operationId": "7b8f07abc5eff70e939a3cfecffc04ae",
+                "parameters": [
+                    {
+                        "name": "consultation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Consultation detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this consultation"
+                    },
+                    "404": {
+                        "description": "Consultation not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Update a consultation",
+                "operationId": "317f187bbcf4d955c2322f94ab7b6351",
+                "parameters": [
+                    {
+                        "name": "consultation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Consultation updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this consultation"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Consultations"
+                ],
+                "summary": "Delete a consultation",
+                "operationId": "fcb4af7b6dff277f757abfff03cfcb95",
+                "parameters": [
+                    {
+                        "name": "consultation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Consultation deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this consultation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "List documents (paginated), optionally filtered by application/project/milestone/type/classification",
+                "description": "List documents for a resource",
+                "operationId": "cf58d1781992e8292fd9914b24487fdc",
+                "parameters": [
+                    {
+                        "name": "application_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "milestone_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "classification",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of documents"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Upload a document, optionally linked to an application/project/milestone",
+                "description": "Store uploaded document",
+                "operationId": "1c3ad2906b68a58de1f603260ab271c4",
+                "responses": {
+                    "201": {
+                        "description": "Document uploaded"
+                    },
+                    "403": {
+                        "description": "Not authorized to upload documents"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Upload failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/{document}": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Get a single document with application and project",
+                "description": "Get single document",
+                "operationId": "9ea040b157f7bb5c163d3c1673c17a86",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this document"
+                    },
+                    "404": {
+                        "description": "Document not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Upload a new version of an existing document",
+                "description": "Update document (new version)",
+                "operationId": "b1a347cb0624abf2cbef76e29e8c29c1",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document version updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this document"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Update failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Delete a document",
+                "description": "Delete document",
+                "operationId": "db1edaf25b7a4411d450e0e52e4d0171",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this document"
+                    },
+                    "500": {
+                        "description": "Deletion failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/{document}/access-code": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Request an email confirmation code needed to download a confidential document",
+                "description": "Send an email confirmation code required to download confidential documents",
+                "operationId": "7791b042fd478a89460abeebcec356f1",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Confirmation code sent to the user's email"
+                    },
+                    "403": {
+                        "description": "Not authorized to download this document"
+                    },
+                    "422": {
+                        "description": "Document is not confidential and needs no confirmation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/{document}/download": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Download a document (confidential documents require a ?code= confirmation code)",
+                "description": "Download document. Confidential documents require a verified email confirmation code first\n(see requestAccessCode), obtained via Redis-backed EmailConfirmationService.",
+                "operationId": "7f1df5aa3f7d3cd65ad4a7f009ea25a3",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Email confirmation code for confidential documents",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document file stream"
+                    },
+                    "403": {
+                        "description": "Not authorized to download this document"
+                    },
+                    "422": {
+                        "description": "Invalid or expired confirmation code"
+                    },
+                    "428": {
+                        "description": "Confirmation code required for confidential document"
+                    },
+                    "500": {
+                        "description": "Download failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/{document}/preview": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Get a temporary preview URL for a document",
+                "description": "Get document preview URL",
+                "operationId": "49dcbf2c08df23cf76597b2c36188617",
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Preview URL"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this document"
+                    },
+                    "500": {
+                        "description": "Failed to get preview"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/generate/internship-agreement": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Generate an internship agreement PDF from a DOCX template",
+                "description": "Generate internship agreement PDF from template",
+                "operationId": "42085e73a9624a22d2a6199b3eef9026",
+                "responses": {
+                    "201": {
+                        "description": "Agreement generated"
+                    },
+                    "403": {
+                        "description": "Not authorized to create documents"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Generation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/templates/upload": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Upload a DOCX document template",
+                "description": "Upload document template (DOCX)",
+                "operationId": "6ec98767e203aa154b9aa3f587416574",
+                "responses": {
+                    "201": {
+                        "description": "Template uploaded"
+                    },
+                    "403": {
+                        "description": "Not authorized to create documents"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Upload failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/documents/templates/generate": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Generate a PDF document by filling in an uploaded template with data",
+                "description": "Generate document from uploaded template",
+                "operationId": "e3c7aadc51d48eb9592d9c3c58197c9a",
+                "responses": {
+                    "201": {
+                        "description": "Document generated"
+                    },
+                    "400": {
+                        "description": "Referenced document is not a template"
+                    },
+                    "403": {
+                        "description": "Not authorized to create documents or view the template"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Generation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/email-templates": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "[Admin] List email templates",
+                "operationId": "0587bef646cf0cc8c645f8f465f14fcd",
+                "responses": {
+                    "200": {
+                        "description": "List of email templates"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "[Admin] Create an email template",
+                "operationId": "02142e5bcea45ebeef89303c0330ed6c",
+                "responses": {
+                    "201": {
+                        "description": "Email template created"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/email-templates/{emailTemplate}": {
+            "get": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "[Admin] Get a single email template",
+                "operationId": "580308bb5512d299dbadbc6e2ed1ba2e",
+                "parameters": [
+                    {
+                        "name": "emailTemplate",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template detail"
+                    },
+                    "404": {
+                        "description": "Email template not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "[Admin] Update an email template",
+                "operationId": "81bf3f9a7dd7f334be6adc222f0fc19f",
+                "parameters": [
+                    {
+                        "name": "emailTemplate",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email template updated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Email Templates"
+                ],
+                "summary": "[Admin] Delete an email template",
+                "operationId": "6b39672861a896b7cb19ba7c7f78f6b3",
+                "parameters": [
+                    {
+                        "name": "emailTemplate",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Email template deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/applications/{application}/evaluations": {
+            "post": {
+                "tags": [
+                    "Evaluations"
+                ],
+                "summary": "[Evaluator] Submit a scored evaluation with recommendation for an application",
+                "operationId": "307fff23b5fd8b6826f1d3352ab66b27",
+                "parameters": [
+                    {
+                        "name": "application",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Evaluation recorded"
+                    },
+                    "403": {
+                        "description": "Not authorized to evaluate this application"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/exports": {
+            "get": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] List export logs (paginated)",
+                "operationId": "f67b6201ca7b94859f63a30f8d3d91e1",
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of export logs"
+                    },
+                    "403": {
+                        "description": "Not authorized to view exports"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] Schedule a data export job",
+                "operationId": "df4b53a81559ba266d7fc83727dbd778",
+                "responses": {
+                    "202": {
+                        "description": "Export scheduled"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/exports/types": {
+            "get": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] List available export types grouped by resource",
+                "operationId": "a91319f2f5040524442b144cd02f4e6c",
+                "responses": {
+                    "200": {
+                        "description": "Available export types"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/export/{resource}/{format}": {
+            "post": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] Schedule a data export job by resource and format shorthand",
+                "operationId": "24be2507e1f7bb3e7abc493512c46530",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Export scheduled"
+                    },
+                    "404": {
+                        "description": "Export format not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/gdpr/export": {
+            "post": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Schedule a GDPR export of the current user's personal data",
+                "operationId": "09507ad8ddb2a0c64e381509674aebd3",
+                "responses": {
+                    "202": {
+                        "description": "Export scheduled"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/gdpr/erase": {
+            "delete": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "Anonymize/erase the current user's personal data (\"right to be forgotten\")",
+                "operationId": "ca69bc5523a97b1c81bfb3b9f07d297d",
+                "responses": {
+                    "200": {
+                        "description": "Personal data anonymized"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/gdpr/users/{user}/export": {
+            "post": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "[Admin] Schedule a GDPR export of a specific user's personal data",
+                "operationId": "9df6747dee1dce6d6502b87c08d608e8",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Export scheduled"
+                    },
+                    "403": {
+                        "description": "Admin privileges required"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/gdpr/users/{user}": {
+            "delete": {
+                "tags": [
+                    "GDPR"
+                ],
+                "summary": "[Admin] Anonymize/erase a specific user's personal data",
+                "operationId": "4aa8aafa37f6d40907a3e650d6016c5a",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User personal data anonymized"
+                    },
+                    "403": {
+                        "description": "Admin privileges required"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/mentorships": {
+            "get": {
+                "tags": [
+                    "Mentorships"
+                ],
+                "summary": "List mentorships with project and mentor",
+                "operationId": "6ce443f08a5ab56cb17b6f449baa4994",
+                "responses": {
+                    "200": {
+                        "description": "List of mentorships"
+                    },
+                    "403": {
+                        "description": "Not authorized to view mentorships"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Mentorships"
+                ],
+                "summary": "[Admin] Assign a mentor to a project",
+                "operationId": "7727f4fd2613feb96fd03708e3b9f1b0",
+                "responses": {
+                    "200": {
+                        "description": "Mentorship created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create mentorships"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/mentorships/{mentorship}": {
+            "get": {
+                "tags": [
+                    "Mentorships"
+                ],
+                "summary": "Get a single mentorship with project, mentor and consultations",
+                "operationId": "dfca49e1414f5635258f69ad5e5c30b1",
+                "parameters": [
+                    {
+                        "name": "mentorship",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mentorship detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this mentorship"
+                    },
+                    "404": {
+                        "description": "Mentorship not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Mentorships"
+                ],
+                "summary": "Update a mentorship",
+                "operationId": "289a5a3f908484d8993d2d17e067fedc",
+                "parameters": [
+                    {
+                        "name": "mentorship",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mentorship updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this mentorship"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Mentorships"
+                ],
+                "summary": "Delete a mentorship",
+                "operationId": "5c87324b9f2d04277bb4dc46c5d7b3be",
+                "parameters": [
+                    {
+                        "name": "mentorship",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mentorship deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this mentorship"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{project}/milestones": {
+            "get": {
+                "tags": [
+                    "Milestones"
+                ],
+                "summary": "List milestones for a project",
+                "operationId": "b292112328e381b2f9fbd9c932e18f78",
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of milestones"
+                    },
+                    "403": {
+                        "description": "Not authorized to view milestones for this project"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Milestones"
+                ],
+                "summary": "[Mentor] Create a new pending milestone for a project",
+                "operationId": "d522eb08ab15600a2bdfbf09f5fe0bef",
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Milestone created"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this project"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/milestones/{milestone}": {
+            "get": {
+                "tags": [
+                    "Milestones"
+                ],
+                "summary": "Get a single milestone",
+                "operationId": "88876195ae448b0a0f676f9c7f8820df",
+                "parameters": [
+                    {
+                        "name": "milestone",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Milestone detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this milestone"
+                    },
+                    "404": {
+                        "description": "Milestone not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Milestones"
+                ],
+                "summary": "Update a milestone",
+                "operationId": "fed8266e6299803737c22bed63cc8647",
+                "parameters": [
+                    {
+                        "name": "milestone",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Milestone updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this milestone"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/milestones/{milestone}/approve": {
+            "post": {
+                "tags": [
+                    "Milestones"
+                ],
+                "summary": "[Mentor/Admin] Approve a milestone",
+                "operationId": "89b183d77e9214258c3cd6a661823e11",
+                "parameters": [
+                    {
+                        "name": "milestone",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Milestone approved"
+                    },
+                    "403": {
+                        "description": "Not authorized to approve this milestone"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List the current user's unread notifications",
+                "operationId": "0f031f66cd8c52bf73e89fb2d050ad83",
+                "responses": {
+                    "200": {
+                        "description": "List of unread notifications"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Clear all of the current user's notifications",
+                "operationId": "ce884d5ad97e4c8c92fd3f415544073a",
+                "responses": {
+                    "200": {
+                        "description": "All notifications cleared"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/notifications/{notification}/accept": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Accept a team invitation notification",
+                "operationId": "0b4f14b0fcefdb908e7f0ea572977acc",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Joined the team successfully"
+                    },
+                    "403": {
+                        "description": "Not authorized to accept this notification"
+                    },
+                    "422": {
+                        "description": "Could not accept the invitation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/notifications/{notification}/reject": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Decline a team invitation notification",
+                "operationId": "77953585d2d423fd7c394d2171cae64e",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Declined successfully"
+                    },
+                    "403": {
+                        "description": "Not authorized to reject this notification"
+                    },
+                    "422": {
+                        "description": "Could not decline the invitation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/notifications/{notification}": {
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Delete a single notification",
+                "operationId": "5b055554e24b9e67dd912035016cea0e",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this notification"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/settings/notifications": {
+            "get": {
+                "tags": [
+                    "Notification Preferences"
+                ],
+                "summary": "Get the current user's notification preferences",
+                "operationId": "d7011c2c6ec491beb6cece1b55a9dba9",
+                "responses": {
+                    "200": {
+                        "description": "Notification preferences"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Notification Preferences"
+                ],
+                "summary": "Update the current user's notification preferences",
+                "operationId": "76f4914d94603ed2578d8c3014bbb7d9",
+                "responses": {
+                    "200": {
+                        "description": "Preferences updated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/organizations": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "List organizations (active organizations and own organizations; all for holders of organizations.view)",
+                "operationId": "3952cb0969bc8305f39882b2637f9b12",
+                "responses": {
+                    "200": {
+                        "description": "List of organizations"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Create an organization (current user becomes owner)",
+                "operationId": "73444d3d0c39d645824c15720b7fb98a",
+                "responses": {
+                    "201": {
+                        "description": "Organization created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create organizations"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/organizations/{organization}": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get a single organization with its users",
+                "operationId": "c0d4bab9fe7d2e1c7f2512135f9abb93",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Organization detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this organization"
+                    },
+                    "404": {
+                        "description": "Organization not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Update an organization (and optionally its logo)",
+                "operationId": "c28160db0127a0a1bb9b3878cdff0f15",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Organization updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this organization"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Delete an organization",
+                "operationId": "2ca51eeec0464f5bf98701ad774b4660",
+                "parameters": [
+                    {
+                        "name": "organization",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Organization deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this organization"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/pages": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "List pages (published only for visitors, all for staff with cms.pages.view)",
+                "operationId": "0bc70b78a0faaba84e97cf676c7cbbec",
+                "responses": {
+                    "200": {
+                        "description": "List of pages"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Create a CMS page",
+                "operationId": "2d8cba23d42b631326e496b1edcc77c1",
+                "responses": {
+                    "201": {
+                        "description": "Page created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create pages"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/pages/{page}": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get a single page",
+                "operationId": "e7235240686d3fac939cb380b959de17",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this page"
+                    },
+                    "404": {
+                        "description": "Page not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Update a CMS page",
+                "operationId": "39c58d0f0672cec942aab5111a83d17a",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this page"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Delete a CMS page",
+                "operationId": "c0d0f763ba37cda5462e2bef6f3f187e",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this page"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/partners": {
+            "get": {
+                "tags": [
+                    "Partners"
+                ],
+                "summary": "List partners and mentors (public directory), featured first",
+                "description": "Spec 9: public \"Partners and mentors\" directory — list of partners with references.",
+                "operationId": "96719bf5ea724a6c6eb645fcb75517ad",
+                "responses": {
+                    "200": {
+                        "description": "List of partners"
+                    }
+                }
+            }
+        },
+        "/partners/{partner}": {
+            "get": {
+                "tags": [
+                    "Partners"
+                ],
+                "summary": "Get a single partner with organization details",
+                "operationId": "c30020e844e0d89039b828ab1aa559d1",
+                "parameters": [
+                    {
+                        "name": "partner",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Partner detail"
+                    },
+                    "404": {
+                        "description": "Partner not found"
+                    }
+                }
+            }
+        },
+        "/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "List published posts",
+                "operationId": "5f292ed47bdbfa79356750be0807450c",
+                "responses": {
+                    "200": {
+                        "description": "List of published posts"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create a blog post (authored by the current user)",
+                "operationId": "c2e0b0e26215e6d34ece33ebae25f7df",
+                "responses": {
+                    "201": {
+                        "description": "Post created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create posts"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/posts/{post}": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get a single post",
+                "operationId": "19d7b55d7d5efd7bc27ed7c01d74ca95",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this post"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Update a blog post",
+                "operationId": "97ae61bfc5c99543e90d6f4136332c12",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this post"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Delete a blog post",
+                "operationId": "f5991cc3c6e9a5fcb5b97135fbe27b0c",
+                "parameters": [
+                    {
+                        "name": "post",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this post"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/settings/update-profile/name": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update the current user's display name",
+                "description": "1. Обновление имени + фамилии",
+                "operationId": "14fd8343ba84ad3d754d53bc1668723d",
+                "responses": {
+                    "200": {
+                        "description": "Profile updated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/settings/update-profile/email": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update the current user's email address",
+                "description": "2. Обновление Email",
+                "operationId": "be518722d2a515ead2f98cf0214def7a",
+                "responses": {
+                    "200": {
+                        "description": "Email updated"
+                    },
+                    "422": {
+                        "description": "Validation error (e.g. email already taken)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/settings/update-profile/avatar": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Upload/replace the current user's avatar image",
+                "description": "3. Обновление аватарки",
+                "operationId": "b14cbd3911b104e94c5d49b79e8e43e8",
+                "responses": {
+                    "200": {
+                        "description": "Avatar updated"
+                    },
+                    "422": {
+                        "description": "Validation error (invalid image)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/programs": {
+            "get": {
+                "tags": [
+                    "Programs"
+                ],
+                "summary": "List active programs",
+                "operationId": "c3bb77153f2117d65a80a27eb16cbce1",
+                "responses": {
+                    "200": {
+                        "description": "List of active programs"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/programs/{id}": {
+            "get": {
+                "tags": [
+                    "Programs"
+                ],
+                "summary": "Get a single program",
+                "operationId": "ad779df687fe94f98a907286fbd06e3f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Program detail"
+                    },
+                    "404": {
+                        "description": "Program not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/programs/{program}/form-fields": {
+            "get": {
+                "tags": [
+                    "Programs"
+                ],
+                "summary": "Get the application form fields for a program (and optionally a specific call)",
+                "description": "Spec 6.3: configurable application form per program/call/applicant type.\nReturns the program-wide fields plus, when a call is given, that call's specific fields.",
+                "operationId": "3c13e49fb731b8b7a787c372473f6650",
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "call_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of form fields"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "List projects (all for admins/holders of projects.view-all, own team/mentored projects otherwise)",
+                "operationId": "07f276c6e629646d087ee4b728e1234c",
+                "responses": {
+                    "200": {
+                        "description": "List of projects"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create a project from an approved application",
+                "operationId": "d91af95183d5934b42aec1325d5165db",
+                "responses": {
+                    "201": {
+                        "description": "Project created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create projects"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/projects/{project}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get a single project with milestones and team members",
+                "operationId": "a8d796d6ef9e7ecc37934df870dc68cf",
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project detail"
+                    },
+                    "403": {
+                        "description": "Not authorized to view this project"
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update a project",
+                "operationId": "6d9ff23b79a456a9d18a3e2d6ebb73f1",
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this project"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Delete a project",
+                "operationId": "31b7a0bd7545f2fe2f768180ffe4f15b",
+                "parameters": [
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Project deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this project"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/specializations": {
+            "get": {
+                "tags": [
+                    "Specializations"
+                ],
+                "summary": "List all specializations",
+                "operationId": "02eaba0559ebe7905b357128d3cd2fe9",
+                "responses": {
+                    "200": {
+                        "description": "List of specializations"
+                    }
+                }
+            }
+        },
+        "/teams": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "List all teams with members and leader",
+                "operationId": "f44e2fcbf1cbf47247272fa5e2632ecb",
+                "responses": {
+                    "200": {
+                        "description": "List of teams"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Create a team and become its leader",
+                "operationId": "b86cd7af54a3695d92ddfbd0c2747e71",
+                "responses": {
+                    "201": {
+                        "description": "Team created"
+                    },
+                    "403": {
+                        "description": "Not authorized to create teams"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teams/{team}": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Get a single team with members and leader",
+                "operationId": "3fd5d824a52e827ee21e0990363c926b",
+                "parameters": [
+                    {
+                        "name": "team",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Team detail"
+                    },
+                    "404": {
+                        "description": "Team not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Update a team",
+                "operationId": "9b28b3ac008af734a21af181a05850ee",
+                "parameters": [
+                    {
+                        "name": "team",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Team updated"
+                    },
+                    "403": {
+                        "description": "Not authorized to update this team"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Delete a team (only if it has no other members)",
+                "operationId": "a9fad615460e82e5f6051865f17b9b91",
+                "parameters": [
+                    {
+                        "name": "team",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Team deleted"
+                    },
+                    "403": {
+                        "description": "Not authorized to delete this team"
+                    },
+                    "422": {
+                        "description": "Cannot delete a team with members"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teams/{team}/invite": {
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "[Leader] Invite a user to the team by email",
+                "operationId": "4624da4313993063f62334aa78df9952",
+                "parameters": [
+                    {
+                        "name": "team",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Invitation sent"
+                    },
+                    "403": {
+                        "description": "Not authorized to invite to this team"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "422": {
+                        "description": "User cannot be invited (already in a team, etc.)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teams/my-team": {
+            "get": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Get the current user's own team",
+                "operationId": "397839bc34bfba55a94b14380640890b",
+                "responses": {
+                    "200": {
+                        "description": "Own team detail"
+                    },
+                    "404": {
+                        "description": "You are not in a team"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teams/leave": {
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "Leave the current user's own team (leaders cannot leave)",
+                "operationId": "2b6d180f8fc3a7585b858e51c0a05fe6",
+                "responses": {
+                    "200": {
+                        "description": "Left the team"
+                    },
+                    "404": {
+                        "description": "You are not in a team"
+                    },
+                    "422": {
+                        "description": "Leaders cannot leave their team"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/teams/{team}/remove-member": {
+            "post": {
+                "tags": [
+                    "Teams"
+                ],
+                "summary": "[Leader] Remove a member from the team",
+                "operationId": "320be8e77682bfaa83bbf3a1b7307968",
+                "parameters": [
+                    {
+                        "name": "team",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member removed"
+                    },
+                    "403": {
+                        "description": "Not authorized to remove members from this team"
+                    },
+                    "404": {
+                        "description": "User is not a member of this team"
+                    },
+                    "422": {
+                        "description": "Cannot remove the team leader"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Sanctum personal access token (Authorization: Bearer {token})",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Admin",
+            "description": "Admin"
+        },
+        {
+            "name": "Applications",
+            "description": "Applications"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Bulk Messages",
+            "description": "Bulk Messages"
+        },
+        {
+            "name": "Calls",
+            "description": "Calls"
+        },
+        {
+            "name": "Challenges",
+            "description": "Challenges"
+        },
+        {
+            "name": "Consultations",
+            "description": "Consultations"
+        },
+        {
+            "name": "Documents",
+            "description": "Documents"
+        },
+        {
+            "name": "Email Templates",
+            "description": "Email Templates"
+        },
+        {
+            "name": "Evaluations",
+            "description": "Evaluations"
+        },
+        {
+            "name": "Exports",
+            "description": "Exports"
+        },
+        {
+            "name": "GDPR",
+            "description": "GDPR"
+        },
+        {
+            "name": "Mentorships",
+            "description": "Mentorships"
+        },
+        {
+            "name": "Milestones",
+            "description": "Milestones"
+        },
+        {
+            "name": "Notifications",
+            "description": "Notifications"
+        },
+        {
+            "name": "Notification Preferences",
+            "description": "Notification Preferences"
+        },
+        {
+            "name": "Organizations",
+            "description": "Organizations"
+        },
+        {
+            "name": "Pages",
+            "description": "Pages"
+        },
+        {
+            "name": "Partners",
+            "description": "Partners"
+        },
+        {
+            "name": "Posts",
+            "description": "Posts"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        },
+        {
+            "name": "Programs",
+            "description": "Programs"
+        },
+        {
+            "name": "Projects",
+            "description": "Projects"
+        },
+        {
+            "name": "Specializations",
+            "description": "Specializations"
+        },
+        {
+            "name": "Teams",
+            "description": "Teams"
+        }
+    ]
+}
