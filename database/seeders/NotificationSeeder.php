@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
@@ -36,6 +35,12 @@ class NotificationSeeder extends Seeder
         // Ручное создание
         // ------------------------------
 
+        EmailTemplate::create([
+            'name'           => 'application_submitted',
+            'subject'        => 'Your application has been submitted',
+            'body'           => 'Dear {{ leader_name }}, your application for "{{ project_title }}" has been successfully submitted and is now under review.',
+            'variables_json' => ['leader_name', 'project_title'],
+        ]);
         EmailTemplate::create([
             'name'           => 'project_approved',
             'subject'        => 'Your project application has been approved!',

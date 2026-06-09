@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 /** Контроллер блог-постов: CRUD для публикаций CMS */
@@ -22,9 +23,15 @@ class PostController extends Controller
             new OA\Response(response: 200, description: 'List of published posts'),
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
-        return PostResource::collection(Post::where('is_published', true)->latest()->get());
+        // Фільтрація за типом: ?type=article|faq|success_story
+        return PostResource::collection(
+            Post::where('is_published', true)
+                ->when($request->query('type'), fn($q, $type) => $q->where('type', $type))
+                ->latest()
+                ->get()
+        );
     }
 
     /** Создаёт новый блог-пост от имени текущего пользователя */

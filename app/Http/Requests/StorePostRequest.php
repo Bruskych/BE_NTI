@@ -16,6 +16,7 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'type'         => 'nullable|in:article,faq,success_story',
             'title'        => 'required|string|max:255',
             'slug'         => 'required|string|unique:posts,slug',
             'content'      => 'required|string',

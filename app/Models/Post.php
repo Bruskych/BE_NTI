@@ -17,8 +17,13 @@ class Post extends Model
     // Configuration
     // ---------------------------------------------------------
 
+    const TYPE_ARTICLE       = 'article';
+    const TYPE_FAQ           = 'faq';
+    const TYPE_SUCCESS_STORY = 'success_story';
+
     protected $fillable = [
         'author_id',
+        'type',
         'title',
         'slug',
         'excerpt',

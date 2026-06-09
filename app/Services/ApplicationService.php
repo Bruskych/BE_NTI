@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\TemplatedNotificationMail;
 use App\Models\{Application, ApplicationAnswer, ApplicationHistory, ApplicationPairingSubmission, AuditEvent, EmailTemplate, FormField};
+use App\Services\NotificationService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 /** Сервис для управления жизненным циклом заявки: создание, сохранение ответов, отправка и принятие решений */
 class ApplicationService
 {
+    public function __construct(private NotificationService $notifications) {}
     const ANSWER_FILES_PATH = 'answers';
     const PAIRING_FILES_PATH = 'pairing';
 
@@ -87,6 +89,25 @@ class ApplicationService
 
             $this->logHistory($application, $oldStatus, Application::STATUS_SUBMITTED, $userId, 'Submitted by leader.');
         });
+
+        // Підтвердження подачі заявки — відправляємо email лідеру команди
+        $leader = $application->team?->leader;
+        if ($leader) {
+            $this->notifications->sendWithEmail(
+                $leader,
+                [
+                    'type'      => 'application_submitted',
+                    'title'     => 'Application submitted successfully',
+                    'message'   => 'Your application has been submitted and is under review.',
+                    'data_json' => ['application_id' => $application->id],
+                ],
+                'application_submitted',
+                [
+                    'leader_name'   => $leader->name,
+                    'project_title' => $application->challenge?->title ?? $application->program?->name ?? 'your application',
+                ]
+            );
+        }
     }
 
     /** Проверяет заполнение обязательных полей и документов Programme B перед отправкой */
