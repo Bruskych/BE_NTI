@@ -8,7 +8,7 @@ use App\Http\Controllers\{
     TeamController, ApplicationController, ProjectController, MilestoneController,
     ConsultationController, EvaluationController, NotificationController,
     NotificationPreferenceController, ExportController, GdprController, MentorshipController, PostController, PageController, DocumentController,
-    BulkMessageController, PartnerController, EmailTemplateController,
+    BulkMessageController, PartnerController, EmailTemplateController, CookieController,
 };
 
 // -------------------------------------------------------------------------
@@ -45,6 +45,11 @@ Route::prefix('partners')->group(function () {
 // PROTECTED ROUTES (Auth: Sanctum)
 // -------------------------------------------------------------------------
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Cookie files
+    Route::post('/set-theme', [CookieController::class, 'setCookie']);
+    Route::get('/get-theme', [CookieController::class, 'getCookie']);
+    Route::post('/delete-theme', [CookieController::class, 'deleteCookie']);
 
     // Auth & Profile
     Route::prefix('auth')->group(function () {
