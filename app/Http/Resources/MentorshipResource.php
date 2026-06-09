@@ -16,6 +16,13 @@ class MentorshipResource extends JsonResource
             'is_active'     => $this->isActive(),
             'started_at'    => $this->started_at,
             'finished_at'   => $this->finished_at,
+            'project'       => $this->whenLoaded('project', fn() =>
+                $this->project ? [
+                    'id'     => $this->project->id,
+                    'title'  => $this->project->title,
+                    'status' => $this->project->status,
+                ] : null
+            ),
             'mentor'        => $this->whenLoaded('mentor', fn() =>
             new UserResource($this->mentor)
             ),
