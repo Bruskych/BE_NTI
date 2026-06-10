@@ -27,7 +27,8 @@ class PostController extends Controller
     {
         // Фільтрація за типом: ?type=article|faq|success_story
         return PostResource::collection(
-            Post::where('is_published', true)
+            Post::with('author:id,name,avatar_path')
+                ->where('is_published', true)
                 ->when($request->query('type'), fn($q, $type) => $q->where('type', $type))
                 ->latest()
                 ->get()

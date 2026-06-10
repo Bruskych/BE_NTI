@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\GdprConsent;
 use App\Models\Organization;
 use App\Models\Notification;
+use App\Models\Program;
 use App\Services\EmailConfirmationService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -99,12 +100,17 @@ class RegisterUserAction
 
         $team->members()->attach($user->id, ['role' => 'leader', 'joined_at' => now()]);
 
-        Application::create([
-            'program_id' => 1,
-            'team_id'    => $team->id,
-            'status'     => 'submitted',
-            'submitted_at' => now(),
-        ]);
+        // Program A (grant incubation) is the default track for student teams
+        $program = Program::where('type', 'grant')->first() ?? Program::first();
+
+        if ($program) {
+            Application::create([
+                'program_id' => $program->id,
+                'team_id'    => $team->id,
+                'status'     => 'submitted',
+                'submitted_at' => now(),
+            ]);
+        }
     }
 
     /** Создаёт организацию, привязывает пользователя как владельца и подаёт заявку на регистрацию компании */
@@ -129,13 +135,18 @@ class RegisterUserAction
 
         $team->members()->attach($user->id, ['role' => 'leader', 'joined_at' => now()]);
 
-        Application::create([
-            'program_id' => 1,
-            'organization_id' => $organization->id,
-            'team_id'    => $team->id,
-            'status'     => 'submitted',
-            'submitted_at' => now(),
-        ]);
+        // Program B (live practice) is the default track for company registrations
+        $program = Program::where('type', 'practice')->first() ?? Program::first();
+
+        if ($program) {
+            Application::create([
+                'program_id' => $program->id,
+                'organization_id' => $organization->id,
+                'team_id'    => $team->id,
+                'status'     => 'submitted',
+                'submitted_at' => now(),
+            ]);
+        }
 
         Notification::create([
             'user_id'   => $user->id,
