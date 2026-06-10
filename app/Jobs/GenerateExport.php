@@ -420,7 +420,10 @@ class GenerateExport implements ShouldQueue
         $this->saveLog($log, $filename);
 
         if ($user && $user->email) {
-            Mail::to($user->email)->queue(
+            // GenerateExport already runs inside the queue worker, so send the
+            // notification synchronously: queueing it here was silently dropped
+            // (nested Mail::queue() from within a running queued job never fires).
+            Mail::to($user->email)->send(
                 new GdprExportReadyMail($user->name, storage_path('app/' . $filename), basename($filename))
             );
         }
