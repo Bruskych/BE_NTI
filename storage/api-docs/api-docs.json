@@ -695,6 +695,21 @@
                 ]
             }
         },
+        "/calls/open": {
+            "get": {
+                "tags": [
+                    "Calls"
+                ],
+                "summary": "List currently open calls with deadlines (public, no authentication required)",
+                "description": "Возвращает список открытых конкурсных отборов (публично, без аутентификации) — для главной страницы",
+                "operationId": "d3c0b6c42831a97ed840f6dad4829c65",
+                "responses": {
+                    "200": {
+                        "description": "List of open calls"
+                    }
+                }
+            }
+        },
         "/calls/{call}": {
             "get": {
                 "tags": [
@@ -1765,6 +1780,69 @@
                     },
                     "422": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/exports/{exportsLog}/download": {
+            "get": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] Download a generated export file",
+                "description": "Скачивает сгенерированный файл экспорта",
+                "operationId": "a691e167576aea90f5eb514184d54ae7",
+                "parameters": [
+                    {
+                        "name": "exportsLog",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Export file"
+                    },
+                    "404": {
+                        "description": "Export file not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/exports/{exportsLog}": {
+            "delete": {
+                "tags": [
+                    "Exports"
+                ],
+                "summary": "[Admin] Delete an export log entry and its generated file",
+                "description": "Удаляет запись журнала экспорта вместе со сгенерированным файлом",
+                "operationId": "15457a7f7f23d8d96f26bb0bd79d9769",
+                "parameters": [
+                    {
+                        "name": "exportsLog",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Export log deleted"
                     }
                 },
                 "security": [
