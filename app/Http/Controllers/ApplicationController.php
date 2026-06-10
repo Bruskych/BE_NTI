@@ -141,6 +141,9 @@ class ApplicationController extends Controller
     {
         $this->authorize('submit', $application);
         $service->submitApplication($application, $request->user()->id);
+
+        event(new \App\Events\ApplicationSubmitted($application));
+
         return $this->apiJson(['message' => 'Application submitted successfully']);
     }
 
@@ -162,6 +165,7 @@ class ApplicationController extends Controller
     public function decide(DecideApplicationRequest $request, Application $application, ApplicationService $service): JsonResponse
     {
         $this->authorize('decide', $application);
+        $decision = $request->validated('decision');
 
         $application = $service->decideApplication(
             $application,
@@ -169,6 +173,8 @@ class ApplicationController extends Controller
             $request->validated('comment'),
             $request->user()->id
         );
+
+        event(new \App\Events\ApplicationDecided($application, $decision));
 
         return $this->apiJson(new ApplicationResource($application));
     }

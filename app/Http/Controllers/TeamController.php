@@ -128,7 +128,13 @@ class TeamController extends Controller
             return $this->apiJson(['message' => 'Cannot delete team with members.'], 422);
         }
 
+        $members = $team->members()->get();
+        $teamName = $team->name;
+
         $team->delete();
+
+        event(new \App\Events\TeamDeleted($members, $teamName));
+
         return $this->apiJson(['message' => 'Team deleted successfully.']);
     }
 
@@ -216,6 +222,9 @@ class TeamController extends Controller
         }
 
         $team->members()->detach($user->id);
+
+        event(new \App\Events\MemberLeftTeam($user, $team));
+
         return $this->apiJson(['message' => 'You have left the team.']);
     }
 
@@ -240,6 +249,7 @@ class TeamController extends Controller
         $this->authorize('removeMember', $team);
 
         $userId = $request->validated('user_id');
+        $userToRemove = User::findOrFail($userId);
 
         if (!$team->hasMember($userId)) {
             return $this->apiJson(['message' => 'User is not in this team.'], 404);
@@ -249,6 +259,9 @@ class TeamController extends Controller
         }
 
         $team->members()->detach($userId);
+
+        event(new \App\Events\MemberKickedFromTeam($userToRemove, $team));
+
         return $this->apiJson(['message' => 'Member removed successfully.']);
     }
 }

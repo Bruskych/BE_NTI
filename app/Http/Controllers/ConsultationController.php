@@ -92,6 +92,8 @@ class ConsultationController extends Controller
             'mentor_id' => $request->user()->id,
         ]));
 
+        event(new \App\Events\ConsultationScheduled($consultation));
+
         return $this->apiJson(new ConsultationResource($consultation), 201);
     }
 

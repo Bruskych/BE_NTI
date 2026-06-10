@@ -63,6 +63,8 @@ class MilestoneController extends Controller
             'completion_percentage' => 0,
         ]));
 
+        event(new \App\Events\MilestoneChanged($milestone, 'created'));
+
         return $this->apiJson(new MilestoneResource($milestone), 201);
     }
 
@@ -105,6 +107,8 @@ class MilestoneController extends Controller
     {
         $milestone->update($request->validated());
 
+        event(new \App\Events\MilestoneChanged($milestone, 'updated'));
+
         return $this->apiJson(new MilestoneResource($milestone->load('approvedBy')));
     }
 
@@ -127,6 +131,8 @@ class MilestoneController extends Controller
         $this->authorize('approve', $milestone);
 
         $milestone->markAsApproved($request->user()->id);
+
+        event(new \App\Events\MilestoneChanged($milestone, 'approved'));
 
         return $this->apiJson([
             'message' => 'Milestone approved successfully',
