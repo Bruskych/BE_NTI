@@ -76,7 +76,7 @@ class MentorshipFlowTest extends TestCase
             ]);
         $assignResponse->assertStatus(201);
 
-        $mentorship = Mentorship::findOrFail($assignResponse->json('data.id'));
+        $mentorship = Mentorship::findOrFail($assignResponse->json('id'));
         $this->assertEquals($project->id, $mentorship->project_id);
         $this->assertEquals($mentor->id, $mentorship->mentor_id);
 
