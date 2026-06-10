@@ -1,20 +1,31 @@
 <div align="center">
 
-# NTI Backend
+# NTI ```Backend```
 ### Nitriansky technologický inkubátor
 
-REST API backend for the NTI platform — a process and registration system for managing programs, applications, projects, mentoring, and evaluation.
+REST API for the NTI platform that powers all business processes of the system.
+
+It handles authentication, program management, applications, evaluations, mentoring, organizations, and reporting.
+
+```Main responsibilities:```
+* user authentication and role-based access control
+* program and challenge management (Program A & B)
+* application workflow and document handling
+* evaluation and scoring system
+* mentoring and project tracking
+* organization and partner management
+* notifications and audit logs
+* data export and reporting
 
 🤖 [Backend Repository](https://github.com/Bruskych/BE_NTI) · 🎨 [Frontend Repository](https://github.com/Bruskych/FE_NTI)
 
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
-![Mailpit](https://img.shields.io/badge/Mailpit-3482A4?style=for-the-badge&logo=go&logoColor=white)
-![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+[![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io)
+[![Mailpit](https://img.shields.io/badge/Mailpit-3482A4?style=for-the-badge&logo=go&logoColor=white)](https://github.com/axllent/mailpit)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 
 </div>
 
@@ -31,14 +42,14 @@ REST API backend for the NTI platform — a process and registration system for 
 
 ### 📥 1. Quick Start
 
-```Clones the repository``` with the backend code from GitHub to your local computer.
+```Clones the repository``` with the backend code from GitHub to your local computer. The command must be executed in an empty folder where you want to see your project.
 ```bash
-git clone <repository-url>
+git clone https://github.com/Bruskych/BE_NTI
 ```
 
 You need to go inside the ```project folder```
 ```bash
-cd BE_NTI
+cd YOUR_PROJECT_FOLDER_NAME
 ```
 
 Creates a copy ````(.env)```` of the template file .env.example
@@ -224,8 +235,14 @@ app/
 ├── Console/                 # AUTOMATION (Artisan CLI & Cron Tasks)
 │   └── Commands/            # Custom Artisan commands (e.g., deadline & notification reminders)
 │
+├── Events/                  # EVENT-DRIVEN ARCHITECTURE (System Lifecycle Triggers)
+│   └── *.php                # DTOs signaling that a specific business event has occurred (e.g., ApplicationSubmitted)
+│
 ├── Jobs/                    # ASYNC PROCESSING (Background Queues via Redis)
 │   └── [Job].php            # Heavy async tasks (e.g., Excel report generation, bulk email dispatches)
+│
+├── Listeners/               # ASYNC & SYNC EVENT HANDLERS (Decoupled Logic Consumers)
+│   └── *.php                # Classes reacting to Events and triggering downstream processes (e.g., calling NotificationService)
 │
 ├── Mail/                    # NOTIFICATIONS (Email Blueprints)
 │   └── [Mailable].php       # Mail layout configurations captured locally by Mailpit
@@ -267,9 +284,11 @@ tests/
 ## 🗺️ Database Schema
 
 <p align="center">
+  <br>
   <a href="https://dbdiagram.io/d/6a28a9ee25fc5bf036cf0a5b">
     <img src=".github/assets/schema.svg" alt="NTI Database Schema" width="100%">
   </a>
+  <br>
   <br>
   <span>💡 <i>Click on the image to open the interactive schema and explore relationships.</i></span>
 </p>
