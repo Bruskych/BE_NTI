@@ -150,6 +150,42 @@ class AuthController extends Controller
     }
 
     /**
+     * Установка нового пароля по токену из письма восстановления.
+     */
+    #[OA\Post(
+        path: '/auth/reset-password',
+        summary: 'Reset the password using the token from the reset email',
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 200, description: 'Password has been reset'),
+            new OA\Response(response: 422, description: 'Invalid token, email or validation error'),
+        ]
+    )]
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required|string',
+            'email'    => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill(['password' => Hash::make($password)])->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'email' => [__($status)],
+            ]);
+        }
+
+        return $this->apiJson(['message' => 'Password has been reset.']);
+    }
+
+    /**
      * Подтверждение e-mail адреса по коду, отправленному при регистрации.
      * Spec 6.2: "registrácia e-mailom s overením adresy".
      */
