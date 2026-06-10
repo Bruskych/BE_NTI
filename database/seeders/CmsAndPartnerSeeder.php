@@ -43,6 +43,7 @@ class CmsAndPartnerSeeder extends Seeder
             Page::factory()->create([
                 'title' => $pageTitle,
                 'slug'  => Str::slug($pageTitle),
+                'is_published' => true,
             ]);
         }
 
