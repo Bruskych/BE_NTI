@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 
 /** Сервис управления документами: загрузка, скачивание, версионирование и генерация PDF из DOCX-шаблонов */
 class DocumentService
@@ -127,7 +128,7 @@ class DocumentService
         ]);
     }
 
-    /** Генерирует PDF из документа-шаблона по его записи в БД */
+    /** Генерирует документ из документа-шаблона по его записи в БД (DOCX-шаблон → DOCX, иначе → PDF) */
     public function generatePdfFromTemplate(Document $template, array $data, ?string $outputName = null): Document
     {
         if ($template->type !== 'template') {
@@ -135,7 +136,58 @@ class DocumentService
         }
 
         $docxPath = Storage::disk('public')->path($template->file_path);
+
+        if (strtolower(pathinfo($template->file_path, PATHINFO_EXTENSION)) === 'docx') {
+            return $this->generateDocxFromDocx($docxPath, $data, $outputName);
+        }
+
         return $this->generatePdfFromDocx($docxPath, $data, $outputName);
+    }
+
+    /** Генерирует DOCX из DOCX-шаблона с подстановкой данных студента, сохраняя исходное форматирование */
+    public function generateDocxFromDocx(string $docxPath, array $data, ?string $outputName = null): Document
+    {
+        if (!file_exists($docxPath)) {
+            throw new \Exception("DOCX file not found: {$docxPath}");
+        }
+
+        $phpWord = WordIOFactory::load($docxPath);
+        $sections = $phpWord->getSections();
+        $section = $sections[0] ?? $phpWord->addSection();
+
+        $section->addTextBreak(2);
+        $section->addTitle('Submitted details', 2);
+
+        $table = $section->addTable(['borderSize' => 6, 'borderColor' => '999999', 'cellMargin' => 80]);
+        foreach ($data as $key => $value) {
+            if ($key === 'uploaded_by' || !filled($value)) {
+                continue;
+            }
+
+            $label = ucwords(str_replace('_', ' ', $key));
+            $table->addRow();
+            $table->addCell(3000)->addText(htmlspecialchars($label), ['bold' => true]);
+            $table->addCell(6000)->addText(htmlspecialchars((string) $value));
+        }
+
+        $fileName = ($outputName ?? Str::slug($data['student_name'] ?? 'document')) . '.docx';
+        $filePath = self::STORAGE_PATH . '/' . Str::uuid() . '.docx';
+
+        $tempPath = tempnam(sys_get_temp_dir(), 'docx') . '.docx';
+        WordIOFactory::createWriter($phpWord, 'Word2007')->save($tempPath);
+        Storage::disk('public')->put($filePath, file_get_contents($tempPath));
+        unlink($tempPath);
+
+        return Document::create([
+            'type' => 'generated',
+            'file_name' => $fileName,
+            'file_path' => $filePath,
+            'mime_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'size' => Storage::disk('public')->size($filePath),
+            'version' => 1,
+            'classification' => Document::CLASSIFICATION_CONFIDENTIAL,
+            'uploaded_by' => $data['uploaded_by'] ?? null,
+        ]);
     }
 
     /** Извлекает XML из DOCX-архива и конвертирует его в HTML с подстановкой данных */

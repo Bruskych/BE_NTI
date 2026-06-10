@@ -7,17 +7,22 @@ use App\Models\BulkMessage;
 use App\Services\BulkMessageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер массовой рассылки сообщений для администраторов */
-class BulkMessageController extends Controller
+class BulkMessageController extends Controller implements HasMiddleware
 {
     protected BulkMessageService $bulkMessageService;
 
     public function __construct(BulkMessageService $bulkMessageService)
     {
         $this->bulkMessageService = $bulkMessageService;
-        $this->authorizeResource(BulkMessage::class, 'bulk_message');
+    }
+
+    public static function middleware(): array
+    {
+        return static::resourcePolicyMiddleware(BulkMessage::class, 'bulk_message');
     }
 
     /** Возвращает постраничный список массовых рассылок */

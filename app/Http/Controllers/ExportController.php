@@ -30,6 +30,62 @@ class ExportController extends Controller
         return $this->apiJson($logs);
     }
 
+    /** Скачивает сгенерированный файл экспорта */
+    #[OA\Get(
+        path: '/admin/exports/{exportsLog}/download',
+        summary: '[Admin] Download a generated export file',
+        tags: ['Exports'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'exportsLog', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Export file'),
+            new OA\Response(response: 404, description: 'Export file not found'),
+        ]
+    )]
+    public function download(ExportsLog $exportsLog)
+    {
+        $this->authorize('viewAny', ExportsLog::class);
+
+        $path = storage_path('app/' . $exportsLog->file_path);
+
+        if (!$exportsLog->file_path || !file_exists($path)) {
+            abort(404, 'Export file not found.');
+        }
+
+        return response()->download($path, basename($exportsLog->file_path));
+    }
+
+    /** Удаляет запись журнала экспорта вместе со сгенерированным файлом */
+    #[OA\Delete(
+        path: '/admin/exports/{exportsLog}',
+        summary: '[Admin] Delete an export log entry and its generated file',
+        tags: ['Exports'],
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(name: 'exportsLog', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Export log deleted'),
+        ]
+    )]
+    public function destroy(ExportsLog $exportsLog)
+    {
+        $this->authorize('viewAny', ExportsLog::class);
+
+        if ($exportsLog->file_path) {
+            $path = storage_path('app/' . $exportsLog->file_path);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        $exportsLog->delete();
+
+        return response()->json(null, 204);
+    }
+
     /** Возвращает доступные типы экспорта, сгруппированные по ресурсу */
     #[OA\Get(
         path: '/admin/exports/types',

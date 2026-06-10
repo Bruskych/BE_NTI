@@ -63,7 +63,7 @@ class Challenge extends Model
 
     public function organization(): BelongsTo
     {
-        return $this->organization(Organization::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function productOwner(): BelongsTo

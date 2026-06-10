@@ -8,16 +8,16 @@ use App\Http\Resources\OrganizationResource;
 use App\Http\Requests\{StoreOrganizationRequest, UpdateOrganizationRequest};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 /** Контроллер организаций: CRUD и управление логотипом */
-class OrganizationController extends Controller
+class OrganizationController extends Controller implements HasMiddleware
 {
-
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Organization::class, 'organization');
+        return static::resourcePolicyMiddleware(Organization::class, 'organization');
     }
 
     /** Возвращает список организаций с учётом прав доступа текущего пользователя */

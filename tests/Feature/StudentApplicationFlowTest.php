@@ -55,6 +55,10 @@ class StudentApplicationFlowTest extends TestCase
         $registrationApplication = Application::where('team_id', $team->id)->firstOrFail();
         $this->assertEquals(Application::STATUS_SUBMITTED, $registrationApplication->status);
 
+        // Program A requires a team of at least 3 members before an application can be submitted
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
+
         // 2. Student fills out the profile
         $this->actingAs($student)
             ->postJson('/api/settings/update-profile/name', ['name' => 'Ivan Petrenko'])

@@ -62,6 +62,10 @@ class ApplicationPolicy
             return Response::deny('You lack the delete permission.');
         }
 
+        if (!$this->isMember($user, $application)) {
+            return Response::deny('You are not a member of the team associated with this application.');
+        }
+
         return ($application->status === Application::STATUS_DRAFT)
             ? Response::allow()
             : Response::deny('You cannot delete an application that has already been submitted.');

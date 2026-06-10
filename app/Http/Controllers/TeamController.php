@@ -8,17 +8,16 @@ use App\Http\Requests\{StoreTeamRequest, UpdateTeamRequest, RemoveMemberRequest}
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Services\NotificationService;
 use OpenApi\Attributes as OA;
 
 /** Контроллер команд: CRUD, приглашения, выход и удаление участников */
-class TeamController extends Controller
+class TeamController extends Controller implements HasMiddleware
 {
-
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Team::class, 'team');
+        return static::resourcePolicyMiddleware(Team::class, 'team');
     }
 
     /** Возвращает список всех команд с участниками и лидером */

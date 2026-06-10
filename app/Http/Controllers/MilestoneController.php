@@ -7,15 +7,19 @@ use App\Http\Resources\MilestoneResource;
 use App\Http\Requests\{StoreMilestoneRequest, UpdateMilestoneRequest};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер контрольных точек проекта: создание, обновление и подтверждение выполнения */
-class MilestoneController extends Controller
+class MilestoneController extends Controller implements HasMiddleware
 {
-
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Milestone::class, 'milestone');
+        return [
+            (new Middleware('can:view,milestone'))->only(['show']),
+            (new Middleware('can:update,milestone'))->only(['update']),
+        ];
     }
 
     /** Возвращает список контрольных точек для указанного проекта */

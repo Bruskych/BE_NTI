@@ -54,6 +54,12 @@ class NotificationSeeder extends Seeder
             'variables_json' => ['leader_name', 'project_title', 'comment'],
         ]);
         EmailTemplate::create([
+            'name'           => 'project_needs_supplement',
+            'subject'        => 'Additional information requested for your application',
+            'body'           => 'Dear {{ leader_name }}, the committee has requested additional information for your application "{{ project_title }}". Details: {{ comment }}',
+            'variables_json' => ['leader_name', 'project_title', 'comment'],
+        ]);
+        EmailTemplate::create([
             'name'           => 'application_approved',
             'subject'        => 'Your application has been approved!',
             'body'           => 'Dear {{ user_name }}, congratulations! Your application (ID: {{ application_id }}) has been approved. Comment: {{ comment }}',

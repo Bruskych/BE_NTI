@@ -115,6 +115,9 @@ class ApplicationFormTest extends TestCase
         ]);
 
         $leader = $this->createLeader();
+        $team = $leader->teams()->where('teams.leader_id', $leader->id)->firstOrFail();
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
 
         $createResponse = $this->actingAs($leader)
             ->postJson('/api/applications', ['program_id' => $program->id, 'call_id' => $call->id]);

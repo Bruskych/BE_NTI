@@ -22,7 +22,7 @@ return [
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', '*'],
 
     // Разрешённые источники запросов (домены фронтенда)
-    'allowed_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    'allowed_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
 
     // Паттерны разрешённых источников (регулярные выражения)
     'allowed_origins_patterns' => [],

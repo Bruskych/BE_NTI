@@ -15,6 +15,7 @@ class ApplicationService
     public function __construct(private NotificationService $notifications) {}
     const ANSWER_FILES_PATH = 'answers';
     const PAIRING_FILES_PATH = 'pairing';
+    const PROGRAM_A_MIN_TEAM_SIZE = 3;
 
     /** Создаёт черновик заявки и фиксирует начальный статус в истории */
     public function createApplication(array $data, int $teamId, int $userId): Application
@@ -81,6 +82,12 @@ class ApplicationService
     /** Переводит заявку в статус «submitted» после проверки обязательных требований */
     public function submitApplication(Application $application, int $userId): void
     {
+        if (!$application->canBeSubmitted()) {
+            throw ValidationException::withMessages([
+                'status' => ["The application cannot be submitted from its current status (\"{$application->status}\")."],
+            ]);
+        }
+
         $this->ensureSubmissionRequirementsAreMet($application);
 
         \DB::transaction(function () use ($application, $userId) {
@@ -114,6 +121,14 @@ class ApplicationService
     private function ensureSubmissionRequirementsAreMet(Application $application): void
     {
         $errors = [];
+
+        if ($application->isProgramA()) {
+            $memberCount = $application->team?->members()->count() ?? 0;
+
+            if ($memberCount < self::PROGRAM_A_MIN_TEAM_SIZE) {
+                $errors['team'] = ["Program A requires a team of at least " . self::PROGRAM_A_MIN_TEAM_SIZE . " members (currently {$memberCount})."];
+            }
+        }
 
         $requiredFields = FormField::where('program_id', $application->program_id)
             ->where('required', true)
@@ -162,7 +177,11 @@ class ApplicationService
     {
         return \DB::transaction(function () use ($application, $decision, $comment, $userId) {
             $oldStatus = $application->status;
-            $newStatus = $decision === 'approve' ? Application::STATUS_APPROVED : Application::STATUS_REJECTED;
+            $newStatus = match ($decision) {
+                'approve'            => Application::STATUS_APPROVED,
+                'request_supplement' => Application::STATUS_NEEDS_SUPPLEMENT,
+                default              => Application::STATUS_REJECTED,
+            };
             $totalScore = $application->evaluations()->avg('total_score');
 
             $application->update([
@@ -200,7 +219,11 @@ class ApplicationService
             return;
         }
 
-        $templateName = $newStatus === Application::STATUS_APPROVED ? 'project_approved' : 'project_rejected';
+        $templateName = match ($newStatus) {
+            Application::STATUS_APPROVED         => 'project_approved',
+            Application::STATUS_NEEDS_SUPPLEMENT => 'project_needs_supplement',
+            default                               => 'project_rejected',
+        };
         $template = EmailTemplate::where('name', $templateName)->first();
 
         if (!$template) {

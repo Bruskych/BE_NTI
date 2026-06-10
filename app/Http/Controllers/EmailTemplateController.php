@@ -27,7 +27,9 @@ class EmailTemplateController extends Controller
     )]
     public function index(): JsonResponse
     {
-        return $this->apiJson(EmailTemplateResource::collection(EmailTemplate::latest()->get()));
+        return $this->apiJson([
+            'data' => EmailTemplateResource::collection(EmailTemplate::latest()->get()),
+        ]);
     }
 
     /** Возвращает один email-шаблон по идентификатору */

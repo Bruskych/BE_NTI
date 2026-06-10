@@ -9,16 +9,17 @@ use App\Http\Requests\UpdateCallRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер конкурсных отборов (calls): CRUD и управление статусом */
-class CallController extends Controller
+class CallController extends Controller implements HasMiddleware
 {
     use AuthorizesRequests;
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Call::class, 'call');
+        return static::resourcePolicyMiddleware(Call::class, 'call');
     }
 
     /** Возвращает список всех конкурсных отборов с программой и специализациями */
@@ -34,6 +35,25 @@ class CallController extends Controller
     public function index(): JsonResponse
     {
         $calls = Call::with(['program', 'specializations'])->latest()->get();
+        return $this->apiJson(CallResource::collection($calls));
+    }
+
+    /** Возвращает список открытых конкурсных отборов (публично, без аутентификации) — для главной страницы */
+    #[OA\Get(
+        path: '/calls/open',
+        summary: 'List currently open calls with deadlines (public, no authentication required)',
+        tags: ['Calls'],
+        responses: [
+            new OA\Response(response: 200, description: 'List of open calls'),
+        ]
+    )]
+    public function openCalls(): JsonResponse
+    {
+        $calls = Call::with(['program', 'specializations'])
+            ->where('status', Call::STATUS_OPEN)
+            ->orderBy('deadline')
+            ->get();
+
         return $this->apiJson(CallResource::collection($calls));
     }
 

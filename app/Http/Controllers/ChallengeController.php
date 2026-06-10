@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreChallengeRequest;
 use App\Http\Requests\UpdateChallengeRequest;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер задач от компаний (challenges): CRUD и управление специализациями */
-class ChallengeController extends Controller
+class ChallengeController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Challenge::class, 'challenge');
+        return static::resourcePolicyMiddleware(Challenge::class, 'challenge');
     }
 
     /** Возвращает список задач, доступных текущему пользователю */

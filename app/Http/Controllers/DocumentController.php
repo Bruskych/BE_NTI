@@ -9,18 +9,23 @@ use App\Services\DocumentService;
 use App\Services\EmailConfirmationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 
 /** Контроллер документов: загрузка, скачивание, генерация PDF и управление шаблонами */
-class DocumentController extends Controller
+class DocumentController extends Controller implements HasMiddleware
 {
     protected DocumentService $documentService;
 
     public function __construct(DocumentService $documentService)
     {
         $this->documentService = $documentService;
-        $this->authorizeResource(Document::class, 'document');
+    }
+
+    public static function middleware(): array
+    {
+        return static::resourcePolicyMiddleware(Document::class, 'document');
     }
 
     /** Возвращает постраничный список документов с возможностью фильтрации */
@@ -372,7 +377,7 @@ class DocumentController extends Controller
         try {
             $docxPath = resource_path('document-templates/Dohoda_o_odbornej_praxi_študenta-AI-final_1_10.docx');
             
-            $document = $this->documentService->generatePdfFromDocx(
+            $document = $this->documentService->generateDocxFromDocx(
                 $docxPath,
                 [
                     ...$validated,

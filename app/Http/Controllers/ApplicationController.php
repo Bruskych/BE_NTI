@@ -8,14 +8,15 @@ use App\Http\Requests\{StoreApplicationRequest, UpdateApplicationRequest, Decide
 use App\Services\ApplicationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер заявок: создание, просмотр, обновление, подача и принятие решений */
-class ApplicationController extends Controller
+class ApplicationController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Application::class, 'application');
+        return static::resourcePolicyMiddleware(Application::class, 'application');
     }
 
     /** Возвращает постраничный список заявок */

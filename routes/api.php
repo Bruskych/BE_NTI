@@ -52,6 +52,9 @@ Route::prefix('pages')->group(function () {
     Route::get('/{page}', [PageController::class, 'show']);
 });
 
+// Публичный список открытых конкурсных отборов с дедлайнами (для главной страницы)
+Route::get('/calls/open', [CallController::class, 'openCalls']);
+
 // Публичные новости / посты блога
 Route::prefix('posts')->group(function () {
     Route::get('/', [PostController::class, 'index']);
@@ -113,7 +116,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Экспорт данных: список типов, журнал экспортов, создание экспорта
         Route::get('/exports/types', [ExportController::class, 'types']);
         Route::get('/exports', [ExportController::class, 'index']);
+        Route::get('/exports/{exportsLog}/download', [ExportController::class, 'download']);
         Route::post('/exports', [ExportController::class, 'store']);
+        Route::delete('/exports/{exportsLog}', [ExportController::class, 'destroy']);
         Route::post('/export/{resource}/{format}', [ExportController::class, 'storeByRoute']);
 
         // GDPR: экспорт и удаление данных произвольного пользователя

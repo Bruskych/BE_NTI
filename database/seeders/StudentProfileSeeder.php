@@ -37,7 +37,7 @@ class StudentProfileSeeder extends Seeder
                     'year'                 => 3,
                     'avg_grade'            => 1.8,
                     'has_carried_subjects' => false,
-                    'skills_json'          => json_encode(['PHP', 'Laravel', 'Vue.js']),
+                    'skills_json'          => ['PHP', 'Laravel', 'Vue.js'],
                 ]
             );
         }
@@ -51,7 +51,7 @@ class StudentProfileSeeder extends Seeder
                     'year'                 => 2,
                     'avg_grade'            => 2.1,
                     'has_carried_subjects' => false,
-                    'skills_json'          => json_encode(['Python', 'SQL']),
+                    'skills_json'          => ['Python', 'SQL'],
                 ]
             );
         }

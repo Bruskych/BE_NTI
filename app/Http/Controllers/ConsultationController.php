@@ -6,15 +6,15 @@ use App\Models\{Consultation, Mentorship};
 use App\Http\Resources\ConsultationResource;
 use App\Http\Requests\{StoreConsultationRequest, UpdateConsultationRequest};
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер консультаций: создание, просмотр и управление встречами ментора */
-class ConsultationController extends Controller
+class ConsultationController extends Controller implements HasMiddleware
 {
-
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Consultation::class, 'consultation');
+        return static::resourcePolicyMiddleware(Consultation::class, 'consultation');
     }
 
     /** Возвращает список консультаций текущего пользователя или всех (при наличии права) */

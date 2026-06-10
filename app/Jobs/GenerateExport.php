@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\GdprExportReadyMail;
 use App\Models\Application;
 use App\Models\ExportsLog;
 use App\Models\Project;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -416,6 +418,12 @@ class GenerateExport implements ShouldQueue
 
         file_put_contents(storage_path('app/' . $filename), json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         $this->saveLog($log, $filename);
+
+        if ($user && $user->email) {
+            Mail::to($user->email)->queue(
+                new GdprExportReadyMail($user->name, storage_path('app/' . $filename), basename($filename))
+            );
+        }
     }
 
     /** Генерирует DOCX-отчёт с заголовком и таблицей данных */

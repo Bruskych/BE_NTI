@@ -6,15 +6,15 @@ use App\Models\Specialization;
 use App\Http\Resources\SpecializationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use OpenApi\Attributes as OA;
 
 /** Контроллер специализаций: список и просмотр направлений подготовки */
-class SpecializationController extends Controller
+class SpecializationController extends Controller implements HasMiddleware
 {
-
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Specialization::class, 'specialization');
+        return static::resourcePolicyMiddleware(Specialization::class, 'specialization');
     }
 
     /** Возвращает список специализаций; фильтр ?stack=01…05 для квалификационных стеков */

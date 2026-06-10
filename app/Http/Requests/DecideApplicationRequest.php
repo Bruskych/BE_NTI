@@ -16,7 +16,7 @@ class DecideApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'decision' => 'required|in:approve,reject',
+            'decision' => 'required|in:approve,reject,request_supplement',
             'comment'  => 'nullable|string',
         ];
     }

@@ -23,7 +23,7 @@ class ApplicationServiceTest extends TestCase
     {
         parent::setUp();
         $this->seed(RoleAndPermissionSeeder::class);
-        $this->service = new ApplicationService();
+        $this->service = app(ApplicationService::class);
     }
 
     public function test_createApplication_sets_draft_status(): void
@@ -54,7 +54,7 @@ class ApplicationServiceTest extends TestCase
             $leader->id
         );
 
-        $this->assertDatabaseHas('application_histories', [
+        $this->assertDatabaseHas('application_history', [
             'application_id' => $application->id,
             'new_status'     => Application::STATUS_DRAFT,
         ]);
@@ -67,6 +67,8 @@ class ApplicationServiceTest extends TestCase
         $leader  = User::factory()->create();
         $team    = Team::factory()->create(['leader_id' => $leader->id]);
         $team->members()->attach($leader->id, ['role' => 'leader', 'joined_at' => now()]);
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
+        $team->members()->attach(User::factory()->create()->id, ['role' => 'member', 'joined_at' => now()]);
 
         $application = Application::create([
             'program_id' => $program->id,
