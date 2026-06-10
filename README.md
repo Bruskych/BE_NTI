@@ -1,15 +1,19 @@
-<div style="text-align: center;">
+<div align="center">
 
 # NTI Backend
 ### Nitriansky technologický inkubátor
 
-REST API backend for the NTI platform - a process and registration system for managing programs, applications, projects, mentoring, and evaluation.
+REST API backend for the NTI platform — a process and registration system for managing programs, applications, projects, mentoring, and evaluation.
 
-[[Repository](https://github.com/Bruskych)] · [[Frontend](https://github.com/Bruskych/FE_NTI)]
+🤖 [Backend Repository](https://github.com/Bruskych/BE_NTI) · 🎨 [Frontend Repository](https://github.com/Bruskych/FE_NTI)
 
 ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
+![Mailpit](https://img.shields.io/badge/Mailpit-3482A4?style=for-the-badge&logo=go&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 </div>
@@ -20,7 +24,7 @@ REST API backend for the NTI platform - a process and registration system for ma
 * **Core:** Laravel 13 & PHP 8.4
 * **Database & Caching:** MySQL 8, Redis
 * **Dev Environment:** Docker Compose, Mailpit (SMTP Testing)
-* **Auth & Security:** Laravel Sanctum, Spatie Laravel-Permission (RBAC)
+* **Auth & Security:** Secure token authentication via Laravel Sanctum and middleware-enforced RBAC using Spatie.
 * **Documentation:** OpenAPI / Swagger (L5-Swagger)
 
 ---
@@ -244,6 +248,31 @@ database/
     ├── RolePermissionSeeder.php    # Initial configuration for Spatie roles & permissions (Admin, Student)
     └── [Domain]Seeder.php          # Dummy data injection for local development
 ```
+
+## Testing Structure & Coverage
+
+```
+tests/
+├── Feature/                          # INTEGRATION & API TESTS (End-to-End HTTP Workflows)
+│   └── [Domain]Test.php              # Feature & endpoint validations (Auth, Application flows, RBAC security, Exports)
+│
+├── Unit/                             # ISOLATED UNIT TESTS (Core Business Logic & Models)
+│   └── [Model/Service]Test.php       # Isolated assertions for Eloquent models, relations, and standalone services
+│
+└── TestCase.php                      # TESTING BASEMENT (Global Setup & Bootstrapping)
+```
+
+---
+
+## 🗺️ Database Schema
+
+<p align="center">
+  <a href="https://dbdiagram.io/d/6a28a9ee25fc5bf036cf0a5b">
+    <img src=".github/assets/schema.svg" alt="NTI Database Schema" width="100%">
+  </a>
+  <br>
+  <span>💡 <i>Click on the image to open the interactive schema and explore relationships.</i></span>
+</p>
 
 ---
 
